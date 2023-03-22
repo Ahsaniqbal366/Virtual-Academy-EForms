@@ -1,0 +1,19 @@
+<ion-content>
+    <ion-list>
+        <ion-item button
+            (click)="this.dismissPopover('editPolicies');">
+            Edit
+        </ion-item>
+        <ion-item button
+            (click)="this.dismissPopover('renewPolicies');">
+            Renew
+        </ion-item>
+        <ion-item button
+            (click)="this.dismissPopover('removePolicies');">
+            Remove
+        </ion-item>
+        <ion-item button (click)="this.dismissPopover('close');">
+            Close
+        </ion-item>
+    </ion-list>
+</ion-content>

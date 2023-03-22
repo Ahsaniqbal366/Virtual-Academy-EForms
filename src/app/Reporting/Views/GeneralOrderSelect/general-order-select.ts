@@ -1,0 +1,162 @@
+import { Component, OnInit, ViewEncapsulation, Pipe, PipeTransform } from '@angular/core';
+import { IonicLoadingService } from '../../../shared/Ionic.Loading.Service';
+import { DNNEmbedService } from '../../../shared/DNN.Embed.Service';
+import { ReportingProvider as ReportingProvider } from '../../Providers/reporting.service';
+import * as ReportingModel from '../../Providers/reporting.model';
+
+// tslint:disable-next-line: max-line-length
+import { ActivatedRoute, Router } from '@angular/router';
+
+// define component
+@Component({
+    selector: 'reporting-general-order-select',
+    templateUrl: 'general-order-select.html',
+    styleUrls: ['../../reporting.page.scss'],
+
+})
+
+// create class for export
+export class ReportingGeneralOrderSelect implements OnInit {
+    // constructor -- define service provider
+    // The service provider will persist along routes
+    constructor(
+        private route: ActivatedRoute,
+        private router: Router,
+        private dnnEmbedService: DNNEmbedService,
+        private loadingService: IonicLoadingService,
+        public reportingProvider: ReportingProvider
+    ) {
+    }
+
+    /*******************************************
+    * PUBLIC VARIABLES
+    *******************************************/
+    public initialized: boolean;
+
+    public serverInfo: ReportingModel.ReportingServerInfo;
+
+    public hideHeaderBackButton: boolean;
+
+    public courseCardConfig: any;
+
+    public selectedCategory: any;
+
+    public searchFilterText: string;
+
+    public selectedUsers: number[];
+    public selectedCourses: number[];
+    public selectedGeneralOrders: number[];
+    public selectedRollCalls: number[];
+
+    public showHiddenTrainingYears: boolean = false;
+
+    /*******************************************
+    * PRIVATE VARIABLES
+    *******************************************/
+
+
+    /********************************************
+    * PUBLIC METHODS 
+    * *******************************************/
+    public onGenerateReportBtnClick() {
+        let dataView = this.reportingProvider.selectedReport.DataView;
+        //navigate to the report datatable view, which will trigger a request to the Reporting API to generate the report
+        this.router.navigate(['reporting/generateReport/' + dataView]);
+    }
+
+
+
+    /**
+     * [setGeneralOrderSelection] sets the value for selected general orders
+     * @param event Event package returned by [GeneralOrderSelect] component
+     */
+    public setGeneralOrderSelection(event: any) {
+        this.reportingProvider.selectedGeneralOrderSections = event;
+    }
+
+
+    public onCategoryChanged(event) {
+        this.selectedCategory = event;
+
+        this.reportingProvider.categories.forEach(category => {
+            if (category.CategoryID == event.CategoryID) {
+                category.GUIData.IsSelected = true;
+            } else {
+                category.GUIData.IsSelected = false;
+            }
+        });
+    }
+
+    public toggleHiddenTrainingYears(){
+        this.showHiddenTrainingYears = !this.showHiddenTrainingYears;
+    }
+    /********************************************
+    * PRIVATE METHODS 
+    * *******************************************/
+
+    
+
+    /**
+    * [_checkForRefresh] - Check paramMap and/or cached data for signs of a refresh.
+    */
+    private _checkForRefresh(): boolean {
+        return !this.reportingProvider.serverInfo;
+    }
+    /*******************************************
+    * SELF INIT
+    *******************************************/
+    ionViewWillEnter() {
+        this._init();
+    }
+
+
+    private async _init() {
+        await this.loadingService.presentLoading('Loading...');
+
+        if (this._checkForRefresh()) {
+            
+            this._onRefresh_getServerInfo();
+
+        }else{
+            this.initialized = true;
+            this.loadingService.dismissLoading();
+        }
+
+
+    }
+
+    private _onRefresh_getServerInfo(): void {
+        this.reportingProvider.getServerInfo().subscribe(
+            (serverInfo: any) => {
+                this.loadingService.dismissLoading();
+                this.initialized = true;
+            },
+            (error) => {
+                console.log('reporting-error: ', error);
+                this.loadingService.dismissLoading();
+                this.initialized = false;
+            }
+        );
+    }
+
+    ngOnInit() {
+        this.hideHeaderBackButton = this.dnnEmbedService.getConfig().IsEmbedded;
+        /**
+         * The Ionic app can be embedded in an <iframe> on the DNN site. Check for that case now.
+         * We really only need to run [tryMessageDNNSite] on the main app/component ngInit.
+         * It will post a message out to the DNN site so the DNN site can will know ionic has loaded.
+         */
+        this.dnnEmbedService.tryMessageDNNSite('ionic-loaded');
+
+        //define course card config
+        //this handles the display of sections on [CourseCardContents] component
+        //TODO: define a better system for this
+        this.courseCardConfig = {
+            descriptionConfig: {
+                showFullDescription: false
+            }
+        }
+
+        this._init();
+    }
+}

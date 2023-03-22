@@ -1,0 +1,790 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import "~@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+
+// https://github.com/ng-select/ng-select
+@import "~@ng-select/ng-select/themes/default.theme.css";
+
+// Our custom overrides to included libraries.
+@import 'theme/Overrides/imports-all-overrides';
+
+// courseSelect Module scss
+@import 'theme/courseselect/courseselect';
+
+@import "src/app/eforms/Styles.scss";
+
+
+
+/**
+ * JTC 09/11/2020
+ * -----
+ * Sizes defined in [$ionic-size-breakpoints] taken from https://ionicframework.com/docs/layout/grid
+ */
+ $ionic-size-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+);
+
+.tms-light-shadow {
+  border-radius: 2px;
+  box-shadow: 1px 1px 2px 1px rgb(0 0 0 / 10%), 0 1px 1px 0 rgb(0 0 0 / 4%),
+    0 2px 1px -1px rgb(0 0 0 / 3%);
+}
+
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.white-text {
+  color: white;
+}
+
+
+/* https://forum.ionicframework.com/t/ionic-4-modal-size/152372/2
+   It's likely due to how deep the modal itself is included, but this 
+   css class in global.scss seems to be the only one that takes effect*/
+@media (min-width: 992px) {
+  .centered-half-modal .modal-wrapper {
+    height: 50%;
+    width: 50%;
+    top: 25%;
+    left: 25%;
+    position: absolute;
+    display: block;
+  }
+}
+
+/* Ensure that click event items have a cursor pointer */
+.pointer {
+  cursor: pointer;
+}
+
+/********************GENERAL FIELD STYLES********************/
+.form-control,
+input[type="search"] {
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Keeps elements fitting best on smaller screens */
+.no-padding {
+  padding: 0;
+}
+
+/* This will force items to full width, regardless of name length */
+.full-width-item {
+  width: 100%;
+}
+
+/**
+ * Custom sizing for ion-modal elements. This likely has to be a global style because modals aren't
+ * enclosed in their child containers.
+ */
+ .small-modal-pwa {
+  .modal-wrapper {
+    // Not using square dimensions for this case because monitors are USUALLY wider then they are tall.
+    max-width: 30vw;
+    max-height: 50vh;
+  }
+}
+
+.medium-modal-pwa {
+  .modal-wrapper {
+    // Not using square dimensions for this case because monitors are USUALLY wider then they are tall.
+    min-width: 60vw;
+    min-height: 75vh;
+  }
+}
+/**
+ * Custom sizing for ion-modal elements. This likely has to be a global style because modals aren't
+ * enclosed in their child containers.
+ */
+.large-modal-pwa {
+  .modal-wrapper {
+    min-width: 90vw;
+    min-height: 90vh;
+  }
+}
+
+ion-item.ion-no-padding {
+  /**
+   * JTC - 03/24/2020
+   * Had an issue w/ the [.ion-no-padding] CSS class no properly removing the RIGHT
+   * padding on <ion-item> elements. This fixes it.
+   */
+  --inner-padding-end: 0px;
+}
+
+/* Table Styling */
+.sls-table-item {
+  @media (max-width: 991px){height: 50px;}
+    @media (min-width: 768px){height: 42px;}
+  align-items: baseline;
+
+  .sls-table-row-expanded {
+    z-index: 2;
+    box-shadow: 0 4px 10px -2px #bbb;
+    border-bottom: 1px solid #bbb;
+  }
+
+  .sls-table-cell {
+    border-right: 1px solid var(--ion-color-secondary-shade);
+    height: 100%;
+  }
+
+  .sls-table-header-row {
+    @media (max-width: 991px){height: 50px;}
+    @media (min-width: 768px){height: 42px;}
+    align-content: space-evenly;
+    // Special color used for borders in the highlighted table header.
+    .sls-table-cell {
+      border-right-color: var(--ion-color-primary-tint);
+    }
+  }
+
+  .sls-body-row {
+    @media (max-width: 991px){height: 50px;}
+    @media (min-width: 768px){height: 42px;}
+    align-content: space-evenly;
+    .sls-table-cell-raised {
+      z-index: 2;
+      box-shadow: 5px 0 10px -2px #ddd;
+    }
+  }
+}
+/* END Table Styling */
+
+// Centers any object and evenly spaced
+.center-any-object {
+  display: flex;
+  justify-content: center;
+  justify-content: space-evenly;
+  align-items: center
+}
+
+// Hides overflowing text rather than wrap
+.hide-overflow{
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+// Vertically center content
+.vert-center{
+  position:relative;
+  top:50%; 
+  transform: translateY(-50%);
+}
+
+// Custom transparent ripple effect
+.transparent-ripple{
+  --ripple-color: transparent;
+  --background-hover: transparent;
+}
+
+// Custom color and opacity placeholder text
+.custom-placeholder{
+  --placeholder-color: #0033a1;
+  --placeholder-opacity: 1;
+}
+
+// Small custom modal wrapper for signature editor
+.small-modal {
+  .modal-wrapper {
+    min-width: 50vw;
+    max-height: 40vh;
+  }
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.vertical-center {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.dark-dialog {
+  mat-dialog-container {
+    color: #ffffff !important;
+    background: #1d1f22 !important;
+
+    .button-solid {
+      --background: #ffb700;
+      color: #000000;
+    }
+  }
+  // As the material is updated and mat -> mat-mdc- prefix changed
+  mat-mdc-dialog-container {
+    color: #ffffff !important;
+    background: #1d1f22 !important;
+
+    .button-solid {
+      --background: #ffb700;
+      color: #000000;
+    }
+  }
+}
+
+.alertButton {
+  button.alert-button.Danger {
+    color: red;
+  }
+}
+
+.button-with-left-mat-icon {
+  padding-left: 2px !important;
+  padding-right: 10px !important;
+
+  mat-icon {
+    vertical-align: top !important;
+    font-size: 1.25em !important;
+  }
+// As the material is updated and mat -> mat-mdc- prefix changed
+  mat-mdc-icon {
+    vertical-align: top !important;
+    font-size: 1.25em !important;
+  }
+}
+
+.squared-and-bordered-searchbar {
+  border-radius: 0px;
+  --border-radius: 0px;
+  box-shadow: none;
+  --box-shadow: none;
+  border: 1px solid var(--ion-color-outline-gray);
+  --background: transparent;
+
+  padding: 0;
+
+  .searchbar-search-icon { display:none; width:0; height:0; }
+
+  .searchbar-input {
+    padding-left: 9px !important;
+  }
+}
+
+// mat-checkbox with this class will be solid when checked.
+.mat-checkbox-no-checkmark {
+  .mat-checkbox-layout {
+    .mat-checkbox-inner-container {
+      .mat-checkbox-background {
+        .mat-checkbox-checkmark {
+          opacity: 0;
+        }
+      }
+    }
+  }
+}
+
+.custom-checkbox {
+  font-size: 15px;
+  .mat-checkbox-inner-container {
+    color: #666;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+// Buttons with gold border
+.gold-border-button:not(.mat-button-disabled) {
+  border-color: var(--ion-color-tms-gold);
+}
+.gold-border-button:hover {
+  background-color: var(--ion-color-hover-gray);
+}
+
+// Buttons with gray border
+.gray-border-button:not(.mat-button-disabled) {
+  border-color: var(--ion-color-outline-gray);
+}
+.gray-border-button:hover {
+  background-color: var(--ion-color-hover-gray);
+}
+
+// Force mat-stroked-button elements to have matching border and text color and squared border.
+.mat-stroked-button {
+  color: var(--ion-color-active-gray);
+  border-radius: 0px !important;
+  --border-radius: 0px !important;
+
+  font-size: 15px;
+}
+
+.taller-button {
+  height: 40px;
+
+  mat-icon {
+    font-size: 1.5em !important;
+  }
+  // As the material is updated and mat -> mat-mdc- prefix changed
+  mat-mdc-icon {
+    font-size: 1.5em !important;
+  }
+}
+
+// Makes the checkbox border match the color scheme of parent elements.
+.mat-checkbox-frame {
+  border-color: unset;
+}
+
+// Makes textarea background and border colors match the color scheme of parent elements.
+textarea {
+  background-color: unset;
+  border-color: var(--ion-color-tms-gray);
+}
+
+.mat-select-value {
+  color: unset;
+}
+.mat-select-arrow {
+  color: unset;
+}
+
+.mat-table {
+  background-color: unset;
+
+}
+
+// Makes mat-dialogs have squared corners and no extra padding.
+.custom-mat-dialog-container {
+  mat-dialog-container {
+    border-radius: 0px !important;
+    padding: 0px !important;
+  }
+// As the material is updated and class:  mat-dialog-container  change to class: mat-mdc-dialog-container
+  mat-mdc-dialog-container{
+    border-radius: 0px !important;
+    padding: 0px !important;
+  }
+
+  .dialog-content-wrapper {
+    padding: 20px;
+    padding-top: 0px;
+  }
+}
+
+// Makes ion-cards have squared corners.
+ion-card {
+  border-radius: 0px;
+}
+
+// Controls font size for most of our titles and headers
+.custom-title-font-size {
+  font-size: 20px;
+}
+
+// Force mat-form-field elements to have matching border and text color and have squared borders.
+.custom-mat-form-field {
+  mat-label {
+    margin-left: 11px;
+  }
+  
+  mat-form-field {
+    padding-top: 7px;
+    height: 55px;
+  }
+
+  mat-form-field:disabled {
+    background-color: var(--ion-color-tms-light-gray-tint);
+  }
+// As the material is updated and mat -> mat-mdc- prefix changed
+  mat-mdc-label {
+    margin-left: 11px;
+  }
+  
+
+  mat-mdc-form-field {
+    padding-top: 7px;
+    height: 55px;
+  }
+
+  mat-mdc-form-field:disabled {
+    background-color: var(--ion-color-tms-light-gray-tint);
+  }
+
+
+  ion-searchbar{
+    --box-shadow:0 0 0 0;
+    padding-top: 12px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    height: 55px;
+    color:black;
+
+    .searchbar-input-container{
+      input{
+        border: 1px solid;
+        border-color: var(--ion-color-tms-light-gray);
+        border-radius: 0px;
+        padding-bottom: 7px;
+        color:var(--ion-color-black);
+      }
+
+      input::placeholder{
+        color: black;
+      }
+    }
+    
+  }
+
+  ng-select {
+    padding-top: 7px;
+    height: 55px;
+    color:black;
+  }
+
+  input {
+    height: 30px;
+  }
+
+  .mat-form-field-outline {
+    color: var(--ion-color-tms-light-gray) !important;
+    top: 0 !important;
+
+    .mat-form-field-outline-start {
+      border-radius: 0px;
+    }
+
+    .mat-form-field-outline-end {
+      border-radius: 0px;
+    }
+  }
+  .mat-form-field-infix {
+    border-top: none;
+  }
+  .mat-form-field-suffix {
+    top: unset !important;
+    align-self: center;
+  }
+  .mat-form-field-label {
+    color: unset !important;
+  }
+  mat-label {
+    color: unset;
+  }
+  // As the material is updated and mat -> mat-mdc- prefix changed
+  mat-mdc-label {
+    color: unset;
+  }
+
+  .standard-input {
+    font-size: 16px;
+    padding: 5px;
+  }
+
+  // Makes sure text color keeps contrast in dark mode and is visibly different from standard input text.
+  input::placeholder {
+    color: var(--ion-color-tms-light-gray);
+    opacity: 0.8;
+  }
+  .mat-input-element:disabled {
+    color: var(--ion-color-tms-dark-gray-shade);
+    opacity: 0.6;
+  }
+  .mat-input-element {
+    color: var(--ion-color-black);
+  }
+  textarea::placeholder {
+    color: var(--ion-color-tms-light-gray);
+    opacity: 0.8;
+  }
+ 
+  mat-label {
+    font-size: 15px;
+  }
+  // As the material is updated and mat -> mat-mdc- prefix changed
+ mat-mdc-label {
+  font-size: 15px;
+}
+}
+
+/* Used to remove excess padding/margin from cards so content is viewable on mobile screens */
+@media (max-width: 700px) {
+  .responsiveCard {
+    ion-card-content {
+      padding: 8px;
+    }
+    ion-card-header {
+      padding: 8px;
+    }
+    margin: 1px;
+  }
+}
+
+/* Menu shown when the avatar is clicked */
+.logout-menu-popover {
+  position: absolute;
+
+  .popover-content {
+    border-radius: 0px;
+    left: unset !important;
+    right: 0px;
+    width: fit-content;
+  }
+
+  ion-text{
+    font-size: 15px;
+  }
+
+  ion-icon {
+    margin-right: 15px;
+  }
+
+  ion-list {
+    background: var(--ion-color-true-black);
+    padding: 20px;
+    padding-top: 0px;
+    width: 300px;
+  }
+
+  ion-toggle {
+    zoom: 0.8;
+    padding-left: 0px;
+  }
+
+  ion-toggle::part(track) {
+    --background: var(--ion-color-secondary-shade);
+  }
+}
+//Offset the top based on the header height.
+@media (max-width: map-get($ionic-size-breakpoints, md)) {
+  .logout-menu-popover {
+    .popover-content {
+      top: 168px;
+    }
+  }
+}
+@media (min-width: map-get($ionic-size-breakpoints, md)) {
+  .logout-menu-popover {
+    .popover-content {
+      top: 168px;
+    }
+  }
+}
+
+/* Notifications Menu */
+.notifications-menu-popover {
+  position: absolute;
+
+  .popover-content {
+    border-radius: 0px;
+    left: unset !important;
+    right: 0px;
+    width: fit-content;
+  }
+
+  ion-list {
+    background: var(--ion-color-true-black);
+    padding: 20px;
+    padding-top: 0px;
+    width: 350px;
+  }
+
+  ion-text{
+    font-size: 15px;
+  }
+
+  ion-icon {
+    font-size: x-large;
+  }
+
+  ion-card {
+    padding: 0px;
+    margin: 0px;
+  }
+}
+//Offset the top based on the header height.
+@media (max-width: map-get($ionic-size-breakpoints, md)) {
+  .notifications-menu-popover {
+    .popover-content {
+      top: 168px;
+    }
+  }
+}
+@media (min-width: map-get($ionic-size-breakpoints, md)) {
+  .notifications-menu-popover {
+    .popover-content {
+      top: 168px;
+    }
+  }
+}
+
+// Segment fully highlights dark blue when selected instead of just an indicator along the bottom.
+.segment-checked-full-color-blue {
+  background: var(--ion-color-hover-gray);
+
+  ion-segment-button {
+    text-transform: none; 
+    font-size: 20px;
+
+    --background-checked: var(--ion-color-tms-dark-blue);
+    --indicator-color: var(--ion-color-hover-gray);;
+
+    ion-label{
+      color: var(--ion-color-black);
+    }
+  }
+  .segment-button-checked {
+    ion-label {
+      color: var(--ion-color-tms-dark-blue-contrast);
+    }
+  }
+}
+
+// Segment fully highlights dark gray when selected instead of just an indicator along the bottom.
+.segment-checked-full-color-gray {
+  ion-segment-button {
+    --background-checked: var(--ion-color-tms-dark-gray);
+
+    ion-label{
+      color: var(--ion-color-black);
+    }
+  }
+  .segment-button-checked {
+    ion-label {
+      color: var(--ion-color-tms-dark-gray-contrast);
+    }
+  }
+
+  ion-segment-button::part(indicator) {
+    opacity: 0;
+  }
+}
+
+.segment-button-with-wrapping-text {
+  max-width: none;
+
+  ion-label {
+    white-space: normal;
+  }
+}
+
+.segment-button-left-aligned {
+  text-transform: none;
+  text-align: left;
+
+  ion-label {
+    align-self: start;
+    width: 100%;
+    white-space: normal;
+  }
+}
+
+/* 
+*  Segment buttons treated as a vertical list on larger screen and as left justified columns 
+*  within rows for smaller screen sizes
+*/
+@media (min-width: map-get($ionic-size-breakpoints, lg)) {
+  .segment-button-list-on-large-screen {
+    justify-content: left;
+    display: block;
+    width: 300px;
+
+    ion-segment-button {
+      text-transform: none;
+      text-align: left;
+
+      ion-label {
+        align-self: start;
+        width: 100%;
+        white-space: normal;
+      }
+    }
+  }
+}
+@media (max-width: map-get($ionic-size-breakpoints, lg)) {
+  .segment-button-list-on-large-screen {
+    justify-content: left;
+
+    ion-segment-button {
+      text-transform: none;
+      min-width: 60px;
+      min-height: 30px;
+      height: 30px;
+    }
+  }
+}
+
+.description-popover {
+  .popover-content {
+    border: 1px solid var(--ion-color-white-contrast);
+  }
+}
+
+.card-shadow-effect {
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 0 9px 8px -3px rgb(64 60 67 / 24%), 8px 0 8px -7px rgb(64 60 67 / 24%), -8px 0 8px -7px rgb(64 60 67 / 24%);
+}
+
+
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+
+  &.badge-light {
+    color: #212529;
+    background-color: #e4f1ff;
+  }
+
+  &.badge-warn {
+    color: #212529;
+    background-color: #ffd0df;
+  }
+}
+
+.alert-box {
+  // font-size: 12px;
+  font-family: monospace;
+  font-weight: bold;
+  letter-spacing: 2px;
+  &.danger {
+    color: #ff5555;
+  }
+}

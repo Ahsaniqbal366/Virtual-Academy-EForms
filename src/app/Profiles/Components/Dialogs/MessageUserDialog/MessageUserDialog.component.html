@@ -1,0 +1,25 @@
+<div class="expanding-dialog-content">
+	<ion-card-header mat-dialog-title>
+		<ion-label>Send Internal Message</ion-label>
+	</ion-card-header>
+	<ion-card-content *ngIf="this.initialized" mat-dialog-content>
+		<ion-label>Send to {{this.message.recipientName}}</ion-label>
+
+		<ion-item>
+			<ion-label position="stacked">Subject</ion-label>
+			<ion-input [(ngModel)]="this.message.subject" name="subject"></ion-input>
+		</ion-item>
+
+		<ion-item>
+			<ion-label position="stacked">Body</ion-label>
+		</ion-item>
+
+		<ckeditor [editor]="this.ckeditorInstance" [config]="this.ckeditorConfig" [(ngModel)]="this.message.body">
+		</ckeditor>
+		
+	</ion-card-content>
+	<ion-card-header *ngIf="this.initialized" mat-dialog-actions>
+		<ion-button (click)="closeDialog()">Cancel</ion-button>
+		<ion-button [disabled]="this.message.body.length <= 0" (click)="sendMessage()">Send</ion-button>
+	</ion-card-header>
+</div>

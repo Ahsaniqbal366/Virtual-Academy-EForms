@@ -1,0 +1,75 @@
+<div class="user-select-component" ng-cloak>
+
+    <ion-row>
+
+    </ion-row>
+    <ion-row class="space-between">
+        <ion-col size="3">
+            <div class="custom-mat-form-field">
+                <ng-select [items]="this.userSelectProvider.roles" bindLabel="RoleName" bindValue="RoleID"
+                    style="width:100%;" class="override-shorter-height ion-no-padding" placeholder="Rank"
+                    appearance="outline" [multiple]="true" [(ngModel)]="this.selectedRoles"
+                    (ngModelChange)="this.onRoleSelectionChanged()" typeToSearchText="Type to search for a category">
+
+                </ng-select>
+            </div>
+           
+        </ion-col>
+        <!--Officer selection column-->
+        <ion-col class="course-assignment-table-column" size="3">
+
+            <!--Officer repeater search textbox-->
+            <div class="custom-mat-form-field">
+
+                <ion-searchbar debounce="300" [(ngModel)]="this.officerSearchFilterText" style="width:100%;"
+                    (ngModelChange)="onOfficerFilterTextChange();">
+                </ion-searchbar>
+
+            </div>
+
+            
+
+
+        </ion-col>
+        <ion-col size="6" *ngIf="maxSelections == 0">
+            <div class="" style="padding-top:15px;padding-right:15px;float:right;">
+
+                <ion-label style="margin-right:10px;">Select All</ion-label>
+
+                <ion-checkbox item-right secondary (ionChange)="this.onSelectAllOfficersChange();"
+                    [(ngModel)]="this.selectAllOfficersFlag"></ion-checkbox>
+
+            </div>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col>
+            <div>
+                {{officerSearchFilterWarningMessage}}
+            </div>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col>
+
+            <!--Officer repeater-->
+            <div class="officer-list-wrapper">
+                <ion-item *ngFor="let officer of this.userSelectProvider.officers " title="{{officer.FullName}}"
+                    class="course-assignment-officer-item" ngClass="{'is-selected': officer.GUIData.IsSelected}"
+                    [hidden]="officer.GUIData.IsHiddenBySearch">
+                    <img class="officer-photo" src="{{officer.ProfilePicture}}" />
+                    <p>
+                        {{officer.FullName}} ({{officer.Rank}})
+                    </p>
+                    <ion-checkbox slot="end" [(ngModel)]="officer.GUIData.IsSelected"
+                        disabled="{{this.hasReachedSelectionLimit && !officer.GUIData.IsSelected}}"
+                        (ngModelChange)="onOfficerRowClicked(officer);"></ion-checkbox>
+                </ion-item>
+            </div>
+            <div *ngIf="this.officerSearchFilterIsActive" class="search-filter-warning bg-danger">
+                <em>{{this.officerSearchFilterWarningMessage}}</em>
+            </div>
+        </ion-col>
+
+    </ion-row>
+</div>

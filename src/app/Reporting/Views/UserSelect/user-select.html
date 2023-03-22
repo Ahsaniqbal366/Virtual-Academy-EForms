@@ -1,0 +1,43 @@
+<ion-content *ngIf="!this.initialized" class="reporting-page-wrapper" color="secondary">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
+
+<ion-content *ngIf="this.initialized" class="reporting-page-wrapper" color="secondary">
+    <div class="reporting-user-select-wrapper">
+        <ion-row>
+            <ion-col class=" ion-no-padding">
+                <report-parameters (onFiltersApplied)="this.onGenerateReportBtnClick()"></report-parameters>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+
+            <ion-col size-xl="12" size-lg="12" size-md="12" size-sm="12" class="ion-no-padding">
+                <ion-card>
+                    <ion-card-content>
+                        <div style="position:relative;">
+                            <user-selector-table (onUsersSelected)="setUserSelection($event);"></user-selector-table>
+                        </div>
+                    </ion-card-content>
+                </ion-card>
+
+
+            </ion-col>
+
+        </ion-row>
+    </div>
+</ion-content>

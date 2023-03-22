@@ -1,0 +1,35 @@
+
+<ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="this.dismiss();">
+          <ion-icon name="close" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>
+        <span>
+          Preview Video
+        </span>
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+    <ion-content>
+
+        <div style="padding: 16px;">
+
+            <p>{{this.course.CourseName}}</p>
+
+            <video controls
+                   controlsList="nodownload"
+                   class="noContextMenu"
+                   preload="metadata"                   
+                   
+                   style="max-width: 100%; height: auto;">
+                <source src="{{this.course.PromoVideoPath}}"
+                        type="video/mp4" />
+            </video>
+
+        </div>
+    </ion-content>
+
+

@@ -1,0 +1,140 @@
+<!-- Loading State: Skeleton Elements -->
+<div *ngIf="!this.initialized">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</div>
+
+<!-- Initialized State: Potentially in Error -->
+<div *ngIf="this.initialized">
+    <!-- Error State -->
+    <ion-item *ngIf="this.hasError" color="danger">
+        <ion-label>
+            <h3>
+                <ion-text animated style="width: 50%">
+                    An Error Occurred
+                </ion-text>
+            </h3>
+            <pre *ngIf="this.isDevMode">{{this.apiResonseError | json}}</pre>
+        </ion-label>
+    </ion-item>
+    <!------- Ready State, displayed under any errors ------->
+    <!-- Manager toggle to select what kind of Recipient to select: User, Section, or (Districts and/or Groups) -->
+    <ion-item *ngIf="this.messageCenterProvider.serverInfo.showToSectionRadioBtn">
+        <ion-label>
+            Recipient Type
+        </ion-label>
+        <ion-radio-group [(ngModel)]="this.messageCenterProvider.messageToBeSent.GUIData.recipientType">
+            <ion-row>
+                <ion-item>
+                    <ion-label>User(s)</ion-label>
+                    <ion-radio value="users"></ion-radio>
+                </ion-item>
+                <ion-item>
+                    <ion-label>Section</ion-label>
+                    <ion-radio value="section"></ion-radio>
+                </ion-item>
+                <ion-item>
+                    <ion-label>District(s) and/or Group(s)</ion-label>
+                    <ion-radio value="districts"></ion-radio>
+                </ion-item>
+                <ion-item>
+                    <ion-label>All Users</ion-label>
+                    <ion-radio value="allUsers"></ion-radio>
+                </ion-item>
+            </ion-row>
+        </ion-radio-group>
+    </ion-item>
+    <div [ngSwitch]="this.messageCenterProvider.messageToBeSent.GUIData.recipientType">
+        <div *ngSwitchCase="'users'">
+            <ion-item button
+                (click)="this.onRecipientsHeaderClick($event)">
+                <ion-row>
+                    <ion-col>
+                        <ion-label>
+                            User(s):
+                        </ion-label>
+                    </ion-col>
+                    <ion-col class="ion-float-right" *ngFor="let loopedRecipient of this.messageCenterProvider.messageToBeSent.Recipients">
+                        <ion-chip>
+                            <ion-avatar [hidden]="!loopedRecipient.ProfilePicture">
+                                <img src="{{loopedRecipient.ProfilePicture}}">
+                            </ion-avatar>
+                            <ion-label>{{loopedRecipient.FullName}}</ion-label>
+                            <ion-icon name="close-circle" (click)="this.onRemoveRecipientClick($event, loopedRecipient);"></ion-icon>
+                        </ion-chip>
+                    </ion-col>
+                </ion-row>
+                <ion-icon slot="end" name="caret-down"></ion-icon>
+            </ion-item>
+        </div>
+        <div *ngSwitchCase="'section'">
+            <ion-item>
+                <ion-label>
+                    Section:
+                </ion-label>
+                <ion-select interface="action-sheet" [(ngModel)]="this.messageCenterProvider.messageToBeSent.Section">
+                    <ion-select-option  *ngFor="let loopedSection of this.messageCenterProvider.serverInfo.Sections"
+                        [value]="loopedSection.SectionID">{{loopedSection.SectionCallID}}</ion-select-option>
+                </ion-select>
+            </ion-item>
+        </div>
+        <div *ngSwitchCase="'districts'">
+            <ion-item>
+                <ion-label>
+                    District(s):
+                </ion-label>
+                <ion-select multiple [(ngModel)]="this.messageCenterProvider.messageToBeSent.Districts">
+                    <ion-select-option *ngFor="let loopedDistrict of this.messageCenterProvider.serverInfo.Districts"
+                        [value]="loopedDistrict.ID">{{loopedDistrict.Name}}</ion-select-option>
+                </ion-select>
+            </ion-item>
+            <ion-item>
+                <ion-label>
+                    Group(s):
+                </ion-label>
+                <ion-select multiple [(ngModel)]="this.messageCenterProvider.messageToBeSent.Groups">
+                    <ion-select-option *ngFor="let loopedGroup of this.messageCenterProvider.serverInfo.Groups"
+                        [value]="loopedGroup.RoleID">{{loopedGroup.RoleName}}</ion-select-option>
+                </ion-select>
+            </ion-item>
+        </div>
+    </div>
+    <ion-item>
+        <ion-label>
+            Subject:
+        </ion-label>
+        <ion-input required="True" type="text" [(ngModel)]="this.messageCenterProvider.messageToBeSent.Subject"></ion-input>
+    </ion-item>
+    <ion-item>
+        <ion-label>
+            Attachments:
+        </ion-label>
+        <ion-input slot="end" (change)="this.onFileUploaded($event)" type="file"
+            name="file" multiple></ion-input>
+        <ion-progress-bar *ngIf="this.isUploadingAttachment" type="indeterminate"></ion-progress-bar>
+    </ion-item>
+    <ion-item lines="none">
+        <ion-label>
+            Message:
+        </ion-label>
+    </ion-item>
+    <ion-item>
+        <ckeditor style = "padding-bottom: 10px;" class="full-width-item" [editor]="this.ckeditorInstance" [config]="this.ckeditorConfig"
+            [(ngModel)]="this.messageCenterProvider.messageToBeSent.Message">
+        </ckeditor>
+    </ion-item>
+</div>

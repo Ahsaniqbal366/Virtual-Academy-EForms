@@ -1,0 +1,52 @@
+<div style="padding: 24px;" >
+<!-- <ion-header> -->
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="this.dismiss(false);">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <span>
+        Send Message to <strong> {{this.name}} </strong>
+      </span>
+    </ion-title>
+  </ion-toolbar>
+<!-- </ion-header> -->
+
+<!-- <ion-content> -->
+  <form #reminderForm="ngForm">
+  <ion-row>
+    <ion-col size="12">
+      <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+        <mat-label>Subject</mat-label>
+        <input matInput  [formControl]="messageSubject">
+      </mat-form-field>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col size="12">
+      <mat-label floatLabel="always" class="matFormLabel" > Message </mat-label>
+    </ion-col>
+    <ion-col size="12">
+        <ckeditor matInput [editor]="Editor" tagName="textarea" style="color:#737373 !important;" required [formControl]="messageText"></ckeditor>
+    </ion-col>
+  </ion-row>
+</form>
+<!-- </ion-content> -->
+
+<ion-footer>
+    <ion-row>
+      <ion-col size="12" style="display: flex; justify-content: space-between;">
+        <!-- <ion-col class="add-question-position" size="auto"> -->
+          <ion-button (click)="this.dismiss(false)" fill="outline">
+            Cancel
+          </ion-button>
+          <ion-button (click)="this.onConfirm();  $event.stopPropagation()" color="success" fill="outline">
+            Send
+          </ion-button>
+      </ion-col>
+      <!-- </ion-col> -->
+    </ion-row>
+</ion-footer>
+</div>

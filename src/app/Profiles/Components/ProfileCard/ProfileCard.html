@@ -1,0 +1,51 @@
+<ion-card style="padding: 8px; border: 2px solid #6bc04b; border-radius: 10px;">
+
+    <!-- Profile quick bar -->
+    <ion-card-header style="padding: 0; margin: 0">
+        <ion-avatar>
+            <ion-img src="{{this.profile.Photopath || 'assets/images/default-profile-pic-profile.png'}}"
+                class="this.profile-image-card"></ion-img>
+        </ion-avatar>
+        <div style="margin-left: 8px">
+            <ion-card-title>{{this.profile.Name}}</ion-card-title>
+            <ion-card-subtitle *ngIf="this.profile.Jobtitle">
+                <ion-text style="font-style: italic;">{{this.profile.Jobtitle}}</ion-text>
+            </ion-card-subtitle>
+            <ion-card-subtitle *ngIf="this.profile.Organization">
+                <ion-text
+                    style="font-style: italic;">{{this.profile.Organization ? this.profile.Organization : "N/A"}}
+                </ion-text>
+            </ion-card-subtitle>
+        </div>
+    </ion-card-header>
+    <ion-card-content style="margin: 16px 0 16px 0">
+
+        <!-- Profile basic information -->
+        <ion-list>
+            <ion-item>
+                <ion-label position="stacked">Email: </ion-label>
+                <ion-text style="white-space: break-spaces; word-break: break-word;">{{this.profile.Email ? this.profile.Email : "N/A"}}</ion-text>
+            </ion-item>
+            <ion-item *ngIf="!this.profile.HideCellPhone">
+                <ion-label position="stacked">Cell: </ion-label>
+                <ion-text style="white-space: break-spaces; word-break: break-word;">{{this.profile.Cell ? this.profile.Cell : "N/A"}}</ion-text>
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">Office: </ion-label>
+                <ion-text style="white-space: break-spaces; word-break: break-word;">{{this.profile.Office ?  this.profile.Office : "N/A" }}</ion-text>
+            </ion-item>
+            <ion-item *ngIf="this.showSessionSearch">
+                <ion-label position="stacked">Session: </ion-label>
+                <ion-text style="white-space: break-spaces; word-break: break-word;">{{this.profile.Session ?  this.profile.Session : "N/A" }}</ion-text>
+            </ion-item>
+        </ion-list>
+
+
+    </ion-card-content>
+
+
+    <!-- Profile more information && message button -->
+    <ion-button (click)="this.openAdditionalInfoDialog(this.profile)">More information</ion-button>
+    <ion-button (click)="this.openMessageDialog(this.profile)">Message</ion-button>
+
+</ion-card>

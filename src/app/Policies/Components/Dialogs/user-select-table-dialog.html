@@ -1,0 +1,24 @@
+<div style="padding: 16px 24px 24px">
+
+
+  <h2 mat-dialog-title class="policy-modal-title margin-0">
+  <ion-row class="full-width-item ion-align-items-center" style="position: relative;top: -9px; "  >
+    <ion-col class>
+      Assign Users to Policy
+    </ion-col>
+    <ion-col size="auto">
+      <ion-button (click)="this.closeDialog();" id="questionClose" fill="clear" style="float: right;margin: 0;position: relative;right: -13px;;">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</h2>
+<ion-text style="padding-left:4px">Select All: </ion-text> 
+          <ion-checkbox 
+          [(ngModel)]="this.isSelectAllUser"
+          (ionChange)="selectAllChecked($event)"></ion-checkbox>
+<user-selector-table (onUsersSelected)="this._emitSelectedUsers($event)" [selectedValues]="sendUserData()" [isSelectAll]="this.isSelectAllUser"></user-selector-table>
+<ion-button (click)="assignUser()" size="small" color="success" style="float: right; margin: 0 0 24px;">
+  Assign
+</ion-button>
+</div>

@@ -1,0 +1,70 @@
+ng-select.ng-select-single.override-shorter-height {
+  /**
+   * Purpose of this css class is to help the ng-select elements fit in better with our 
+   * height overrides to other angular md form field controls.
+   */
+
+  padding-bottom: 0;
+
+  .ng-select-container.ng-appearance-outline {
+    min-height: 45px;
+    border-radius:0px;
+
+    // Scoot the ddl buttons further down now that we've reduced the height.
+    .ng-arrow-wrapper {
+      bottom: 11px;
+    }
+    .ng-clear-wrapper {
+      // Scoot the ddl buttons further down now that we've reduced the height.
+      bottom: 9px;
+    }
+
+    // Prevents the input text from being too far left and overlapping with outlines.
+    .ng-value-container .ng-input>input{
+      padding: 0 12px;
+    }
+  }
+
+  // Prevents the select options from overlapping with the text input.
+  .ng-dropdown-panel {
+    top: 40px;
+  }
+
+  .ng-placeholder{
+    color:black !important;
+}
+}
+
+ng-select.ng-select-multiple.override-shorter-height {
+  /**
+   * Purpose of this css class is to help the ng-select elements fit in better with our 
+   * height overrides to other angular md form field controls.
+   */
+
+  padding-bottom: 0;
+
+  .ng-select-container.ng-appearance-outline {
+    min-height: 45px;
+    border-radius:0px;
+    border-color: var(--ion-color-tms-light-gray);
+    color:black;
+
+    .ng-value-container .ng-placeholder{
+      top:10px;
+      color: black;
+    }
+    // Prevents the input text from being too far left and overlapping with outlines.
+    .ng-value-container .ng-input>input{
+      padding: 0 12px;
+    }
+  }
+
+  // Prevents the select options from overlapping with the text input.
+  .ng-dropdown-panel {
+    top: 40px;
+  }
+
+
+}
+
+

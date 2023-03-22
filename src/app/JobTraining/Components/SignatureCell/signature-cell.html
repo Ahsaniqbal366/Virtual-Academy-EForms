@@ -1,0 +1,28 @@
+<div *ngFor="let signature of Signatures">
+  <div [ngSwitch]="signature.SignatureReceived">
+    <div *ngSwitchCase="true">
+      <ion-row>
+        <ion-icon name="checkmark"></ion-icon>
+        <ion-label class="ion-align-self-start">
+          {{signature.SignatureName}}
+        </ion-label>
+      </ion-row>
+    </div>
+    <div *ngSwitchCase="false">
+      <ion-row>
+        <ion-icon name="remove"></ion-icon>
+        <ion-label class="ion-align-self-start">
+          {{signature.SignatureName}}
+        </ion-label>
+      </ion-row>
+    </div>
+    <div *ngSwitchDefault>
+      <ion-row>
+        <ion-icon name="remove"></ion-icon>
+        <ion-label class="ion-align-self-start">
+          {{signature.SignatureName}}
+        </ion-label>
+      </ion-row>
+    </div>
+  </div>
+</div>

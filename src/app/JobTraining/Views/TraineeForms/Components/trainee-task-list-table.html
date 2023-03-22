@@ -1,0 +1,125 @@
+<div class="trainee-forms-wrapper" *ngIf="this.initialized">
+    <ion-list lines="full" class="jt-table ion-no-padding">
+        <ion-header>
+            <!-- Search bar - shown when a form is open. 
+            Otherwise a search bar is shown on the parent view. 
+            -----
+            We are using [hidden] on the search bar so the connected 
+            search bar in the parent control can affect this (ionChange).
+            If we use *ngIf this searchbar can't listen for changes
+            from the parent quite as easily.
+            ----
+            [debounce] only makes us wait for the (ionChange) to run.
+            (ionInput) & (ionClear) will run immediately to show our loading spinner.-->
+            <ion-searchbar class="ion-no-padding" [hidden]="!this.traineeFormsService.hasFormOpenInInlineMode"
+                debounce="300" [(ngModel)]="this.traineeFormsService.searchTextboxInputValue"
+                (ionInput)="this.traineeFormsService.isSearching = true;"
+                (ionClear)="this.traineeFormsService.isSearching = true;" (ionChange)="this.setFilteredTaskList();">
+            </ion-searchbar>
+
+            <div *ngIf="this.traineeFormsService.isSearching" style="text-align: center;">
+                <ion-spinner></ion-spinner>
+            </div>
+            <ion-item color="primary" class="jt-table-row table-header-row ion-no-padding">
+                <ion-row class="full-width-item">
+                    <ion-col class="jt-table-cell index-cell ion-text-center">
+                        <ion-label>#</ion-label>
+                    </ion-col>
+                    <ion-col class="jt-table-cell">
+                        <ion-label>Category</ion-label>
+                    </ion-col>
+                    <ion-col class="jt-table-cell summary-cell"
+                        *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                        <ion-label>Summary</ion-label>
+                    </ion-col>
+                    <ion-col class="jt-table-cell status-cell"
+                        *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                        <ion-label>Status</ion-label>
+                    </ion-col>
+                    <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center"
+                        *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                        <!-- Action/menu button -->
+                    </ion-col>
+                </ion-row>
+            </ion-item>
+        </ion-header>
+        <div class="task-list-wrapper">
+            <div *ngFor="let category of this.filteredTaskListCategories; index as index;">
+                <ion-item button class="jt-table-row table-body-row ion-no-padding"
+                    [ngClass]="{'task-category-row-expanded' : category.GUIData.Expanded}"
+                    (click)="this.onCategoryClick(category)">
+                    <ion-row class="full-width-item">
+                        <ion-col class="jt-table-cell index-cell ion-text-center">
+                            {{index + 1}}
+                        </ion-col>
+                        <ion-col class="jt-table-cell">
+                            {{category.Name}}
+                        </ion-col>
+                        <ion-col class="jt-table-cell" *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                            <div *ngFor="let formattedData of category.Summary.FormattedData">
+                                <ion-label>
+                                    {{formattedData.DataName}}:&nbsp;{{formattedData.DataValue}}
+                                </ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col class="jt-table-cell status-cell ion-no-padding"
+                            *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                            <!-- Status cell shows a brief message like "Action Required" or "Signature Required"-->
+                            <app-status-cell [statusMessage]="category.Summary.Status.Text"
+                                [statusTheme]="category.Summary.Status.Theme">
+                            </app-status-cell>
+                        </ion-col>
+                        <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center"
+                            *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                            <ion-button fill="clear">
+                                <ion-icon *ngIf="category.GUIData.Expanded" name="chevron-up"></ion-icon>
+                                <ion-icon *ngIf="!category.GUIData.Expanded" name="chevron-down"></ion-icon>
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                </ion-item>
+                <div *ngIf="category.GUIData.Expanded" class="jt-table-nested-rows-wrapper">
+                    <ion-item button class="jt-table-row table-body-row inner-body-row ion-no-padding"
+                        *ngFor="let task of category.Tasks" (click)="this.onFormRowClick($event, task);"
+                        [ngClass]="{'jt-table-row-selected' : (task.TaskID === this.traineeFormsService.selectedTaskID)}">
+                        <ion-row class="full-width-item">
+                            <ion-col class="jt-table-cell index-spacer-cell jt-spacer-cell">
+                                <!-- Spacer cell -->
+                            </ion-col>
+                            <ion-col class="jt-table-cell jt-table-cell-raised">
+                                {{task.Name}}
+                            </ion-col>
+                            <ion-col class="jt-table-cell" [hidden]="!task.CanHaveForm"
+                                *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                                <ion-row>
+                                    <ion-col class="summary-inner-cell"
+                                        *ngFor="let formattedData of task.Summary.FormattedData" size-xs="12"
+                                        size-sm="12" size-md="auto">
+                                        <ion-label>
+                                            <b>{{formattedData.DataName}}</b>:&nbsp;{{formattedData.DataValue}}
+                                        </ion-label>
+                                    </ion-col>
+                                </ion-row>
+                            </ion-col>
+                            <ion-col class="jt-table-cell status-cell ion-no-padding" [hidden]="!task.CanHaveForm"
+                                *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                                <!-- Status cell shows a brief message like "Action Required" or "Signature Required"-->
+                                <app-status-cell [statusMessage]="task.Summary.Status.Text"
+                                    [statusTheme]="task.Summary.Status.Theme">
+                                </app-status-cell>
+                            </ion-col>
+                            <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center"
+                                *ngIf="task.CanHaveForm">
+                                <ion-button
+                                    [color]="(task.TaskID !== this.traineeFormsService.selectedTaskID) ? 'primary': 'light'"
+                                    fill="clear">
+                                    <ion-icon name="eye"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-item>
+                </div>
+            </div>
+        </div>
+    </ion-list>
+</div>

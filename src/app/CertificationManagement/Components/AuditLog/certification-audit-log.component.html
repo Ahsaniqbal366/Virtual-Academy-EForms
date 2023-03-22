@@ -1,0 +1,27 @@
+<div class="ion-page">
+    <ion-content color="secondary">
+        <ion-row>
+            <ion-col size="12">
+                <ion-card class="responsiveCard" style="margin-top: 0;">
+                    <!--Skeleton Table to display when data is being loaded/searched-->
+                    <div *ngIf="!this.initialized">
+                      <ion-card-header>
+                        <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+                      </ion-card-header>
+                      <ion-card-content *ngIf="!this.initialized">
+                        <ion-row>
+                          <ion-col>
+                            <sls-skeleton-table [rows]="3" [columns]="9"></sls-skeleton-table>
+                          </ion-col>
+                        </ion-row>
+                      </ion-card-content>
+                    </div>
+          
+                    
+                    
+          
+                  </ion-card>
+            </ion-col>
+        </ion-row>
+    </ion-content>
+</div>

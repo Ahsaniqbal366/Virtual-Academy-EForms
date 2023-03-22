@@ -1,0 +1,337 @@
+<!-- Loading State: Skeleton Elements -->
+<ion-content *ngIf="!this.initialized">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
+
+<!-- Initialized State: Potentially in Error -->
+<ion-content color="secondary" *ngIf="this.initialized">
+    <!-- Error State -->
+    <ion-item *ngIf="this.hasError" color="danger">
+        <ion-label>
+            <h3>
+                <ion-text animated style="width: 50%">
+                    An Error Occurred
+                </ion-text>
+            </h3>
+            <p>
+                <ion-text animated style="width: 80%">
+                    Page is unavailable
+                </ion-text>
+            </p>
+            <pre *ngIf="this.isDevMode">{{this.apiResonseError | json}}</pre>
+        </ion-label>
+    </ion-item>
+    <!------- Ready State, displayed under any errors ------->
+    <ion-grid>
+        <ion-row class="ion-text-center">
+            <ion-col size="12">
+                <ion-label>
+                    <h1>
+                        <u>Profile Information</u>
+                    </h1>
+                </ion-label>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <!-- Profile Picture and Password change -->
+            <ion-col size-xl="3" size-lg="3" size-md="4" size-sm="4" size-xs="12">
+                <div class="profile-picture-wrapper">
+                    <ion-item class="ion-no-padding" color="secondary">
+                        <ion-label>
+                            <h2>
+                                <ion-text>
+                                    Profile Picture
+                                </ion-text>
+                            </h2>
+                        </ion-label>
+                    </ion-item>
+                    <ion-item color="secondary" lines="none">
+                        <ion-avatar style="width: 100%; height: auto; max-width: 200px;">
+                            <ion-img class="profile-picture"
+                                [src]="this.profileData.Photopath ? this.profileData.Photopath : 'assets/images/default-profile-pic-profile.png'">
+                            </ion-img>
+                        </ion-avatar>
+                    </ion-item>
+                </div>
+
+                <br />
+                <div style="border: 1px black solid; background-color: white;">
+                    <ion-input accept="image/*" (change)="this.profilePictureChangeListener($event)"
+                        class="profile-picture-file-upload" type="file" name="file" id="avatar"></ion-input>
+                    <ion-progress-bar *ngIf="this.isUploading" type="indeterminate"></ion-progress-bar>
+                </div>
+                <br />
+
+                <form (ngSubmit)="this.onChangePasswordClick()">
+
+                    <div class="change-password-wrapper">
+                        <ion-item class="ion-no-padding" color="secondary">
+                            <ion-label>
+                                <h2>
+                                    <ion-text>
+                                        Change Password
+                                    </ion-text>
+                                </h2>
+                            </ion-label>
+                        </ion-item>
+
+                        <!--
+                                Putting the autocomplete="new-password" attribute on all type=password fields on this form
+                                to prevent Chrome from autofilling random textboxes with saved username info.
+                                --https://vcamp.zendesk.com/agent/tickets/84896
+                                --https://stackoverflow.com/questions/15738259/disabling-chrome-autofill
+                                -->
+                        <ion-item color="secondary">
+                            <ion-label position="floating">Current Password</ion-label>
+                            <ion-input type="password" name="currentPassword"
+                                [(ngModel)]="this.authentication.currentPassword" autocomplete="new-password">
+                            </ion-input>
+                        </ion-item>
+
+                        <ion-item color="secondary">
+                            <ion-label position="floating">New Password</ion-label>
+                            <ion-input type="password" name="newPassword" [(ngModel)]="this.authentication.newPassword"
+                                autocomplete="new-password">
+                            </ion-input>
+                        </ion-item>
+
+                        <ion-item color="secondary">
+                            <ion-label position="floating">Confirm Password</ion-label>
+                            <ion-input type="password" name="confirmPassword"
+                                [(ngModel)]="this.authentication.confirmPassword" autocomplete="new-password">
+                            </ion-input>
+                        </ion-item>
+                        <ion-button class="md-raised " md-theme="success" type="submit" fill="solid"
+                            [disabled]="!this.authentication.currentPassword || !this.authentication.newPassword || this.authentication.newPassword !== this.authentication.confirmPassword">
+                            Change Password
+                        </ion-button>
+                        <ion-progress-bar *ngIf="this.isPasswordUpdating" type="indeterminate"></ion-progress-bar>
+
+                        <div (ngStyle)="'color: ' + this.authentication.passwordResponse.color + ';'">
+                            <p>{{this.authentication.passwordResponse.message}}</p>
+                        </div>
+                        <p>{{this.profilesProvider.serverInfo.passwordRequirementMessage}}</p>
+
+                    </div>
+                </form>
+            </ion-col>
+
+            <!-- User Info -->
+            <ion-col size-xl="9" size-lg="9" size-md="8" size-sm="8" size-xs="12">
+                <ion-card>
+                    <ion-row>
+                        <!-- Disabled -->
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">Suffix</ion-label>
+                                <ion-input type="text" disabled name="Suffix" [(ngModel)]="this.profileData.Suffix">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">First Name</ion-label>
+                                <ion-input type="text" disabled name="FirstName"
+                                    [(ngModel)]="this.profileData.FirstName">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">Middle Name</ion-label>
+                                <ion-input type="text" disabled name="MiddleName"
+                                    [(ngModel)]="this.profileData.MiddleName">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">Last Name</ion-label>
+                                <ion-input type="text" disabled name="LastName" [(ngModel)]="this.profileData.LastName">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <!-- Editable -->
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">Preferred Name</ion-label>
+                                <ion-input type="text" name="PreferredName"
+                                    [(ngModel)]="this.profileData.PreferredName">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">
+                                    Email
+                                </ion-label>
+                                <ion-input type="email" name="Email" [(ngModel)]="this.profileData.Email">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">
+                                    Office
+                                </ion-label>
+                                <ion-input class="number" type="tel" name="Office"
+                                    [(ngModel)]="this.profileData.Office">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-lg="3" size-sm="6" size="12">
+                            <ion-item>
+                                <ion-label position="floating">
+                                    Cell
+                                </ion-label>
+                                <ion-input class="number" type="tel" name="Cell" [(ngModel)]="this.profileData.Cell">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <!-- 3 in row -->
+                        <ion-col size-md="4" size="12">
+                            <ion-item>
+                                <ion-label position="stacked">Cell Carrier</ion-label>
+                                <ion-select name="CarrierID" [(ngModel)]="this.profileData.CarrierID"
+                                    ion-on-close="this.log()">
+                                    <!--wish we could use this.profiledata.carrierID here in the [(ngModel)]-->
+                                    <ion-select-option *ngFor="let item of this.carrierList" [value]="item.ID">
+                                        {{item.name}}</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-md="4" size="12">
+                            <ion-item>
+                                <ion-label position="stacked">Date of Birth</ion-label>
+                                <ion-input>
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <app-datepicker-button slot="end" [inputDate]="this.profileData.DOB"
+                                        (outputDate)="this.updateProfileDOB($event)">
+                                    </app-datepicker-button>
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size="12" size-md="4">
+                            <ion-item>
+                                <ion-label position="floating">Job Title</ion-label>
+                                <ion-input type="text" name="Jobtitle" [(ngModel)]="this.profileData.Jobtitle">
+                                </ion-input>
+                            </ion-item>
+
+                        </ion-col>
+                        <!-- Organization -->
+                        <!--The organization fields below won't be shown on all sites.
+                                Reference *ngIf for related logic.-->
+                        <ion-col *ngIf="this.profilesProvider.serverInfo.showOrganizationFields" size-xl="6" size-lg="6"
+                            size-md="6" size-sm="12" size-xs="12">
+                            <ion-item>
+                                <ion-label position="floating">Organization</ion-label>
+                                <ion-input type="text" name="Organization" [(ngModel)]="this.profileData.Organization">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col *ngIf="this.profilesProvider.serverInfo.showOrganizationFields" size-xl="6" size-lg="6"
+                            size-md="6" size-sm="12" size-xs="12">
+                            <ion-item>
+                                <ion-label position="floating">URL</ion-label>
+                                <ion-input type="text" name="Organizationurl"
+                                    [(ngModel)]="this.profileData.Organizationurl"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <!-- Notifications -->
+                        <ion-col size="12" size-md="6">
+                            <p>I would like to receive notifications via:</p>
+                            <ion-row>
+                                <ion-col size="12" size-lg="6">
+                                    <ion-item>
+                                        <ion-checkbox slot="end" name="EmailNotifications"
+                                            [(ngModel)]="this.profileData.EmailNotifications"></ion-checkbox>
+                                        <ion-label>Email</ion-label>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size="12" size-lg="6">
+                                    <ion-item>
+                                        <ion-checkbox slot="end" name="TextNotifications"
+                                            [(ngModel)]="this.profileData.TextNotifications"></ion-checkbox>
+                                        <ion-label>Cell</ion-label>
+                                    </ion-item>
+                                </ion-col>
+                            </ion-row>
+                        </ion-col>
+                        <ion-col size="12" size-md="6">
+                            <ion-item>
+                                <ion-checkbox slot="end" name="HideCellPhone"
+                                    [(ngModel)]="this.profileData.HideCellPhone"></ion-checkbox>
+                                <ion-label style="white-space: pre-wrap; max-width: 100%;">
+                                    I would like to hide my cell phone number
+                                </ion-label>
+                            </ion-item>
+                            <ion-item *ngIf="this.profilesProvider.serverInfo.showSchool">
+                                <ion-label *ngIf="this.profilesProvider.serverInfo.isFbinaaSite">Chapter</ion-label>
+                                <ion-label *ngIf="!this.profilesProvider.serverInfo.isFbinaaSite">School</ion-label>
+                                <ion-input type="text" disabled name="Chapter" [(ngModel)]="this.profileData.Chapter">
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+
+                        <!-- Additional Info -->
+                        <ion-col size="12">
+                            <ion-label>
+                                <ion-icon name="information-circle"></ion-icon>
+                                Additional Info:
+                            </ion-label>
+                            <!--The id attribute "profileAdditionalInfoTextarea" of this textarea element
+                                    is used by a CKEditor nanospell plugin in the JS. If you change the ID of this textarea
+                                    you might have to account for the change in the related JS file too.-->
+                            <ckeditor [editor]="this.ckeditorInstance" [config]="this.ckeditorConfig"
+                                [(ngModel)]="this.profileData.AdditionalInfo" name="AdditionalInfo">
+                            </ckeditor>
+
+
+                            <!--The organization fields below won't be shown on all sites.
+                                    Reference *ngIf for related logic.-->
+                            <div *ngIf="this.profilesProvider.serverInfo.showOrganizationFields">
+                                <p>
+                                    Organization Info:
+                                </p>
+                                <!--The id attribute "profileOrganizationInfoTextarea" of this textarea element
+                                        is used by a CKEditor nanospell plugin in the JS. If you change the ID of this textarea
+                                        you might have to account for the change in the related JS file too.-->
+                                <ckeditor [editor]="this.ckeditorInstance" [config]="this.ckeditorConfig"
+                                    [(ngModel)]="this.profileData.Organizationalinfo" name="Organizationalinfo">
+                                </ckeditor>
+                            </div>
+                        </ion-col>
+                    </ion-row>
+                </ion-card>
+                <ion-row>
+                    <ion-col size="12">
+                        <ion-button class="ion-float-right" color="success" (click)="this.onUpdateProfileClick()"
+                            fill="solid" [disabled]="this.saveDisabled">
+                            Save
+                        </ion-button>
+                        <ion-progress-bar *ngIf="this.isUpdating" type="indeterminate"></ion-progress-bar>
+                    </ion-col>
+                </ion-row>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>

@@ -1,0 +1,136 @@
+<ion-card *ngIf="!this.initialized">
+    <ion-card-header>
+        <ion-card-title>
+            <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-card-title>
+        <ion-card-subtitle>
+            <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+        <ion-label>
+            Body:
+        </ion-label>
+        <ion-text>
+            <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-text>
+    </ion-card-content>
+</ion-card>
+<ion-card *ngIf="this.initialized">
+    <ion-card-header>
+        <ion-card-title>
+            <b>
+                {{this.messageCenterProvider.subView === 'sent' ? 'To' : 'From'}}:
+            </b> <ion-text [innerHtml]="this.selectedMessage.DisplayName"></ion-text>
+        </ion-card-title>
+        <ion-card-subtitle>
+            <b>
+                Subject:
+            </b>
+            {{this.selectedMessage.MsgSubject}}
+        </ion-card-subtitle>
+        <ion-card-subtitle>
+            <b>
+                {{this.messageCenterProvider.subView === 'sent' ? 'Sent' : 'Received'}}:
+            </b>
+            {{this.selectedMessage.DateCreated | date:'short'}}
+        </ion-card-subtitle>
+        <ion-card-subtitle *ngIf="this.selectedMessage.SLS_MessageCenterMessagesAttachments.length">
+            <b>
+                {{this.selectedMessage.SLS_MessageCenterMessagesAttachments.length > 1 ? 'Attachments' : 'Attachment'}}:
+            </b>
+            <ion-chip *ngFor="let loopedAttachment of this.selectedMessage.SLS_MessageCenterMessagesAttachments"
+                (click)="this.onAttachmentClick(loopedAttachment.AttachmentPath)">
+                <a>{{loopedAttachment.AttachmentPath}}</a>
+            </ion-chip>
+        </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+        <ion-label>
+            <b>
+                Body:
+            </b>
+        </ion-label>
+        <br>
+        <ion-text [innerHTML]="this.selectedMessage.MsgMessage">
+        </ion-text>
+    </ion-card-content>
+    <ion-item [ngSwitch]="this.messageCenterProvider.subView" class="center-any-object">
+        <ion-row class="full-width-item">
+            <ion-col class="center-any-object">
+                <div *ngIf="this.messageCenterProvider.filteredAndSortedMessages.indexOf(this.selectedMessage) != 0">
+                    <ion-button color="primary" fill="outline"
+                        (click)="goToNeighboringMessage(this.selectedMessage, -1)">
+                        <b>Prev</b>
+                    </ion-button>
+                </div>
+            </ion-col>
+            <!-- Inbox -->
+            <ion-col class="center-any-object">
+                <ion-buttons *ngSwitchCase="'inbox'" class="center">
+                    <ion-button color="primary" fill="outline" (click)="this.onReturnClick()">
+                        <b>Return</b>
+                    </ion-button>
+                    <ion-button color="primary" fill="outline" (click)="this.onReplyClick()">
+                        <b>Reply</b>
+                    </ion-button>
+                    <ion-button color="primary" fill="outline"
+                        (click)="this.messageCenterProvider.onMoveMessageClick($event, this.selectedMessage, 'A', true, 'active')">
+                        <b>Archive</b>
+                    </ion-button>
+                    <ion-button color="danger" fill="outline"
+                        (click)="this.messageCenterProvider.onMoveMessageClick($event, this.selectedMessage, 'D', true, 'active')">
+                        <b>Delete</b>
+                    </ion-button>
+                </ion-buttons>
+                <!-- Sent -->
+                <ion-buttons *ngSwitchCase="'sent'">
+                    <ion-button color="primary" fill="outline" (click)="this.onReturnClick()">
+                        <b>Return</b>
+                    </ion-button>
+                    <ion-button color="danger" fill="outline"
+                        (click)="this.messageCenterProvider.onEradicateMessageClick($event, this.selectedMessage, 'S')">
+                        <b>Delete</b>
+                    </ion-button>
+                </ion-buttons>
+                <!-- Trash -->
+                <ion-buttons *ngSwitchCase="'trash'">
+                    <ion-button color="primary" fill="outline" (click)="this.onReturnClick()">
+                        <b>Return</b>
+                    </ion-button>
+                    <ion-button color="success" fill="outline"
+                        (click)="this.messageCenterProvider.onMoveMessageClick($event, this.selectedMessage, 'D', false, 'deleted')">
+                        <b>Restore</b>
+                    </ion-button>
+                    <ion-button color="danger" fill="outline"
+                        (click)="this.messageCenterProvider.onEradicateMessageClick($event, this.selectedMessage, 'E')">
+                        <b>Delete</b>
+                    </ion-button>
+                </ion-buttons>
+                <!-- Archive -->
+                <ion-buttons *ngSwitchCase="'archive'">
+                    <ion-button color="primary" fill="outline" (click)="this.onReturnClick()">
+                        <b>Return</b>
+                    </ion-button>
+                    <ion-button color="success" fill="outline"
+                        (click)="this.messageCenterProvider.onMoveMessageClick($event, this.selectedMessage, 'A', false, 'archive')">
+                        <b>Restore</b>
+                    </ion-button>
+                    <ion-button color="danger" fill="outline"
+                        (click)="this.messageCenterProvider.onMoveMessageClick($event, this.selectedMessage, 'D', true, 'archive')">
+                        <b>Delete</b>
+                    </ion-button>
+                </ion-buttons>
+            </ion-col>
+            <ion-col class="center-any-object">
+                <div
+                    *ngIf="this.messageCenterProvider.filteredAndSortedMessages.indexOf(this.selectedMessage) != this.getLengthLikeIndex()">
+                    <ion-button color="primary" fill="outline"
+                        (click)="goToNeighboringMessage(this.selectedMessage, 1)">
+                        <b>Next</b>
+                    </ion-button>
+                </div>
+            </ion-col>
+        </ion-row>
+    </ion-item>
+</ion-card>

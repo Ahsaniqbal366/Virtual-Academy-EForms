@@ -1,0 +1,360 @@
+
+  /***Datatables Classes**/
+  
+table.dataTable thead th {
+    /*
+	color: rgb(102, 102, 102) !important;
+	padding: 5px 5px;
+	*/
+    font-size: 16px;
+    font-family: Arial !important;
+    color: white !important;
+    font-weight: normal !important;
+    background-color: var(--ion-color-primary) !important;
+    text-align: center !important;
+    border-right-color: var(--ion-color-primary-tint) !important;
+    border-right-style: solid;
+    border-right-width: 1px;
+    /* JDB 1/4/2017 - Added white-space and text-overflow rules to keep headers on one line. */
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+table.dataTable tbody td:not(:last-child) {
+    border-right-width: 4px;
+}
+
+.DTFC_LeftBodyWrapper {
+    overflow: hidden !important;
+}
+
+
+.dataTables_filter, .dataTables_length {
+    font-family: Arial !important;
+    color: rgb(102, 102, 102) !important;
+    font-size: 13px;
+    font-weight: normal !important;
+    margin-right:20px;
+    margin-top:5px !important;
+    padding-bottom: 10px !important;
+    float: left !important;
+}
+
+.dataTables_length {
+    padding-top:10px;
+}
+
+.dt-buttons{
+    float:right !important;
+    padding-top:10px;
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, 
+.pagination > .active > a:hover, .pagination > .active > span, 
+.pagination > .active > span:focus, .pagination > .active > span:hover {
+    z-index: 2;
+    color: #fff;
+    cursor: default;
+    background-color: #808080 !important;
+    border-color: var(ion-color-tms-dark-grey) !important;
+
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    cursor: not-allowed;
+    color: #777 !important;
+    border: 1px solid #ddd !important;
+    background: 0 0;
+    box-shadow: none;
+
+}
+
+.dataTables_paginate{
+    font-size:12px;
+}
+
+.tms-table-row {
+    /* START OF: Table row & cell [colors] */
+  
+    &.table-body-row {
+      .tms-table-cell {
+        // TODO - Color pulled directely from accreditation. Make it a variable?
+        background-color: #fafafa;
+      }
+      .tms-table-cell-warning::after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 20px 20px 0;
+        border-color: transparent var(--ion-color-warning) transparent transparent;
+        right: 0;
+        top: 0;
+        position: absolute;
+      }
+      .tms-table-cell-danger::after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 20px 20px 0;
+        border-color: transparent var(--ion-color-danger) transparent transparent;
+        right: 0;
+        top: 0;
+        position: absolute;
+      }
+    }
+  
+    &.inner-body-row {
+      // TODO - Colors below pulled directely from accreditation. Make it a variable?
+      // Darker
+      &:nth-child(odd) {
+        .tms-table-cell {
+          background-color: #D6D6D626;
+        }
+        .tms-table-cell-raised {
+          background-color: #eaf0f4;
+        }
+        .tms-table-cell-warning {
+          background-color: #f4f3ea;
+        }
+        .tms-table-cell-danger {
+          background-color: #f4ebea;
+        }
+        .tms-table-cell-success {
+          background-color: #eaf4eb;
+        }
+        .tms-table-cell-disabled {
+          background-color: var(--ion-color-medium);
+        }
+      }
+      // Lighter
+      &:nth-child(even) {
+        .tms-table-cell {
+          background-color: #D6D6D64D;
+        }
+        .tms-table-cell-raised {
+          background-color: #f2f8fc;
+        }
+        .tms-table-cell-warning {
+          background-color: #f7f7f2;
+        }
+        .tms-table-cell-danger {
+          background-color: #f7f1f0;
+        }
+        .tms-table-cell-success {
+          background-color: #f4fcf2;
+        }
+        .tms-table-cell-disabled {
+          background-color: var(--ion-color-medium-tint);
+        }
+      }
+  
+      .tms-spacer-cell {
+        background-color: #ddd !important;
+      }
+  
+      /**
+       * Highlight coloring the selected row.
+       * This bit of CSS is duped HERE because it's needed within this [&.inner-body-row] to override the
+       * alternating row colors defined above.
+       */
+      &.tms-table-row-selected {
+        .tms-table-cell {
+          background-color: var(--ion-color-primary);
+          color: var(--ion-color-primary-contrast);
+          text-align: center !important;
+        }
+      }
+    }
+  
+    /**
+     * Highlight coloring the selected row.
+     * This bit of CSS is duped HERE because it's needed even when the row does not also have the 
+     * [.inner-body-row] CSS class, as required above.
+     */
+    &.tms-table-row-selected {
+      .tms-table-cell {
+        background-color: var(--ion-color-primary);
+        color: var(--ion-color-primary-contrast);
+      }
+    }
+  
+    /* END OF: Table row & cell [colors] */
+  
+    /* START OF: Table row & cell [borders] */
+    .tms-table-cell {
+      border: 1px solid var(--ion-color-secondary-shade);
+    }
+  
+    &.table-header-row {
+      // Special color used for borders in the highlighted table header.
+      .tms-table-cell {
+        border-color: #00000029;
+        background-color: #fff;
+        color: #000000;
+      }
+    }
+  
+    // No border needed for the action button cell. It's the last cell in the table.
+    .tms-table-no-border-right {
+      border-right: none;
+    }
+  
+    .summary-inner-cell {
+      border-right: 1px solid var(--ion-color-secondary-shade);
+    }
+    .summary-inner-cell:last-child {
+      border-right: none;
+    }
+  
+    /* END OF: Table row & cell [borders] */
+  
+    /* START OF: Table row & cell [box-shadows] & divisions */
+    &.tms-row-expanded {
+      z-index: 2;
+      box-shadow: 0 4px 10px -2px #bbb;
+      border-bottom: 1px solid #bbb;
+    }
+    // We treat [&.form-group-row-expanded] special because it is already nested once.
+    &.form-group-row-expanded {
+      z-index: 2;
+      // 40px x-offset to account for already being nested.
+      box-shadow: 40px 4px 10px -2px #bbb;
+    }
+    &.inner-body-row {
+      .tms-table-cell-raised {
+        z-index: 2;
+        box-shadow: 5px 0 10px -2px #ddd;
+      }
+    }
+  }
+    
+  .tms-mat-table {
+    .tms-table-cell {
+      min-height: 36px;
+      height: 36px;
+      font-size:12px;
+    }
+    .tms-table-cell:not(.status-cell) {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+  
+    tr.mat-header-row{
+      height:35px;
+      
+    }
+  
+    tr.mat-header-cell{
+      font-size:14px;
+    }
+  
+    tr.mat-row, tr.mat-footer-row{
+      height:35px;
+    }
+
+    tr.expanded-detail-row {
+      height: 0;
+      background-color: var(--ion-color-secondary);
+    }
+    
+    tr.expanded-element-row:not(.expanded-row):hover {
+      background: whitesmoke;
+    }
+    
+    tr.expanded-element-row:not(.expanded-row):active {
+      background: #efefef;
+    }
+    
+    .expanded-element-row td {
+      border-bottom-width: 0;
+    }
+    
+    .expanded-element-detail {
+      overflow: hidden;
+    }
+
+    tr.deleted-row {
+      background-color: var(--ion-color-bootstrap-bg-danger) !important;
+
+      td {
+        background-color: var(--ion-color-bootstrap-bg-danger) !important;
+      }
+      .jt-table-cell-danger{
+        background-color:var(--ion-color-danger) !important;
+      }
+
+    }
+  }
+  
+  // Mat table hover effects
+  .tms-table-row[role="button"]{
+    cursor: pointer;
+  }
+  
+  .mat-form-field-wrapper {
+    // Remove excessive bottom padding on <.mat-form-field-wrapper> elements.
+    padding-bottom: 0;
+  }
+  
+  .mat-form-field-appearance-outline {
+    // Keep "outline" mat-form-fields much shorter than the default.
+    .mat-form-field-infix {
+      padding: 8px 0;
+    }
+  
+    // Darken up the labels on "outline" form fields.
+    mat-label{
+        color: #444444;
+    }
+  }
+  
+   .dataTables_filter{
+    float:left;
+    
+  }
+  
+  .status-cell {
+    width: 175px;
+    max-width: 175px;
+  }
+  .action-button-cell {
+    width: 64px;
+    max-width: 64px;
+  }
+  
+  
+  .course-type-table{
+    .header{
+      padding-top:0px;
+      padding-bottom:0px;
+      font-size:20px;
+      color:black;
+    }
+  }
+
+  .square-input {
+     
+    background:white;
+    color:black;
+    max-width: 200px;
+    float: left;
+  }
+
+// ion-button override to remove rounded edges and full caps
+ion-button {
+  text-transform: none;
+  --border-radius:0px !important;
+ }
+
+ // always show the mat-header sort icons
+ .mat-sort-header-sorted .mat-sort-header-arrow {
+  transform: none !important;
+  opacity: 1 !important;
+}
+.mat-sort-header-arrow {
+  transform: none !important;
+  opacity: 0.54 !important;
+}
+

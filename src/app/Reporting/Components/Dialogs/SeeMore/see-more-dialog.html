@@ -1,0 +1,485 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      <span *ngIf="initialized">
+        {{this.LearnerInformation.studentName + " (" + this.LearnerInformation.PSID + ")"}} 
+        
+      </span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="this.dismiss(false);">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="secondary">
+  <div *ngIf="!initialized">
+    <ion-row style="font-size:14px;">
+
+      <ion-col size="4">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="4">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="4">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="4">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="4">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="4">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="4">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+
+    </ion-row>
+    <ion-row style="font-size:14px;">
+
+      <ion-col size="12">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="3">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-col>
+
+    </ion-row>
+  </div>
+  <div [hidden]="!this.initialized">
+
+    <ion-card>
+      <ion-row  style="font-size:14px;">
+        <ion-col size="10">
+          Click "Print Summary" for a download of all courses, roll calls, and external training completed by the selected user in the current Training Year.
+        </ion-col>
+        <ion-col size="2">
+          <ion-button class="button-small ion-float-right" color="primary" title="Print" (click)="this.printCollatedSummary()">
+            Print Summary
+          </ion-button>
+        </ion-col>
+  
+      </ion-row>
+    </ion-card>
+        
+
+
+    <!--COURSE TABLE-->
+    <ion-card class="course-type-table">
+      <ion-card-header class="header">
+        <ion-row class="full-width-item ion-align-items-center ion-no-padding">
+          <ion-col >
+            Courses
+          </ion-col>
+          
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Export"  (click)="this.generateCSV(this.courseTableConfig, this.courseTableDataSource)">
+              Export
+            </ion-button>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Print" (click)="this.printTable(this.courseTableConfig, this.courseTableDataSource)">
+              Print
+            </ion-button>
+          </ion-col>
+        </ion-row>
+        
+      </ion-card-header>
+      <ion-card-content>
+        <table mat-table [dataSource]="this.courseTableDataSource" matSort class="tms-mat-table" style="width:100%;"
+        (matSortChange)="this.reportSortChange(this.courseTableDataSource, $event)">
+
+          <ng-container matColumnDef="CourseName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Course
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell">
+              {{course.courseName}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="CourseType">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Type
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              Elective
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="DateOfCompletion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Date Of Completion
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.submitDate}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="CourseHours">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Hours
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.numCredits}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="Grade">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Grade
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.studentGrade}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="DownloadCertificate">
+            <th mat-header-cell *matHeaderCellDef  class="tms-table-cell">
+              Certificate
+            </th>
+
+            <td mat-cell *matCellDef="let course"
+              class="tms-table-cell tms-table-cell action-button-cell ion-text-center">
+              <ion-label *ngIf="!course.isComplete">-</ion-label>
+              <ion-icon name="document-outline" class="action-button"
+                style="font-size:22px;cursor:pointer;text-align:center" *ngIf="course.isComplete"
+                (click)="this.generateCertification(course)"></ion-icon>
+            </td>
+
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="courseTableConfig.displayedColumns" class="tms-table-row table-header-row"></tr>
+          <tr mat-row *matRowDef="let user; columns: courseTableConfig.displayedColumns;" role="button"
+            class="tms-table-row table-body-row inner-body-row"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td [attr.colspan]="courseTableConfig.displayedColumns.length">
+              <div>
+                <span>
+                  There is no course data to review.
+                </span>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator [length]="this.totalCourseCount" [pageSize]="50" [pageSizeOptions]="[5, 10, 20, 50]"
+          showFirstLastButtons></mat-paginator>
+      </ion-card-content>
+    </ion-card>
+
+    <!--Roll Call TABLE-->
+    <ion-card class="course-type-table">
+      <ion-card-header class="header">
+        <ion-row class="full-width-item ion-align-items-center ion-no-padding">
+          <ion-col >
+            Roll Calls
+          </ion-col>
+          
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Export"  (click)="this.generateCSV(this.rollCallTableConfig, this.rollCallTableDataSource)">
+              Export
+            </ion-button>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Print" 
+            (click)="this.printTable(this.rollCallTableConfig, this.rollCallTableDataSource)">
+              Print
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-card-header>
+      <ion-card-content>
+        <table mat-table [dataSource]="this.rollCallTableDataSource" matSort style="width: 100%; "
+          class="tms-mat-table" (matSortChange)="this.reportSortChange(this.rollCallTableDataSource, $event)">
+
+          <ng-container matColumnDef="RollCallCourseName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Course
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell ">
+              {{course.CourseName}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="HasCompleted">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Has Completed
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.HasCompleted ? "Yes" : "No"}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="CompletionDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Completion Date
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.CompletionDate | date:'MM/dd/yyyy'}}
+            </td>
+
+          </ng-container>
+
+
+          <tr mat-header-row *matHeaderRowDef="rollCallTableConfig.displayedColumns" class="tms-table-row table-header-row">
+          </tr>
+          <tr mat-row *matRowDef="let user; columns: rollCallTableConfig.displayedColumns;" role="button"
+            class="tms-table-row table-body-row inner-body-row"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td [attr.colspan]="rollCallTableConfig.displayedColumns.length">
+              <div>
+                <span>
+                  There is no roll call data to review.
+                </span>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator [length]="this.totalRollCallCount" [pageSize]="50" [pageSizeOptions]="[5, 10, 20, 50]"
+          showFirstLastButtons></mat-paginator>
+      </ion-card-content>
+    </ion-card>
+
+    <!--POLICY TABLE-->
+    <ion-card class="course-type-table">
+      <ion-card-header class="header">
+        <ion-row class="full-width-item ion-align-items-center ion-no-padding">
+          <ion-col >
+            Policies
+          </ion-col>
+          
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Export"  (click)="this.generateCSV(this.policyTableConfig, this.policyTableDataSource)">
+              Export
+            </ion-button>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Print" (click)="this.printTable(this.policyTableConfig, this.policyTableDataSource)">
+              Print
+            </ion-button>
+          </ion-col>
+        </ion-row>
+        
+      </ion-card-header>
+      <ion-card-content>
+        <table mat-table [dataSource]="this.policyTableDataSource" matSort class="tms-mat-table" style="width:100%;"
+        (matSortChange)="this.reportSortChange(this.policyTableDataSource, $event)">
+
+          <ng-container matColumnDef="CourseName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Course
+            </th>
+
+            <td mat-cell *matCellDef="let policy" class="tms-table-cell">
+              {{policy.courseName}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="StartDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Start Date
+            </th>
+
+            <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+              {{policy.startDate}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="IsComplete">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Is Complete
+            </th>
+
+            <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+              {{policy.isComplete ? "Yes" : "No"}}
+            </td>
+
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="policyTableConfig.displayedColumns" class="tms-table-row table-header-row"></tr>
+          <tr mat-row *matRowDef="let user; columns: policyTableConfig.displayedColumns;" role="button"
+            class="tms-table-row table-body-row inner-body-row"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td [attr.colspan]="policyTableConfig.displayedColumns.length">
+              <div>
+                <span>
+                  There is no policy data to review.
+                </span>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator [length]="this.totalPolicyCount" [pageSize]="50" [pageSizeOptions]="[5, 10, 20, 50]"
+          showFirstLastButtons></mat-paginator>
+      </ion-card-content>
+    </ion-card>
+
+    <!--External Training TABLE-->
+    <ion-card class="course-type-table">
+      <ion-card-header class="header">
+        <ion-row class="full-width-item ion-align-items-center ion-no-padding">
+          <ion-col >
+            External Training
+          </ion-col>
+          
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Export" (click)="this.generateCSV(this.externalTrainingTableConfig, this.externalTrainingTableDataSource)" >
+              Export
+            </ion-button>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-button class="button-small" color="primary" title="Print" 
+            (click)="this.printTable(this.externalTrainingTableConfig, this.externalTrainingTableDataSource)" >
+              Print
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-card-header>
+      <ion-card-content>
+        <table mat-table [dataSource]="this.externalTrainingTableDataSource" matSort style="width: 100%; "
+          class="tms-mat-table" (matSortChange)="this.reportSortChange(this.externalTrainingTableDataSource, $event)">
+
+          <ng-container matColumnDef="CourseTitle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Course
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell ">
+              {{course.CourseTitle}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="ExTrainingCourseHours">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Course Hours
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.CourseHours}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="ExTrainingGrade">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Grade
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.Grade}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="ExTrainingStartDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Start Date
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.Startdate | date:'MM/dd/yyyy'}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="ExTrainingSubmitDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              Submit Date
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.SubmitDate | date:'MM/dd/yyyy'}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="POSTApproved">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+              POST Approved?
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+              {{course.IsStateApproved ? 'Yes': 'No'}}
+            </td>
+
+          </ng-container>
+          <ng-container matColumnDef="AdditionalInfo">
+            <th mat-header-cell *matHeaderCellDef  class="tms-table-cell">
+              AdditionalInfo
+            </th>
+
+            <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+
+            </td>
+
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="externalTrainingTableConfig.displayedColumns"
+            class="tms-table-row table-header-row"></tr>
+          <tr mat-row *matRowDef="let user; columns: externalTrainingTableConfig.displayedColumns;" role="button"
+            class="tms-table-row table-body-row inner-body-row"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td [attr.colspan]="externalTrainingTableConfig.displayedColumns.length">
+              <div>
+                <span>
+                  There is no external training data to review.
+                </span>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+
+        <mat-paginator [length]="this.totalExternalTrainingCount" [pageSize]="50" [pageSizeOptions]="[5, 10, 20, 50]"
+          showFirstLastButtons></mat-paginator>
+      </ion-card-content>
+    </ion-card>
+
+
+  </div>
+
+</ion-content>

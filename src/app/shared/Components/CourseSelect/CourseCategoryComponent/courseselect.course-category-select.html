@@ -1,0 +1,27 @@
+<div class="courseCatalogView" ng-cloak>
+
+        <ion-grid ng-hide="this.isLoading">
+                
+                <!--Course selector header - Has search bar and tag filter-->
+                <div class="custom-tabs-wrapper">
+                        <ion-card class="custom-tab-item" (click)="onCatalogTabClick(catalogTab);"
+                        [ngClass]="{'selected': catalogTab.GUIData.IsSelected}"
+                        [hidden]="!catalogTab.GUIData.ShowTab"
+                        *ngFor="let catalogTab of catalogTabs">
+                                <ion-card-content class="ion-no-padding">
+                                        
+                                                {{catalogTab.CategoryName}}
+                                       
+                                </ion-card-content>
+                        </ion-card>
+                        <!-- <div class="custom-tab-item" (click)="onCatalogTabClick(catalogTab);"
+                                [ngClass]="{'selected': catalogTab.GUIData.IsSelected}"
+                                [hidden]="!catalogTab.GUIData.ShowTab"
+                                *ngFor="let catalogTab of catalogTabs">
+                                {{catalogTab.CategoryName}}
+                        </div> -->
+                </div>
+                
+
+        </ion-grid>
+</div>

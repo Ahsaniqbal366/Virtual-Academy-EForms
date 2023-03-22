@@ -1,0 +1,283 @@
+<ion-header>
+    <app-header [defaultHref]="'/home'" [headerText]="'Announcements'" [hideBackButton]="this.hideHeaderBackButton"></app-header>
+</ion-header>
+
+<ion-content *ngIf="!this.initialized">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
+
+<ion-content *ngIf="this.initialized" class="announcements-page-wrapper">
+    <!-- Error case - [getAnnouncements] API call failed. Show error message about why. -->
+    <ion-item *ngIf="this.failedToLoadAnnouncements" color="danger">
+        <span>
+            {{this.announcementErrorMessage}}
+        </span>
+        &nbsp;
+        <span>
+            Announcements cannot be loaded at this time.
+        </span>
+    </ion-item>
+
+    <div *ngIf="!this.failedToLoadAnnouncements">
+        <ion-row class="ion-align-items-center ion-wrap-reverse">
+            <ion-col>
+                <!-- All users can filter announcements, but not all users can see all filter options. -->
+                <ion-select [(ngModel)]="this.filterType" class="form-control" (ionChange)="this.onFilterTypeChange();">
+                    <ion-select-option value="Current">Current</ion-select-option>
+                    <ion-select-option value="Expired">Expired</ion-select-option>
+                    <ion-select-option value="Future"
+                        *ngIf="this.serverInfo.UserPermissions.CanFilterToFutureAnnouncements">
+                        Future
+                    </ion-select-option>
+                    <ion-select-option value="All">All</ion-select-option>
+                </ion-select>
+            </ion-col>
+            <ion-col>
+                <ion-button class="ion-float-right" color="success" fill="outline"
+                    *ngIf="this.serverInfo.UserPermissions.CanAddAnnouncements"
+                    (click)="this.onAddAnnouncementClick();">
+                    <ion-icon name="add"></ion-icon>Announcement
+                </ion-button>
+            </ion-col>
+        </ion-row>
+
+        <ion-item *ngIf="!this.hasAnnouncements">
+            <em>
+                There are no announcements...
+            </em>
+        </ion-item>
+
+        <div *ngFor="let announcement of this.announcements" class="announcement-card-wrapper">
+            <!-- [.announcement-creator-profile-pic] image element is outside of the <ion-card> so that it 
+            can be absolutely positioned on top of the card. When the image was nested inside the card the 
+            image would fall behind the cards borders. -->
+            <img alt="Announcement poster's profile picture" class="announcement-creator-profile-pic"
+                [src]="announcement.CreatedByUserInfo.ProfilePicture">
+            <ion-card class="announcement-card">
+                <ion-card-header>
+                    <ion-row>
+                        <div class="announcement-header-profile-spacer">
+                            <!-- Spacer element to kick the announcement title over so it doesn't fall
+                            behind the absolutely positioned profile pic. -->
+                        </div>
+                        <ion-col class="ion-self-align-center">
+                            <ion-card-title class="announcement-title">
+                                {{announcement.Title}}
+                            </ion-card-title>
+                            <ion-card-subtitle class="announcement-subtitle">
+                                {{announcement.Category}}
+                            </ion-card-subtitle>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-header>
+                <ion-card-content>
+                    <div [innerHTML]="announcement.GUIData.SafeHTMLContent" class="announcement-content"></div>
+                    <br />
+                    <div>
+                        <ion-label>
+                            <b>By:</b>
+                            {{announcement.CreatedByUserInfo != null ? announcement.CreatedByUserInfo.FullName : 'TODO - Handle NULL [announcement.CreatedByUserInfo] on the server side.'}}
+                        </ion-label>
+                        <br />
+                        <ion-label>
+                            <b>Date:</b> {{announcement.PublishDate | date:'MM/dd/yyyy HH:mm a'}}
+                        </ion-label>
+                    </div>
+                    <br />
+                    <ion-row class="ion-align-items-center ion-wrap-reverse">
+                        <ion-col size-xs="12" size-sm="7" size-md class="no-padding">
+                            <!-- Edit buttons cell.
+                                -----
+                                If edit buttons are hidden, this <ion-col> still shows up to act as 
+                                a spacer column to center reactions on larger screens.
+                                The "no-padding" css class is applied to keep excess white space from appearing
+                                in this case. -->
+                            <div *ngIf="this.canEditAnnouncement">
+                                <ion-button fill="outline" (click)="this.onEditAnnouncementClick(announcement);"
+                                    *ngIf="announcement.CanEditAnnouncement">
+                                    Edit
+                                </ion-button>
+                                <ion-button fill="outline" *ngIf="announcement.CanDeleteAnnouncement">
+                                    Delete
+                                </ion-button>
+                            </div>
+                        </ion-col>
+                        <ion-col *ngIf="announcement.AllowReactions" class="ion-text-start ion-text-md-center"
+                            size-xs="12" size-sm="7" size-md>
+                            <!-- Reaction icons & counts -->
+                            <ion-button fill="clear"
+                                color="{{announcement.UserReactionType === 'like' ? 'tms-gold': 'primary'}}"
+                                (click)="this.onReactionButtonClick(announcement, 'like');">
+                                <i alt="Like this announcement"
+                                    class="announcement-reaction-icon icon icon-satisfied "></i>
+                                <span>
+                                    {{announcement.LikeReactionCount}}
+                                </span>
+                            </ion-button>
+                            <ion-button fill="clear"
+                                color="{{announcement.UserReactionType === 'neutral' ? 'tms-gold': 'primary'}}"
+                                (click)="this.onReactionButtonClick(announcement, 'neutral');">
+                                <i alt="Neutral this announcement"
+                                    class="announcement-reaction-icon icon icon-dissatisfied "></i>
+                                <span>
+                                    {{announcement.NeutralReactionCount}}
+                                </span>
+                            </ion-button>
+                            <ion-button fill="clear"
+                                color="{{announcement.UserReactionType === 'dislike' ? 'tms-gold': 'primary'}}"
+                                (click)="this.onReactionButtonClick(announcement, 'dislike');">
+                                <i alt="Dislike this announcement"
+                                    class="announcement-reaction-icon icon icon-very-dissatisfied "></i>
+                                <span>
+                                    {{announcement.DislikeReactionCount}}
+                                </span>
+                            </ion-button>
+                        </ion-col>
+                        <ion-col class="no-padding ion-text-start ion-text-sm-end" size-xs="12"
+                            size-sm="5" size-md>
+                            <!-- View/edit comments button & message cell.
+                                -----
+                                If comments not available, this <ion-col> still shows up to act as 
+                                a spacer column to center reactions on larger screens.
+                                The "no-padding" css class is applied to keep excess white space from appearing
+                                in this case. -->
+                            <ion-button fill="clear" *ngIf="announcement.AllowComments"
+                                (click)="this.onAnnouncementsCommentsButtonClick(announcement);">
+                                {{announcement.GUIData.CommentsCountMessage}}
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                    <!-- [ID] attribute set on the [announcement-comments-wrapper] element to help with autoscrolling
+                        to this content in the TS file. -->
+                    <div *ngIf="announcement.GUIData.ShowCommentsContainer" class="announcement-comments-wrapper"
+                        id="announcement-comments-wrapper-{{announcement.AnnouncementID}}">
+                        <!-- Error case - [getAnnouncementComments] API call failed. Show error message about why. -->
+                        <ion-item *ngIf="announcement.GUIData.FailedToLoadComments" color="danger">
+                            <span>
+                                {{announcement.GUIData.CommentsErrorMessage}}
+                            </span>
+                            &nbsp;
+                            <span>
+                                Comments cannot be loaded at this time.
+                            </span>
+                        </ion-item>
+                        <div *ngIf="!announcement.GUIData.FailedToLoadComments">
+                            <ion-note color="primary" class="announcement-comment-header-counter">
+                                {{announcement.GUIData.CommentsCountMessage}}
+                            </ion-note>
+
+                            <!-- Announcement comment loading indicator -->
+                            <div *ngIf="announcement.GUIData.IsLoadingComments">
+                                <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start">
+                                </ion-skeleton-text>
+                                <ion-label>
+                                    <h3>
+                                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                                    </h3>
+                                    <p>
+                                        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                                    </p>
+                                    <p>
+                                        <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                                    </p>
+                                </ion-label>
+                            </div>
+                            <div *ngIf="!announcement.GUIData.IsLoadingComments">
+                                <!-- Add announcement comment control -->
+                                <ion-row>
+                                    <ion-col size="auto">
+                                        <img alt="Current profile picture" class="announcement-commentor-profile-pic"
+                                            [src]="this.serverInfo.UserProfilePicturePath">
+                                    </ion-col>
+                                    <ion-col>
+                                        <announcement-comment-textarea [comment]="announcement.GUIData.NewCommentInfo"
+                                            [autofocusTextarea]="false" [showCancelButton]="false"
+                                            (submitCallback)="this.onSubmitAnnouncementComment($event);">
+                                        </announcement-comment-textarea>
+                                    </ion-col>
+                                </ion-row>
+
+                                <!-- Announcement comments repeater. -->
+                                <!-- [ID] attribute set on the [announcement-comment-item-wrapper] element to help with autoscrolling
+                                    to this content in the TS file. -->
+                                <ion-row *ngFor="let comment of announcement.Comments"
+                                    class="announcement-comment-item-wrapper"
+                                    id="announcement-comment-item-wrapper-{{comment.CommentID}}"
+                                    [ngClass]="{'announcement-reply-comment': comment.IsReply}">
+                                    <ion-col size="auto">
+                                        <img alt="Commenter profile picture" class="announcement-commentor-profile-pic"
+                                            [src]="comment.CommenterUserInfo != null ? comment.CommenterUserInfo.ProfilePicture : this.serverInfo.UserProfilePicturePath">
+                                    </ion-col>
+                                    <ion-col>
+                                        <ion-row>
+                                            <ion-col size-xs="12" size-sm="12" size-md>
+                                                <div>
+                                                    <span>{{comment.CommenterUserInfo.FullName}}</span>
+                                                    <span>
+                                                        &nbsp;|&nbsp;
+                                                    </span>
+                                                    <span>{{(comment.CommentDateCreated | date:'MM/dd/yyyy hh:mm a')}}</span>
+                                                </div>
+                                                <!-- Announcement comment plaintext.
+                                                    Hidden if user is editing this comment. -->
+                                                <div class="announcement-comment-text"
+                                                    *ngIf="!comment.GUIData.IsEditing">
+                                                    {{comment.Comment}}
+                                                </div>
+                                                <!-- Announcement editor/textarea. -->
+                                                <announcement-comment-textarea *ngIf="comment.GUIData.IsEditing"
+                                                    [comment]="comment" [autofocusTextarea]="true"
+                                                    [showCancelButton]="true"
+                                                    (submitCallback)="this.onSubmitAnnouncementComment($event);"
+                                                    (cancelCallback)="this.onCancelAnnouncementComment($event);">
+                                                </announcement-comment-textarea>
+                                            </ion-col>
+                                            <ion-col size="auto">
+                                                <div *ngIf="comment.GUIData.ShowActionButtons">
+                                                    <!-- Not all comments can be replied to. Logic set in API. -->
+                                                    <ion-button fill="clear" color="primary" size="small"
+                                                        (click)="this.onReplyToAnnouncementCommentClick(announcement, comment);"
+                                                        *ngIf="comment.CanReplyToComment">
+                                                        Reply
+                                                    </ion-button>
+                                                    <ion-button fill="clear" color="primary" size="small"
+                                                        (click)="this.onAnnouncementCommentPopoverMenuButtonClick($event, comment);"
+                                                        *ngIf="comment.CanEditComment">
+                                                        ...
+                                                    </ion-button>
+                                                </div>
+                                                <ion-row *ngIf="comment.GUIData.IsDeleting"
+                                                    class="ion-align-items-center">
+                                                    <ion-spinner name="crescent"></ion-spinner>
+                                                    &nbsp;
+                                                    <span>
+                                                        Deleting...
+                                                    </span>
+                                                </ion-row>
+                                            </ion-col>
+                                        </ion-row>
+                                    </ion-col>
+                                </ion-row>
+                            </div>
+                        </div>
+                    </div>
+                </ion-card-content>
+            </ion-card>
+        </div>
+    </div>
+</ion-content>

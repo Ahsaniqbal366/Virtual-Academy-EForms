@@ -1,0 +1,22 @@
+<div class="skeleton-table" ng-cloak >
+
+    <table style="width:100%;">
+        <thead>
+            <tr>
+                <th *ngFor="let column of boneColumns" style="height:35px;">
+                    <ion-skeleton-text animated style="width:90%;"></ion-skeleton-text>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of boneRows">
+                <td *ngFor="let column of boneColumns">
+                    <ion-skeleton-text animated style="width:90%;"></ion-skeleton-text>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+   
+
+</div>

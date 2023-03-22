@@ -1,0 +1,12 @@
+<ion-item title="{{statusHoverMessage}}" color="{{this.formattedStatusTheme}}" lines="none"
+  class="ion-no-padding status-cell-item">
+  <div [ngSwitch]="this.statusTheme" class="status-cell-icon">
+    <ion-icon *ngSwitchCase="'success'" name="checkmark" slot="start"></ion-icon>
+    <ion-icon *ngSwitchCase="'warning'" name="alert" slot="start"></ion-icon>
+    <ion-icon *ngSwitchCase="'danger'" name="alert" slot="start"></ion-icon>
+  </div>
+  &nbsp;
+  <div class="status-cell-text">
+    {{this.statusMessage}}
+  </div>
+</ion-item>

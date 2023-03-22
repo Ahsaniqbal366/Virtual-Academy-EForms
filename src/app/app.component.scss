@@ -1,0 +1,15 @@
+/* For the expandable list component */
+.expand-wrapper {
+    transition: max-height 0.6s ease-in-out;
+    overflow-y: auto;
+    height: auto;
+  }
+  
+  /* When [expanded] is false, this class is applied to shrink the expandable item */
+.collapsed {
+    max-height: 0 !important;
+  }
+  
+  .category-header-collapsed {
+    border-bottom: 2px solid var(--ion-color-secondary-shade);
+  }

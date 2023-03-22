@@ -1,0 +1,54 @@
+.trainee-forms-wrapper {
+    .trainee-photo {
+        width: 40px;
+        height: auto;
+        max-height: 40px;
+    }
+
+    .visibility-hidden {
+        visibility: hidden;
+    }
+
+    .phase-header-collapsed {
+        border-bottom: 2px solid var(--ion-color-secondary-shade);
+    }
+
+    /**
+        * Optional .sub-form-list class is used to visually show if forms are nested under a common
+        * form group header.
+        */
+    .sub-form-list {
+        border-left: 32px solid var(--ion-color-secondary-shade);
+    }
+
+    .embedded-form-wrapper {
+        border-top: 1px solid var(--ion-color-secondary-shade);
+        border-left: 1px solid var(--ion-color-secondary-shade);
+
+        .form-details-wrapper {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    }
+}
+
+/**
+ * START OF: Combating scroll height issues with the task/form list and it's sibling embedded/inline form.
+ */
+.trainee-forms-wrapper {
+    .phase-list-wrapper {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+    .task-list-wrapper {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+}
+.form-details-content {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+/**
+ * END OF: Combating scroll height issues with the task/form list and it's sibling embedded/inline form.
+ */

@@ -1,0 +1,201 @@
+.listItem {
+  width: 100%;
+}
+
+.listItem:hover {
+  --ion-background-color: #0033a1 !important;
+  color: white;
+  cursor: pointer;
+}
+
+.listHeader {
+  --ion-background-color: #0033a1 !important;
+  color: white;
+}
+
+.control-header {
+  background-color: #0033a1 !important;
+  color: white;
+  padding: 5px;
+}
+
+.control-header-buttons {
+  text-align: right;
+}
+
+/* For the expandable list component - May move to shared */
+.expand-wrapper {
+  transition: max-height 0.6s ease-in-out;
+  overflow-y: auto;
+  height: auto;
+}
+
+/* When [expanded] is false, this class is applied to shrink the expandable item */
+.collapsed {
+  max-height: 0 !important;
+}
+
+/* Used to remove excess padding/margin from cards so content is viewable on mobile screens */
+@media (max-width: 700px) {
+  .responsiveCard {
+    ion-card-content {
+      padding: 8px;
+    }
+    ion-card-header {
+      padding: 8px;
+    }
+    margin: 1px;
+  }
+}
+
+/* Keeps the contents of element spread evenly */
+.space-evenly {
+  display: flex;
+  justify-content: space-evenly;
+}
+/* Keeps the contents of element spread evenly and apart*/
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+// Border for forms/trainees/etc under a given shift/phase/category or w/e.
+.jt-table-nested-rows-wrapper {
+  border-left: 1px solid var(--ion-color-secondary-shade);
+  border-bottom: 1px solid var(--ion-color-secondary-shade);
+}
+
+.jt-table-row {
+  /* START OF: Table row & cell [colors] */
+
+  &.table-body-row {
+    .jt-table-cell {
+      // TODO - Color pulled directely from accreditation. Make it a variable?
+      background-color: #fafafa;
+    }
+  }
+
+  &.inner-body-row {
+    // TODO - Colors below pulled directely from accreditation. Make it a variable?
+    &:nth-child(odd) {
+      .jt-table-cell {
+        background-color: #f7f7f7;
+      }
+      .jt-table-cell-raised {
+        background-color: #eaf0f4;
+      }
+    }
+    &:nth-child(even) {
+      .jt-table-cell {
+        background-color: #ffffff;
+      }
+      .jt-table-cell-raised {
+        background-color: #f2f8fc;
+      }
+    }
+
+    .jt-spacer-cell {
+      background-color: #ddd !important;
+    }
+
+    // Highlight coloring the selected row.
+    &.jt-table-row-selected {    
+      .jt-table-cell {
+        background-color: var(--ion-color-primary);
+        color: var(--ion-color-primary-contrast);
+      }
+    }
+  }
+
+  /* END OF: Table row & cell [colors] */
+
+  /* START OF: Table row & cell [borders] */
+  .jt-table-cell {
+    border-right: 1px solid var(--ion-color-secondary-shade);
+  }
+
+  &.table-header-row {
+    // Special color used for borders in the highlighted table header.
+    .jt-table-cell {
+      border-right-color: var(--ion-color-primary-tint);
+    }
+  }
+
+  // No border needed for the action button cell. It's the last cell in the table.
+  .jt-table-no-border-right {
+    border-right: none;
+  }
+
+  .summary-inner-cell {
+    border-right: 1px solid var(--ion-color-secondary-shade);
+  }
+  .summary-inner-cell:last-child {
+    border-right: none;
+  }
+
+  /* END OF: Table row & cell [borders] */
+
+  /* START OF: Table row & cell [box-shadows] & divisions */
+  &.jt-row-expanded,
+  &.phase-row-expanded,
+  &.task-category-row-expanded,
+  &.shift-row-expanded {
+    z-index: 2;
+    box-shadow: 0 4px 10px -2px #bbb;
+    border-bottom: 1px solid #bbb;
+  }
+  // We treat [&.form-group-row-expanded] special because it is already nested once.
+  &.form-group-row-expanded {
+    z-index: 2;
+    // 40px x-offset to account for already being nested.
+    box-shadow: 40px 4px 10px -2px #bbb;
+  }
+  &.inner-body-row {
+    .jt-table-cell-raised {
+      z-index: 2;
+      box-shadow: 5px 0 10px -2px #ddd;
+    }
+  }
+  /* END OF: Table row & cell [box-shadows] */
+
+  /* START OF: Table row, cell, & special content dimensions */
+  .index-cell {
+    width: 40px;
+    max-width: 40px;
+  }
+  .index-spacer-cell {
+    width: 39px;
+    max-width: 39px;
+  }
+  .index-spacer-cell-double-wide {
+    width: 79px;
+    max-width: 79px;
+  }  
+
+  .status-cell {
+    width: 175px;
+    max-width: 175px;
+  }
+  .action-button-cell {
+    width: 64px;
+    max-width: 64px;
+  }
+  .action-button-spacer-cell {
+    width: 63px;
+    max-width: 63px;
+  }
+
+  .jt-table-profile-photo {
+    width: 40px;
+    height: auto;
+    max-height: 40px;
+  }
+  
+  /* END OF: Table row & cell [widths] */
+
+  /* START OF: Table row & cell [heights] */
+  ion-row {
+    height: 100%;
+  }
+  /* END OF: Table row & cell [heights] */
+}

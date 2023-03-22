@@ -1,0 +1,41 @@
+<!-- Loading State: Skeleton Elements -->
+<ion-content *ngIf="!this.initialized">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
+
+<!-- Initialized State: Potentially in Error -->
+<div *ngIf="this.initialized">
+    <!-- Error State -->
+    <ion-item *ngIf="this.hasError" color="danger">
+        <ion-label>
+            <h3>
+                <ion-text animated style="width: 50%">
+                    An Error Occurred
+                </ion-text>
+            </h3>
+            <p>
+                <ion-text animated style="width: 80%">
+                    Page is unavailable
+                </ion-text>
+            </p>
+            <pre *ngIf="this.isDevMode">{{this.apiResonseError | json}}</pre>
+        </ion-label>
+    </ion-item>
+    <!------- Ready State, displayed under any errors ------->
+    <router-outlet></router-outlet>
+</div>

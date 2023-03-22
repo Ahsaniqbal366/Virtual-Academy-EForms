@@ -1,0 +1,76 @@
+<ion-header>
+  <app-header [defaultHref]="'/home'" [headerText]="this.messageCenterProvider.headerText | titlecase "
+    [hideBackButton]="this.hideHeaderBackButton">
+  </app-header>
+  <!-- Error State -->
+  <ion-item *ngIf="this.hasError" color="danger">
+    <ion-label>
+      <h3>
+        <ion-text animated style="width: 50%">
+          An Error Occurred
+        </ion-text>
+      </h3>
+    </ion-label>
+  </ion-item>
+  <!-- Tabs for sub route navigation -->
+  <ion-toolbar *ngIf="this.initialized">
+    <ion-segment [(ngModel)]="this.messageCenterProvider.subView" (ionChange)="this.onTabChanged($event)">
+      <ion-segment-button value="inbox" (click)="this.onCurrentTabClicked('/messagecenter/inbox')">
+        <ion-label>Inbox
+          <ion-badge *ngIf="this.messageCenterProvider.unreadCounts[0]" class="badge-center">
+            {{this.messageCenterProvider.unreadCounts[0]}}
+          </ion-badge>
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="compose">
+        <ion-label>Compose</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="sent" (click)="this.onCurrentTabClicked('/messagecenter/sent')">
+        <ion-label>Sent</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="trash" (click)="this.onCurrentTabClicked('/messagecenter/trash')">
+        <ion-label>Trash
+          <ion-badge *ngIf="this.messageCenterProvider.unreadCounts[2]" class="badge-center">
+            {{this.messageCenterProvider.unreadCounts[2]}}
+          </ion-badge>
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="archive" (click)="this.onCurrentTabClicked('/messagecenter/archive')">
+        <ion-label>Archive
+          <ion-badge *ngIf="this.messageCenterProvider.unreadCounts[1]" class="badge-center">
+            {{this.messageCenterProvider.unreadCounts[1]}}
+          </ion-badge>
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Loading State: Skeleton Elements -->
+<ion-content color="medium" *ngIf="!this.initialized">
+  <ion-list>
+    <ion-item>
+      <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+      <ion-label>
+        <h3>
+          <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+        </h3>
+        <p>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </p>
+        <p>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<!-- Initialized State: Potentially in Error -->
+<ion-content color="medium" *ngIf="this.initialized">
+  <router-outlet></router-outlet>
+</ion-content>
+
+<ion-footer>
+  <sls-message-center-master-action></sls-message-center-master-action>
+</ion-footer>

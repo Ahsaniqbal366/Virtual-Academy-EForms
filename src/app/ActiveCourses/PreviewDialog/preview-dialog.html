@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss([], false)">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Preview of {{courseName}}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content #videoElementWrapper class="preview-video-wrapper">
+  <video  #videoElement class="preview-video" width="400" controls autoplay>
+    <source src="{{videoURL}}" type="video/mp4">
+    Your broswer or browser does not support HTML5 video.
+  </video>
+</ion-content>

@@ -1,0 +1,54 @@
+<ion-content *ngIf="!this.initialized">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
+
+<!-- Initialized State: Potentially in Error -->
+<ion-content *ngIf="this.initialized">
+    <!-- hide if its in classroom-->
+    <ion-item *ngIf="!this.isInClassroom">
+        <div *ngIf="this.showSessionSearch">
+            <ion-item>
+                <ion-input type="text" placeholder="Search Sessions" [(ngModel)]="this.searchSessionsText"
+                    (ionChange)="this.onSessionSearchKeyup()">
+                </ion-input>
+                <div>
+                    <!-- hide if there is no search input -->
+                    <ion-button *ngIf="this.searchSessionsText" (click)="this.searchSessions()">Search</ion-button>
+                    <ion-button *ngIf="this.searchSessionsText" (click)="this.clearSessions()">Clear</ion-button>
+                </div>
+            </ion-item>
+        </div>
+        <div>
+            <ion-item>
+                <ion-searchbar [(ngModel)]="this.searchGeneralText" placeholder="Search" animated showCancelButton="always"></ion-searchbar>
+            </ion-item>
+        </div>
+    </ion-item>
+    <ion-grid>
+        <ion-row no-padding>
+            <ion-col size-xl="3" size-lg="4" size-md="6" size-sm="12" size-xs="12" *ngFor="let profile of this.allProfiles | rosterfilter:{text:this.searchGeneralText, size: this.numberToRender}">
+                <profile-card [profile]="profile"
+                 [profilesProvider]="this.profilesProvider"
+                 [showSessionSearch]="this.showSessionSearch"></profile-card>
+            </ion-col>
+            <ion-infinite-scroll (ionInfinite)="this.doInfinite($event)">
+                <ion-infinite-scroll-content></ion-infinite-scroll-content>
+              </ion-infinite-scroll>
+        </ion-row>
+    </ion-grid>
+</ion-content>

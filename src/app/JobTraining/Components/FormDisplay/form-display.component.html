@@ -1,0 +1,573 @@
+<div class="form-display-wrapper">
+    <div class="form-display-content">
+        <ion-item *ngIf="this.formInfo.IncludeDateField">
+            <ion-label>
+                Date
+            </ion-label>
+            <!-- Form record [Date] picker control.
+                - Disabled if the user cannot edit this form. -->
+            <app-datepicker-button slot="end" name="fieldName" ngDefaultControl
+                [disabled]="!this.formInfo.TraineeFormRecordInfo.Permissions.CanEdit"
+                [inputDate]="this.formInfo.TraineeFormRecordInfo.Date" (outputDate)="this.updateDate($event)">
+            </app-datepicker-button>
+        </ion-item>
+
+        <!--Instructions-->
+        <div *ngIf="formInfo.HasInstructions">
+            <ion-toolbar color="tms-dark-grey">
+                <ion-row style="padding: 0 8px;">
+                    <ion-col>
+                        Instructions
+                    </ion-col>
+                </ion-row>
+            </ion-toolbar>
+            <ion-card class="responsiveCard" color="white">
+                <ion-card-content>
+                    <div [innerHTML]="this.formInfo.Instructions">
+                    </div>
+                    <!-- Check that likert exists then if it should be displayed w/ instructions. -->
+                    <div *ngIf="formInfo.HasLikert && formInfo.Likert.IncludeLikertBelowFormInstructions">
+                        <div class="field-card-divider">
+                            <!-- Divider element to draw a border between the instructions text & likert info.-->
+                        </div>
+                        <ion-grid>
+                            <ion-row class="ion-justify-content-around ion-text-center">
+                                <ng-container *ngFor="let likertRating of formInfo.Likert.Ratings">
+                                    <ion-col *ngIf="likertRating.ShowInTable">
+                                        {{likertRating.Description}}
+                                        <br />
+                                        {{likertRating.Text}}
+                                    </ion-col>
+                                </ng-container>
+                            </ion-row>
+                        </ion-grid>
+                        <div class="field-card-divider">
+                            <!-- Divider element to draw a border between the instructions likert scored & non-score ratings.-->
+                        </div>
+                        <ion-row class="ion-justify-content-around ion-text-center">
+                            <ng-container *ngFor="let likertRating of formInfo.Likert.Ratings">
+                                <ion-col *ngIf="!likertRating.ShowInTable">
+                                    {{likertRating.Description}}
+                                </ion-col>
+                            </ng-container>
+                        </ion-row>
+                    </div>
+                </ion-card-content>
+            </ion-card>
+        </div>
+
+
+        <!--Categories-->
+        <div *ngFor="let category of this.formInfo.Categories">
+            <ion-toolbar [color]="category.GUIData.Expanded ? 'tms-dark-grey' : 'medium'"
+                [ngClass]="{'category-header-collapsed': !category.GUIData.Expanded}">
+                <ion-row (click)="expandCategory(category, $event)" class="pointer" style="padding: 0 8px;">
+                    <!-- Various 'cell' components will go here, taking summary info from later pages 
+                displaying it here. They will have siza-* attributes to render them when there's 
+                available screen space -->
+                    <ion-col>
+                        <span>
+                            {{category.Name}}
+                        </span>
+                    </ion-col>
+
+                    <ion-col *ngIf="category.GUIData.SummaryFlags.ShowFieldsMarkedCell">
+                        <app-marked-fields-cell class="ion-hide-xs"
+                            [TotalMarkedFields]="category.GUIData.Summary.TotalFieldsMarked"
+                            [PossibleMarkedFields]="category.GUIData.Summary.PossibleFieldsMarked">
+                        </app-marked-fields-cell>
+                    </ion-col>
+
+                    <!-- Score cell shows total earned/possible points accross all subpages -->
+                    <ion-col *ngIf="category.GUIData.SummaryFlags.ShowScoreCell">
+                        <app-score-cell class="ion-hide-sm" [TotalScore]="category.GUIData.Summary.TotalScore"
+                            [PossibleScore]="category.GUIData.Summary.PossibleScore">
+                        </app-score-cell>
+                    </ion-col>
+
+                    <!-- Trend cell shows current average trend accross all sub pages -->
+                    <app-trend-cell *ngIf="category.GUIData.SummaryFlags.ShowTrendCell" class="ion-hide-sm"
+                        [Trend]="category.GUIData.Summary.Trend"></app-trend-cell>
+                    <!-- signature cell shows signature accross all sub pages -->
+                    <app-signature-cell *ngIf="category.GUIData.SummaryFlags.ShowSignatureCell" class="ion-hide-sm"
+                        [Signatures]="category.GUIData.Summary.Signatures">
+                    </app-signature-cell>
+
+                    <ion-col size="auto">
+                        <ion-button color="clear" *ngIf="category.CanCollapse" size="small">
+                            <ion-icon *ngIf="category.GUIData.Expanded" name="chevron-up"></ion-icon>
+                            <ion-icon *ngIf="!category.GUIData.Expanded" name="chevron-down"></ion-icon>
+                        </ion-button>
+                        <!--Filler element-->
+                        <div *ngIf="!category.CanCollapse"></div>
+                    </ion-col>
+                </ion-row>
+                <!-- Status cell shows a breif message like "Action Required" or "Signature Required".
+                Not shown at all if no action is required for the current user, to reduce clutter. -->
+                <app-status-cell *ngIf="category.GUIData.Summary.Status.ActionRequired"
+                    [statusMessage]="category.GUIData.Summary.Status.Text"
+                    [statusHoverMessage]="category.GUIData.Summary.Status.HoverText"
+                    [statusTheme]="category.GUIData.Summary.Status.Theme">
+                </app-status-cell>
+            </ion-toolbar>
+            <!--Fields-->
+            <!-- Placing small amount of expansion logic here to avoid needing to check for changes in expanded
+        status of category, is this field cannot collapse (!category.CanCollapse), it will never reach the [Expanded] check-->
+            <app-expandable-list [expandHeight]="'auto'"
+                [expanded]="!category.CanCollapse || category.GUIData.Expanded">
+                <div *ngIf="category.HasTable">
+                    <ion-card color="white" *ngFor="let row of category.TableInfo.Rows; index as i;"
+                        class="responsiveCard">
+                        <ion-card-content>
+                            <ion-grid>
+                                <ion-row>
+                                    <ion-col *ngFor="let cell of row.Cells; index as j;" [attr.size-xs]="cell.SizeXS"
+                                        [attr.size-sm]="cell.SizeSM" [attr.size-md]="cell.SizeMD"
+                                        [attr.size-lg]="cell.SizeLG" [attr.size-xl]="cell.SizeXL">
+                                        <div>
+                                            {{cell.Text}}
+                                        </div>
+                                        <div class="field-card-divider">
+                                            <!-- Divider element to draw a border between the instructions text & field info.-->
+                                        </div>
+                                        <ion-row class="ion-align-items-center"
+                                            *ngFor="let field of cell.Fields; index as k;">
+                                            <ion-label>
+                                                {{field.Text}}
+                                            </ion-label>
+                                            &nbsp;
+                                            <div [ngSwitch]="field.FieldType.Type">
+                                                <ion-row class="ion-align-items-center">
+                                                    <ion-col size="auto">
+                                                        <div *ngSwitchCase="'Signature'">
+                                                            <!-- Using [checked] with the ngModel will prevent the [ionChange] from
+                                                                firing after the model is initialized. I'm not entirely sure why, but with ion 
+                                                                checkboxes and ion toggles it's been a running ionic issue that the ionChange may trigger on page
+                                                                load, with no clear indication that it happened automatically. 
+                                                                In our unique case, refreshing the page will not cause this issue, but forward navigation to the page will.
+    
+                                                                We didn't want the checkbox to appear as changed so it wouldn't show incorrect names & dates, 
+                                                                and so it wouldn't send faulty data into the API.
+    
+                                                                https://forum.ionicframework.com/t/ion-toggle-ionchange-triggered/139187/6 
+                                                            -->
+                                                            <ion-checkbox
+                                                                (ngModelChange)="onModifyEntry($event, field, category)"
+                                                                [(ngModel)]="field.EntryInfo.Value"
+                                                                [disabled]="!field.Permissions.CanEdit">
+                                                            </ion-checkbox>
+                                                        </div>
+                                                        <!--FieldType: Textbox-->
+                                                        <div *ngSwitchCase="'Textbox'">
+                                                            <!-- 'Textbox' entry/input control. -->
+                                                            <input class="full-width-item form-control"
+                                                                *ngIf="field.Permissions.CanEdit"
+                                                                [(ngModel)]="field.EntryInfo.Value"
+                                                                (input)="onModifyEntry($event, field, category)">
+                                                            <!-- 'Textbox' read-only control. -->
+                                                            <div *ngIf="!field.Permissions.CanEdit">
+                                                                <div *ngIf="field.EntryInfo.HasValue">
+                                                                    <!-- Existing 'Textarea' Value. -->
+                                                                    {{field.EntryInfo.Value}}
+                                                                </div>
+                                                                <div *ngIf="!field.EntryInfo.HasValue">
+                                                                    <!-- Default 'Textarea' Value. -->
+                                                                    No entry added, yet.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!--FieldType: DatePicker-->
+                                                        <div *ngSwitchCase="'DatePicker'">
+                                                            <app-datepicker-button name="fieldName" ngDefaultControl
+                                                                [disabled]="!field.Permissions.CanEdit"
+                                                                [inputDate]="field.EntryInfo.Value"
+                                                                (outputDate)="onModifyEntry($event, field, category); field.EntryInfo.Value = $event">
+                                                            </app-datepicker-button>
+                                                        </div>
+                                                    </ion-col>
+                                                    <ion-col
+                                                        *ngIf="field.EntryInfo.HasValue && (field.ShowSignatureInfo || field.FieldType.Type === 'Signature')">
+                                                        <div>
+                                                            <b>Signed:</b>
+                                                            {{field.EntryInfo.CreatedByDisplayName}}
+                                                        </div>
+                                                        <div>
+                                                            on {{field.EntryInfo.CreatedOnDate | date:'MM/dd/yyyy HH:mm'}}
+                                                        </div>
+                                                    </ion-col>
+                                                </ion-row>
+                                            </div>
+                                        </ion-row>
+                                    </ion-col>
+                                </ion-row>
+                            </ion-grid>
+                        </ion-card-content>
+                    </ion-card>
+                </div>
+                <ion-card [ngClass]="field.GUIData.Status.CSSClass" color="white"
+                    *ngFor="let field of category.Fields; index as i" class="responsiveCard">
+                    <ion-card-content class="ion-no-padding">
+                        <ion-row>
+                            <ion-col class="ion-align-self-center">
+                                {{i + 1}}. {{field.Text}}
+                            </ion-col>
+                            <ion-col class="ion-no-padding" size="auto" *ngIf="field.GUIData.Status.ActionRequired">
+                                <app-status-cell [statusMessage]="field.GUIData.Status.Text"
+                                    [statusHoverMessage]="field.GUIData.Status.HoverText"
+                                    [statusTheme]="field.GUIData.Status.Theme">
+                                </app-status-cell>
+                            </ion-col>
+
+                        </ion-row>
+                        <div class="field-card-divider" *ngIf="field.FieldType.Type !== 'Instructions'">
+                            <!-- Divider element to draw a border between the field header/instructions
+                        and the field entry input/controls. -->
+                        </div>
+                        <ion-row class="space-between">
+                            <!--Field types-->
+                            <ion-col>
+                                <div [ngSwitch]="field.FieldType.Type" size="12" size-sm>
+                                    <!--FieldType: Signatures-->
+                                    <div *ngSwitchCase="'Signature'">
+                                        <ion-item lines="none" class="ion-no-padding">
+                                            <!-- Using [checked] with the ngModel will prevent the [ionChange] from
+                                                firing after the model is initialized. I'm not entirely sure why, but with ion 
+                                                checkboxes and ion toggles it's been a running ionic issue that the ionChange may trigger on page
+                                                load, with no clear indication that it happened automatically. 
+                                                In our unique case, refreshing the page will not cause this issue, but forward navigation to the page will.
+
+                                                We didn't want the checkbox to appear as changed so it wouldn't show incorrect names & dates, 
+                                                and so it wouldn't send faulty data into the API.
+
+                                                https://forum.ionicframework.com/t/ion-toggle-ionchange-triggered/139187/6 
+                                            -->
+                                            <ion-checkbox (ngModelChange)="onModifyEntry($event, field, category)"
+                                                [(ngModel)]="field.EntryInfo.Value"
+                                                [disabled]="!field.Permissions.CanEdit">
+                                            </ion-checkbox>
+                                            &nbsp;
+                                            <span *ngIf="!field.Permissions.CanEdit" [hidden]="field.EntryInfo.Value">No
+                                                signature added, yet.</span>
+                                            <span *ngIf="field.Permissions.CanEdit"
+                                                [hidden]="field.EntryInfo.Value">Click to sign</span>
+                                            <span *ngIf="field.EntryInfo.Value">
+                                                <b>Signed: </b>{{field.EntryInfo.CreatedByDisplayName}} on
+                                                {{field.EntryInfo.CreatedOnDate | date:'MM/dd/yyyy HH:mm'}}
+                                            </span>
+                                        </ion-item>
+                                    </div>
+                                    <!--FieldType: Number-->
+                                    <div *ngSwitchCase="'Number'">
+                                        <!--
+                                            'Number' entry/input control. 
+                                            -----
+                                            https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
+                                            [inputmode="decimal"] isn't supported on all browsers, but it'll help control the
+                                            user input in some cases.
+                                        -->
+                                        <input [(ngModel)]="field.EntryInfo.Value" class="form-control"
+                                            inputmode="decimal" (input)="onModifyEntry($event, field, category)"
+                                            *ngIf="field.Permissions.CanEdit" type="number">
+                                        <!-- 'Number' read-only control. -->
+                                        <div *ngIf="!field.Permissions.CanEdit">
+                                            <div *ngIf="field.EntryInfo.HasValue">
+                                                <!-- Existing 'Number' Value. -->
+                                                {{field.EntryInfo.Value}}
+                                            </div>
+                                            <div *ngIf="!field.EntryInfo.HasValue">
+                                                <!-- Default 'Number' Value. -->
+                                                No entry added, yet.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--FieldType: Likert-->
+                                    <div *ngSwitchCase="'Likert'">
+
+                                        <!-- It could be the case the user didn't configure a likert yet. 
+                                            We'll check for that and just show a warning message here.-->
+                                        <div *ngIf="!this.formInfo.HasLikert">
+                                            The likert rating scale is not available to display at this time.
+                                        </div>
+                                        <div *ngIf="this.formInfo.HasLikert">
+                                            <ion-radio-group [(ngModel)]="field.EntryInfo.Value"
+                                                (ngModelChange)="onModifyEntry($event, field, category)">
+                                                <ion-row class="ion-justify-content-around ion-text-center">
+                                                    <!-- We're relying on <ion-item> here to help with a couple of things:
+                                                1. Helps the <ion-radio> options be more easily clickable.
+                                                    2. Helps <ion-radio> option appear selected in read-only mode. -->
+                                                    <ion-item *ngFor="let likertRating of formInfo.Likert.Ratings"
+                                                        class="radio-field-item-wrapper" lines="none">
+                                                        <ion-label>{{likertRating.Text}}</ion-label>
+                                                        <!-- The <ion-radio> element will be disabled & hidden if the user cannot edit.
+                                                    We only hide it instead of fully removing it so that the <ion-radio-group> logic
+                                                        can still work because we rely on some of those CSS classes for read-only mode. -->
+                                                        <ion-radio class="likert-radio"
+                                                            disabled="{{!field.Permissions.CanEdit}}"
+                                                            [hidden]="!field.Permissions.CanEdit" color="primary"
+                                                            [value]="likertRating.RatingID">
+                                                        </ion-radio>
+                                                    </ion-item>
+                                                </ion-row>
+                                            </ion-radio-group>
+                                        </div>
+                                    </div>
+                                    <!-- FieldType: YesNo - A yes or no radio group. -->
+                                    <div *ngSwitchCase="'YesNo'">
+                                        <ion-radio-group [(ngModel)]="field.EntryInfo.Value"
+                                            (ngModelChange)="onModifyEntry($event, field, category)">
+                                            <!-- The <ion-radio> element will be disabled & hidden if the user cannot edit.
+                                            We only hide it instead of fully removing it so that the <ion-radio-group> logic
+                                                can still work because we rely on some of those CSS classes for read-only mode. -->
+                                            <ion-row class="ion-justify-content-around ion-text-center" size="12"
+                                                size-sm="3">
+                                                <!-- We're relying on <ion-item> here to help with a couple of things:
+                                                1. Helps the <ion-radio> options be more easily clickable.
+                                                    2. Helps <ion-radio> option appear selected in read-only mode. -->
+                                                <ion-item class="radio-field-item-wrapper" lines="none">
+                                                    <ion-label>Yes</ion-label>
+                                                    <ion-radio class="yes-no-radio"
+                                                        disabled="{{!field.Permissions.CanEdit}}"
+                                                        [hidden]="!field.Permissions.CanEdit" color="primary"
+                                                        [value]="'Yes'"></ion-radio>
+                                                </ion-item>
+                                                <ion-item class="radio-field-item-wrapper" lines="none">
+                                                    <ion-label>No</ion-label>
+                                                    <ion-radio class="yes-no-radio"
+                                                        disabled="{{!field.Permissions.CanEdit}}"
+                                                        [hidden]="!field.Permissions.CanEdit" color="primary"
+                                                        [value]="'No'"></ion-radio>
+                                                </ion-item>
+                                            </ion-row>
+                                        </ion-radio-group>
+                                    </div>
+                                    <div *ngSwitchCase="'Textarea'">
+                                        <!-- 'Textarea' entry/input control. -->
+                                        <textarea class="entry-textarea full-width-item form-control"
+                                            *ngIf="field.Permissions.CanEdit"
+                                            (input)="onModifyTextAreaEntry(field, category, $event)"
+                                            [(ngModel)]="field.EntryInfo.Value"
+                                            (change)="onModifyEntry($event, field, category)">
+                                    </textarea>
+                                        <!-- 'Textarea' read-only control. -->
+                                        <div *ngIf="!field.Permissions.CanEdit" class="textarea-field-read-only">
+                                            <div *ngIf="field.EntryInfo.HasValue">
+                                                <!-- Existing 'Textarea' Value. -->
+                                                {{field.EntryInfo.Value}}
+                                            </div>
+                                            <div *ngIf="!field.EntryInfo.HasValue">
+                                                <!-- Default 'Textarea' Value. -->
+                                                No entry added, yet.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--FieldType: Textbox-->
+                                    <div *ngSwitchCase="'Textbox'">
+                                        <!-- 'Textbox' entry/input control. -->
+                                        <input class="full-width-item form-control" *ngIf="field.Permissions.CanEdit"
+                                            [(ngModel)]="field.EntryInfo.Value"
+                                            (input)="onModifyEntry($event, field, category)">
+                                        <!-- 'Textbox' read-only control. -->
+                                        <div *ngIf="!field.Permissions.CanEdit">
+                                            <div *ngIf="field.EntryInfo.HasValue">
+                                                <!-- Existing 'Textarea' Value. -->
+                                                {{field.EntryInfo.Value}}
+                                            </div>
+                                            <div *ngIf="!field.EntryInfo.HasValue">
+                                                <!-- Default 'Textarea' Value. -->
+                                                No entry added, yet.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--FieldType: DatePicker-->
+                                    <div *ngSwitchCase="'DatePicker'">
+                                        <app-datepicker-button name="fieldName" ngDefaultControl
+                                            [disabled]="!field.Permissions.CanEdit" [inputDate]="field.EntryInfo.Value"
+                                            (outputDate)="onModifyEntry($event, field, category); field.EntryInfo.Value = $event">
+                                        </app-datepicker-button>
+                                    </div>
+                                    <!--FieldType: DateTimePicker-->
+                                    <div *ngSwitchCase="'DateTimePicker'">
+                                        <!-- We are using a different <ion-datetime> element for both the edit & read-only
+                                        cases because we didn't want some of the edit-mode css to be applied to
+                                        the read-only case. -->
+                                        <!-- 'DateTimePicker' entry/input control. -->
+                                        <div *ngIf="field.Permissions.CanEdit">
+                                            <ion-datetime class="form-control" displayFormat="MM/DD/YYYY HH:mm"
+                                                [(ngModel)]="field.EntryInfo.Value" min="1900-01-01" max="2100-12-31"
+                                                placeholder="Select Date And Time"
+                                                (ngModelChange)="onModifyEntry($event, field, category)">
+                                            </ion-datetime>
+                                        </div>
+                                        <!-- 'DateTimePicker' read-only control. -->
+                                        <div *ngIf="!field.Permissions.CanEdit">
+                                            <ion-datetime class="no-padding" displayFormat="MM/DD/YYYY HH:mm"
+                                                style="color: black;" readonly="true"
+                                                placeholder="No date and time selected, yet."
+                                                [value]="field.EntryInfo.Value">
+                                            </ion-datetime>
+                                        </div>
+                                    </div>
+
+                                    <!--FieldType: DropDownList-->
+                                    <div *ngSwitchCase="'DropDownList'">
+                                        <!-- We are using a different <ion-select> element for both the edit & read-only
+                                        cases because we didn't want some of the edit-mode css to be applied to
+                                        the read-only case. -->
+                                        <!-- 'DropDownList' entry/input control. -->
+                                        <div *ngIf="field.Permissions.CanEdit">
+                                            <ion-select placeholder="Select..." class="form-control"
+                                                [(ngModel)]="field.EntryInfo.Value"
+                                                (ngModelChange)="onModifyEntry($event, field, category)"
+                                                interface="action-sheet">
+                                                <ion-select-option *ngFor="let ddlOption of field.Options"
+                                                    [value]="ddlOption.OptionID">
+                                                    {{ddlOption.Text}}</ion-select-option>
+                                            </ion-select>
+                                        </div>
+                                        <!-- 'DropDownList' read-only control. -->
+                                        <div *ngIf="!field.Permissions.CanEdit">
+                                            <!-- While stored as an array, the c# will reduce this down to a single option -->
+                                            {{field.Options[0].Text}}
+                                        </div>
+                                    </div>
+                                    <!-- FieldType: RadioGroup - A configurable radio group. -->
+                                    <div *ngSwitchCase="'RadioGroup'">
+                                        <ion-radio-group [(ngModel)]="field.EntryInfo.Value"
+                                            (ngModelChange)="onModifyEntry($event, field, category)">
+                                            <!-- The <ion-radio> element will be disabled & hidden if the user cannot edit.
+                                            We only hide it instead of fully removing it so that the <ion-radio-group> logic
+                                                can still work because we rely on some of those CSS classes for read-only mode. -->
+                                            <ion-row class="ion-justify-content-around ion-text-center" size="12"
+                                                size-sm="3">
+                                                <!-- We're relying on <ion-item> here to help with a couple of things:
+                                                    1. Helps the <ion-radio> options be more easily clickable.
+                                                    2. Helps <ion-radio> option appear selected in read-only mode. -->
+                                                <ion-item class="radio-field-item-wrapper" lines="none"
+                                                    *ngFor="let ddlOption of field.Options">
+                                                    <ion-label>{{ddlOption.Text}}</ion-label>
+                                                    <ion-radio class="yes-no-radio"
+                                                        disabled="{{!field.Permissions.CanEdit}}"
+                                                        [hidden]="!field.Permissions.CanEdit" color="primary"
+                                                        [value]="ddlOption.OptionID"></ion-radio>
+                                                </ion-item>
+                                            </ion-row>
+                                        </ion-radio-group>
+                                    </div>
+                                    <!--FieldType: ReportTable-->
+                                    <div *ngSwitchCase="'ReportTable'">
+                                        <report-table-component [report]="field.EntryInfo.Value"></report-table-component>                                        
+                                    </div>
+                                    <!--FieldType: TaskName-->
+                                    <div *ngSwitchCase="'TaskName'">
+                                        <!-- TaskName is just a plaintext read-only label for now. -->
+                                        {{field.EntryInfo.Value}}
+                                    </div>
+                                    <!--FieldType: Instructions-->
+                                    <div *ngSwitchCase="'Instructions'">
+                                        <!--Just a filler element to not display the error message-->
+                                    </div>
+                                    <!--FieldType: Unknown-->
+                                    <div *ngSwitchDefault>
+                                        Error, field type not recognized.
+                                    </div>
+                                    <div *ngIf="field.EntryInfo.HasValue && field.ShowSignatureInfo">
+                                        <div class="field-card-divider">
+                                            <!-- Divider element to draw a border -->
+                                        </div>
+                                        <b>Signed: </b>{{field.EntryInfo.CreatedByDisplayName}} on
+                                        {{field.EntryInfo.CreatedOnDate | date:'MM/dd/yyyy HH:mm'}}
+                                    </div>
+                                </div>
+                            </ion-col>
+                            <ion-col style="margin-left: 16px;" class="ion-align-self-end" size="12" size-sm="auto"
+                                *ngIf="field.CanHaveFeedback" [hidden]="field.GUIData.ShowFeedbackField">
+                                <ion-button class="ion-float-right" color="white" size="small"
+                                    (click)="onAddFeedbackClick(field);">
+                                    Add Feedback
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                        <div *ngIf="field.GUIData.ShowFeedbackField">
+                            <div class="field-card-divider">
+                                <!-- Divider element to draw a border between the field entry controls 
+                                    & feedback controls. -->
+                            </div>
+                            <ion-row>
+                                <ion-col size="12" size-sm>
+                                    <ion-label>Feedback</ion-label>
+                                    <!-- 'Feedback' <textarea> entry/input control. -->
+                                    <textarea maxlength="{{this.MAX_FEEDBACK_LENGTH}}"
+                                        class="entry-textarea full-width-item form-control"
+                                        *ngIf="field.Permissions.CanEdit"
+                                        (input)="onModifyTextAreaEntry(field, category, $event)"
+                                        [(ngModel)]="field.EntryInfo.Feedback"
+                                        placeholder="Please enter feedback"></textarea>
+                                    <!-- 'Feedback' read-only control. -->
+                                    <div *ngIf="!field.Permissions.CanEdit && field.GUIData.HasFeedback"
+                                        class="textarea-field-read-only">
+                                        {{field.EntryInfo.Feedback}}
+                                    </div>
+                                    <em *ngIf="!field.Permissions.CanEdit && field.EntryInfo.Feedback.length === 0"
+                                        class="textarea-field-read-only">
+                                        No feedback has been added yet...
+                                    </em>
+                                </ion-col>
+                                <ion-col class="ion-align-self-end" size="12" size-sm="auto"
+                                    *ngIf="field.GUIData.CanClearFeedback">
+                                    <ion-button class="ion-float-right" color="white" size="small"
+                                        (click)="onClearFeedbackClick(field);">
+                                        Clear Feedback
+                                    </ion-button>
+                                </ion-col>
+                            </ion-row>
+                            <!-- Links area -->
+                            <ion-row class="space-between">
+                                <ion-col size="12" size-sm>
+                                    <ion-label>Links</ion-label>
+                                    <!-- 'FeedbackLink' <input> entry/input control. -->
+                                    <input maxlength="{{this.MAX_LINK_LENGTH}}"
+                                        class="entry-textarea full-width-item form-control"
+                                        *ngIf="field.Permissions.CanEdit"
+                                        (input)="onModifyFeedbackLinks(field.EntryInfo)"
+                                        [(ngModel)]="field.EntryInfo.FormEntryLinkInput"
+                                        placeholder="Please enter a link and click Add Link">
+                                    <!-- 'FeedbackLink' read-only does not have a control. -->
+                                    <em *ngIf="!field.Permissions.CanEdit && field.EntryInfo.FormEntryLinks.length === 0"
+                                        class="textarea-field-read-only">
+                                        No links have been added yet...
+                                    </em>
+                                </ion-col>
+                                <ion-col class="ion-align-self-end" size="12" size-sm="auto">
+                                    <ion-button *ngIf="field.Permissions.CanEdit" class="ion-float-right" color="white"
+                                        size="small" (click)="onAddLinkClick(field.EntryInfo);">
+                                        Add Link
+                                    </ion-button>
+                                </ion-col>
+                            </ion-row>
+                            <ion-row>
+                                <div *ngFor="let link of field.EntryInfo.FormEntryLinks">
+                                    <ion-chip style="height: auto;" *ngIf="!link.IsDeleted">
+                                        <ion-icon name="link" color="primary"></ion-icon>
+                                        <ion-label color="primary">
+                                            <!-- We must open the link in a new tab / window because it's not able to open in the iFrame of the app -->
+                                            <a target="_blank" style="word-break: break-all;"
+                                                [href]="link.URL">{{link.URL}}</a>
+                                        </ion-label>
+                                        <ion-buttons>
+                                            <ion-button *ngIf="field.Permissions.CanEdit" color="danger"
+                                                class="ion-float-right" fil="clear"
+                                                (click)="onRemoveLinkClick(field.EntryInfo, link);">
+                                                <ion-icon name="close"></ion-icon>
+                                            </ion-button>
+                                        </ion-buttons>
+                                    </ion-chip>
+                                </div>
+                            </ion-row>
+                        </div>
+                    </ion-card-content>
+                </ion-card>
+            </app-expandable-list>
+        </div>
+
+    </div>
+</div>

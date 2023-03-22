@@ -1,0 +1,103 @@
+<div>
+    <ion-item-divider>
+        <ion-row class="full-width-item ion-align-items-center">
+            <ion-col>
+                Fields for <u>{{this.categoryInfo.Name}}</u> category
+            </ion-col>
+            <ion-col size="auto">
+                <ion-button fill="outline" (click)="this.onCloseClick();">
+                    Close
+                </ion-button>
+                <ion-button color="success" fill="outline" (click)="this.onSubmitClick();">
+                    Save Changes
+                </ion-button>
+            </ion-col>
+        </ion-row>
+    </ion-item-divider>
+    <ion-list lines="full" class="jt-table ion-no-padding" color="secondary">
+        <ion-item color="primary" class="jt-table-row table-header-row ion-no-padding">
+            <ion-row class="full-width-item">
+                <ion-col class="jt-table-cell action-button-cell ion-text-center">
+                    <ion-label>#</ion-label>
+                </ion-col>
+                <ion-col class="jt-table-cell">
+                    <ion-label>Text</ion-label>
+                </ion-col>
+                <ion-col class="jt-table-cell ion-text-center">
+                    <ion-label>Type</ion-label>
+                </ion-col>
+                <ion-col class="jt-table-cell action-button-cell ion-text-center">
+                    <ion-label>Edit</ion-label>
+                </ion-col>
+                <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center">
+                    <!-- Popover or other actions column -->
+                    <!-- Header cell holds the "+" record button. -->
+                    <!-- <ion-button color="success" title="Add Field" (click)="this.onAddFieldClick();">
+                        <ion-icon name="add"></ion-icon>
+                    </ion-button> -->
+                </ion-col>
+            </ion-row>
+        </ion-item>
+        <!-- Warning messages, like "no data" & stuff.
+            - Shown on the jt-table because that table also holds the +Form button.-->
+        <ng-container *ngFor="let warning of this.warnings">
+            <ion-item [color]="warning.Color">
+                <em>
+                    {{warning.Message}}
+                </em>
+            </ion-item>
+        </ng-container>
+        <ion-reorder-group disabled="false" (ionItemReorder)="this.onFieldReorder($event)">
+            <div *ngFor="let field of this.categoryInfo.Fields">
+                <ion-item class="ion-no-padding jt-table-row inner-body-row table-body-row">
+                    <ion-row class="full-width-item">
+                        <ion-col class="jt-table-cell action-button-cell ion-text-center">
+                            <ion-reorder>
+                                <ion-button fill="clear">
+                                    <ion-icon name="move"></ion-icon>
+                                </ion-button>
+                            </ion-reorder>
+                        </ion-col>
+                        <ion-col class="jt-table-cell jt-table-cell-raised">
+                            {{field.Text}}
+                        </ion-col>
+                        <ion-col class="jt-table-cell ion-text-center">
+                            {{field.FieldType.FriendlyName}}
+                        </ion-col>
+                        <ion-col class="jt-table-cell action-button-cell ion-text-center">
+                            <ion-button *ngIf="!field.IsDeleted" fill="outline" title="Edit field info"
+                                (click)="this.onEditFieldClick(field);">
+                                <ion-icon name="create"></ion-icon>
+                            </ion-button>
+                        </ion-col>
+                        <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center">
+                            <ion-button *ngIf="!field.IsDeleted" fill="outline" title="Remove field" color="danger"
+                                (click)="this.onRemoveFieldClick(field);">
+                                <ion-icon name="close"></ion-icon>
+                            </ion-button>
+                            <ion-button *ngIf="field.IsDeleted" fill="outline" title="Restore field" color="success"
+                                (click)="this.onRestoreFieldClick(field);">
+                                <ion-icon name="refresh"></ion-icon>
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                </ion-item>
+                <!-- Record disabled warning message -->
+                <div class="jt-table-nested-rows-wrapper" *ngIf="field.IsDeleted">
+                    <ion-item class="jt-table-row table-body-row inner-body-row ion-no-padding">
+                        <ion-row class="full-width-item">
+                            <ion-col class="jt-table-cell action-button-cell jt-spacer-cell ion-no-padding">
+                                <!-- Spacer cell -->
+                            </ion-col>
+                            <ion-col class="jt-table-cell ion-no-padding">
+                                <ion-item lines="none" color="danger">
+                                    This field has been disabled.
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                    </ion-item>
+                </div>
+            </div>
+        </ion-reorder-group>
+    </ion-list>
+</div>

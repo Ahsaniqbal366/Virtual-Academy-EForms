@@ -1,0 +1,354 @@
+/**
+ * JTC 09/11/2020
+ * -----
+ * Sizes defined in [$ionic-size-breakpoints] taken from https://ionicframework.com/docs/layout/grid
+ */
+ $ionic-size-breakpoints: (
+    xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+  );
+
+  .jt-table-outlined{
+    outline: 1px solid var(--ion-color-secondary-shade);
+  }
+
+  .jt-table-border{
+    border: 1px solid var(--ion-color-secondary-shade);
+  }
+  
+  .jt-table-row {
+    /* START OF: Table row & cell [colors] */
+  
+    &.table-body-row {
+      .jt-table-cell {
+        background-color: var(--ion-color-white);
+      }
+      .jt-table-cell-warning::after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 20px 20px 0;
+        border-color: transparent var(--ion-color-warning) transparent transparent;
+        right: 0;
+        top: 0;
+        position: absolute;
+      }
+      .jt-table-cell-danger::after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 20px 20px 0;
+        border-color: transparent var(--ion-color-danger) transparent transparent;
+        right: 0;
+        top: 0;
+        position: absolute;
+      }
+    }
+  
+    &.inner-body-row {
+      // Lighter
+      &:nth-child(odd) {
+        .jt-table-cell {
+          background-color: var(--ion-color-light);
+        }
+        .jt-table-cell-raised {
+          background-color: var(--ion-color-light-raised);
+        }
+        .jt-table-cell-warning {
+          background-color: var(--ion-color-light-warning);
+        }
+        .jt-table-cell-danger {
+          background-color: var(--ion-color-light-danger);
+        }
+        .jt-table-cell-success {
+          background-color: var(--ion-color-light-success);
+        }
+        .jt-table-cell-disabled {
+          background-color: var(--ion-color-medium-tint);
+        }
+      }
+      // Darker
+      &:nth-child(even) {
+        .jt-table-cell {
+          background-color: var(--ion-color-secondary);
+        }
+        .jt-table-cell-raised {
+          background-color: var(--ion-color-secondary-raised);
+        }
+        .jt-table-cell-warning {
+          background-color: var(--ion-color-secondary-warning);
+        }
+        .jt-table-cell-danger {
+          background-color: var(--ion-color-secondary-danger);
+        }
+        .jt-table-cell-success {
+          background-color: var(--ion-color-secondary-success);
+        }
+        .jt-table-cell-disabled {
+          background-color: var(--ion-color-medium);
+        }
+      }
+  
+      /**
+       * Highlight coloring the selected row.
+       * This bit of CSS is duped HERE because it's needed within this [&.inner-body-row] to override the
+       * alternating row colors defined above.
+       */
+      &.jt-table-row-selected {
+        .jt-table-cell {
+          background-color: var(--ion-color-primary);
+          color: var(--ion-color-primary-contrast);
+        }
+      }
+    }
+  
+    /**
+     * Highlight coloring the selected row.
+     * This bit of CSS is duped HERE because it's needed even when the row does not also have the 
+     * [.inner-body-row] CSS class, as required above.
+     */
+    &.jt-table-row-selected {
+      .jt-table-cell {
+        background-color: var(--ion-color-primary);
+        color: var(--ion-color-primary-contrast);
+      }
+    }
+  
+    /* END OF: Table row & cell [colors] */
+  
+    /* START OF: Table row & cell [borders] */
+    .jt-table-cell {
+      border-right: 1px solid var(--ion-color-secondary-shade);
+      outline: 1px solid var(--ion-color-secondary-shade);
+    }
+  
+    &.table-header-row {
+      // Special color used for borders in the highlighted table header.
+      .jt-table-cell {
+        border-right-color: var(--ion-color-white-tint);
+        background-color: var(--ion-color-white);
+        color: var(--ion-color-white-contrast);
+      }
+    }
+  
+    // No border needed for the action button cell. It's the last cell in the table.
+    .jt-table-no-border-right {
+      border-right: none;
+    }
+  
+    .summary-inner-cell {
+      border-right: 1px solid var(--ion-color-secondary-shade);
+    }
+    .summary-inner-cell:last-child {
+      border-right: none;
+    }
+  
+    /* END OF: Table row & cell [borders] */
+  
+    /* START OF: Table row & cell [box-shadows] & divisions */
+    &.jt-row-expanded {
+      z-index: 2;
+      box-shadow: 0 4px 10px -2px var(--ion-color-medium-shade);
+      border-bottom: 1px solid var(--ion-color-medium-shade);
+    }
+    // We treat [&.form-group-row-expanded] special because it is already nested once.
+    &.form-group-row-expanded {
+      z-index: 2;
+      // 40px x-offset to account for already being nested.
+      box-shadow: 40px 4px 10px -2px var(--ion-color-medium-shade);
+    }
+    &.inner-body-row {
+      .jt-table-cell-raised {
+        z-index: 2;
+        box-shadow: 2px 0 10px -2px var(--ion-color-medium-shade);
+      }
+    }
+    /* END OF: Table row & cell [box-shadows] */
+  
+    /* START OF: Table row, cell, & special content dimensions */
+    .index-cell {
+      width: 40px;
+      max-width: 40px;
+    }
+    .index-spacer-cell {
+      width: 39px;
+      max-width: 39px;
+    }
+    .index-spacer-cell-double-wide {
+      width: 79px;
+      max-width: 79px;
+    }
+    @media (max-width: map-get($ionic-size-breakpoints, md)) {
+      .index-spacer-cell {
+        width: 19px;
+        max-width: 19px;
+      }
+      .index-spacer-cell-double-wide {
+        width: 39px;
+        max-width: 39px;
+      }
+    }
+  
+    .small-info-cell {
+      width: 100px;
+      max-width: 100px;
+    }
+    .info-cell {
+      width: 200px;
+      max-width: 200px;
+    }
+    .status-cell {
+      width: 200px;
+      max-width: 200px;
+    }
+    .date-cell {
+      width: 130px;
+      max-width: 130px;
+    }
+    .status-icon-cell {
+      width: 40px;
+      max-width: 40px;
+    }
+    @media (max-width: map-get($ionic-size-breakpoints, md)) {
+      .status-cell {
+        width: 40px;
+        max-width: 40px;
+      }
+    }
+  
+    .action-button-cell {
+      width: 64px;
+      max-width: 64px;
+      padding: 0;
+  
+      ion-button {
+        margin: 0;
+      }
+    }
+    .action-button-spacer-cell {
+      width: 63px;
+      max-width: 63px;
+    }
+  
+    .jt-table-profile-photo {
+      width: 40px;
+      height: auto;
+      max-height: 40px;
+    }
+  
+    /* END OF: Table row & cell [widths] */
+  
+    /* START OF: Table row & cell [heights] */
+  
+    // Apply a shorter than usual [--min-height] to all [<ion-item>.jt-table-row] elements.
+    ion-item{
+        --min-height: 36px; //Default was 48px.
+        height: auto;
+    }
+    
+  
+    /**
+       * Making the <ion-row> element within a [.jt-table-row] "height: 100%" helps 
+       * with the background coloring of the table cells within the rows.
+       */
+    ion-row {
+      --min-height: 36px;
+      height: 100%;
+    }
+    /* END OF: Table row & cell [heights] */
+  }
+  
+  .jt-mat-table {
+    // Corrects the coloring and outline for material headers within a jt-mat-table
+    .mat-header-cell{
+        background-color: var(--ion-color-white);
+        color: var(--ion-color-white-contrast);
+        outline: 1px solid var(--ion-color-secondary-shade);
+
+        font-size: 15px;
+    }
+    // As the material is updated and mat -> mat-mdc- prefix changed
+    .mat-mdc-header-cell{
+      background-color: var(--ion-color-white);
+      color: var(--ion-color-white-contrast);
+      outline: 1px solid var(--ion-color-secondary-shade);
+
+      font-size: 15px;
+   }
+    .jt-table-cell {
+      min-height: 36px;
+      height: 36px;
+    }
+    .jt-table-cell:not(.status-cell) {
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+  
+  /**
+   * [jt-table-loading-cover] can be used to cover a table while it's loading.
+   * Placement should be like:
+   * ----
+   <div class="some-parent-wrapper" style="position: relative;">
+  
+       <div class="jt-table-loading-cover"></div>
+  
+       <mat-table></mat-table>
+  
+   </div>
+   * ----
+   * Style taken from here: https://material.angular.io/components/table/examples
+   */ 
+  .jt-table-loading-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .jt-mat-table {
+    .jt-table-cell {
+      min-height: 36px;
+      height: 36px;
+    }
+    .jt-table-cell {
+      padding-left: 8px;
+      padding-right: 8px;
+      &.status-cell,
+      &.action-button-cell {
+        padding: 0;
+      }
+      &.fit-content{
+        width: fit-content; 
+        white-space: nowrap;
+      }
+    }
+    // Mat table hover effects
+    .jt-table-row[role="button"],
+    tr[button] {
+      cursor: pointer;
+      &:hover {
+        .jt-table-cell {
+          background-color: #eaf0f4;
+        }
+      }
+      &.jt-table-row-selected {
+        .jt-table-cell {
+          background-color: var(--ion-color-primary);
+          color: var(--ion-color-primary-contrast);
+        }
+      }
+    }
+  }
+

@@ -1,0 +1,34 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="this.dismiss(false);">
+          <ion-icon name="close" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>
+        <span>
+          Assign Item
+        </span>
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content>
+    <user-selector  (onUsersSelected)="setUserSelection($event);" [maxSelections]="1"></user-selector>
+  </ion-content>
+  
+  <ion-footer>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="this.dismiss(false);" fill="outline">
+          Cancel
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end">
+        <ion-button (click)="this.onConfirm();" color="success" fill="outline" >
+          OK
+        </ion-button>
+        
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>

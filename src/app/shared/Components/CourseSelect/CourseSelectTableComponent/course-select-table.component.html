@@ -1,0 +1,125 @@
+
+<div class="course-select-table"  ng-cloak>
+
+    <ion-row class="">
+        <ion-col size="3">
+            <div class="custom-mat-form-field">
+                <ng-select [items]="this.courseCategories" bindLabel="CategoryName" bindValue="CategoryID"
+                    style="width:100%;" class="override-shorter-height ion-no-padding" placeholder="Category"
+                    appearance="outline" [multiple]="true" [(ngModel)]="this.selectedCategories"
+                    (ngModelChange)="this.onCategoryFilterChanged()" typeToSearchText="Type to search for a category">
+
+                </ng-select>
+            </div>
+
+        </ion-col>
+        <ion-col size="3">
+            <!--Course repeater search textbox-->
+            <div class="custom-mat-form-field">
+
+                <ion-searchbar debounce="300" [(ngModel)]="this.courseSearchFilterText" style="width:100%;"
+                    (ionInput)="this.isSearching = true;" (ionClear)="this.isSearching = true;"
+                    (ionChange)="this.onSearchFilterChanged();">
+                </ion-searchbar>
+
+            </div>
+
+
+        </ion-col>
+
+    </ion-row>
+    <div >
+        <ion-row>
+            
+    
+        </ion-row>
+    </div>
+    <ion-row >
+        <ion-col *ngIf="!this.isInitialized || this.isSearching">
+            <sls-skeleton-table [rows]="3" [columns]="5"></sls-skeleton-table>
+        </ion-col>
+        <!--Course selection column-->
+        <ion-col *ngIf="this.isInitialized && !this.isSearching">
+
+            <table mat-table matSort [dataSource]="this.courseTableDataSource" matSort class="tms-mat-table"
+            (matSortChange)="this.onSortChange($event)" style="width:100%;">
+
+                <ng-container matColumnDef="CourseName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell" mat-sort-header="coursename">
+                        Course
+                    </th>
+
+                    <td mat-cell *matCellDef="let course" class="tms-table-cell">
+                        {{course.CourseName}}
+                    </td>
+
+                </ng-container>
+                <ng-container matColumnDef="CallNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell" mat-sort-header="callnumber">
+                        Call Number
+                    </th>
+
+                    <td mat-cell *matCellDef="let course" class="tms-table-cell">
+                        {{course.CallNo}}
+                    </td>
+
+                </ng-container>
+                <ng-container matColumnDef="SME">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell" mat-sort-header="sme">
+                        Instructor
+                    </th>
+
+                    <td mat-cell *matCellDef="let course" class="tms-table-cell">
+                        {{course.SME ? course.SME.Name : "N/A"}}
+                    </td>
+
+                </ng-container>
+                <ng-container matColumnDef="CourseHours">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell" mat-sort-header="coursehours">
+                        Hours
+                    </th>
+
+                    <td mat-cell *matCellDef="let course" class="tms-table-cell">
+                        {{course.FormattedCreditHoursText}}
+                    </td>
+
+                </ng-container>
+                <ng-container matColumnDef="SelectCourse">
+                    <th mat-header-cell *matHeaderCellDef
+                        class="tms-table-cell tms-table-cell action-button-cell ion-text-center">
+                        <ion-checkbox (click)="this.onSelectAllCoursesChange()"></ion-checkbox>
+                    </th>
+
+                    <td mat-cell *matCellDef="let course"
+                        class="tms-table-cell tms-table-cell action-button-cell ion-text-center">
+                        <ion-checkbox [(ngModel)]="course.GUIData.IsSelected"
+                            (ngModelChange)="onCourseRowClicked()"></ion-checkbox>
+                    </td>
+
+                </ng-container>
+
+
+
+                <tr mat-header-row *matHeaderRowDef="courseTableDisplayedColumns"
+                    class="tms-table-row table-header-row"></tr>
+                <tr mat-row *matRowDef="let user; columns: courseTableDisplayedColumns;" role="button"
+                    class="tms-table-row table-body-row inner-body-row"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                    <td [attr.colspan]="courseTableDisplayedColumns.length">
+                        <div>
+                            <span>
+                                No result found.
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+        </ion-col>
+    </ion-row>
+    <mat-paginator [length]="this.totalCourseCount" [pageSize]="50" [pageSizeOptions]="[5, 10, 20, 50]"
+                showFirstLastButtons></mat-paginator>
+
+</div>

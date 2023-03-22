@@ -1,0 +1,49 @@
+<md-dialog aria-label="row dialog" ng-cloak style="width:40%;">
+
+	<!-- Modal top tool bar -->
+	<md-toolbar style="background-color: #f2f2f2; color: #444;">
+		<div class="md-toolbar-tools">
+			<span>
+				{{dialogCtrl.dialogData.Name}}
+			</span>
+		</div>
+	</md-toolbar>
+
+    <md-dialog-content style="padding: 20px; margin: 0px;min-height:350px;">
+        <div layout="row" layout-wrap layout-align="space-between center">
+            <!-- Profile Picture -->
+            <div class="md-media-lg card-media" flex="100" flex-gt-md="33">
+                <img src="{{dialogCtrl.dialogData.Photopath ? dialogCtrl.dialogData.Photopath : 'assets/images/default-profile-pic-profile.png'}}" class="profile-image-detail" />
+            </div>
+
+            <!-- Profile information -->
+            <div layout="column" flex="50" flex-gt-md="33" class="additional-profile-info-column">
+                <div><label>Email:</label><br /> {{dialogCtrl.dialogData.Email ? dialogCtrl.dialogData.Email : "N/A"}}</div>
+                <div><label>Phone:</label> <br />{{dialogCtrl.dialogData.Cell ? dialogCtrl.dialogData.Cell : "N/A"}}</div>
+                <div><label>Preferred Name:</label><br /> {{dialogCtrl.dialogData.PreferredName ? dialogCtrl.dialogData.PreferredName : 'N\A'}}</div>
+            </div>
+            <div layout="column" flex="33" class="additional-profile-info-column">
+                <div><label>Chapter:</label><br /> {{dialogCtrl.dialogData.Chapter ? dialogCtrl.dialogData.Chapter : "N/A"}}</div>
+                <div><label>Session:</label> <br />{{dialogCtrl.dialogData.Session ? dialogCtrl.dialogData.Session : "N/A"}}</div>
+            </div>
+
+        </div>
+        <hr />
+
+        <div layout="row">
+            <div class="info-overflow-container">
+                <label>Additional Info:</label>
+                <!--<p>{{dialogCtrl.dialogData.additionalInfo ? dialogCtrl.dialogData.AdditionalInfo : "N/A"}} </p>-->
+                <div class="info-overflow-div" ng-bind-html="dialogCtrl.dialogData.AdditionalInfo"></div>
+            </div>
+        </div>
+
+
+    </md-dialog-content>
+	<!-- Modal close button -->
+	<md-dialog-actions layout="row" layout-align="end center">
+		<md-button type="button" class="md-raised" ng-click="dialogCtrl.Cancel();" style="margin-right:10px;">
+			Close
+		</md-button>
+	</md-dialog-actions>
+</md-dialog>

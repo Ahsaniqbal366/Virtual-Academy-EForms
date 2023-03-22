@@ -1,0 +1,67 @@
+<div>
+  <ion-item-divider>
+    <ion-row class="full-width-item ion-align-items-center">
+      <ion-col>
+        Settings
+      </ion-col>
+      <ion-col size="auto">
+        <ion-button fill="outline" (click)="this.onCloseClick();">
+          Close
+        </ion-button>
+        <ion-button color="success" fill="outline" (click)="this.onSubmitClick();">
+          Save Changes
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    
+  </ion-item-divider>
+  <ion-item>
+    <ion-label position="fixed">Name</ion-label>
+    <ion-input class="form-control" placeholder="Add a form name..." [(ngModel)]="this.formInfo.Name"></ion-input>
+  </ion-item>
+  <!-- 
+    [IncludeInPhaseForms]
+    Changing this field will potentially affect other fields in the GUI.
+   -->
+  <ion-item>
+    <ion-checkbox color="primary" [(ngModel)]="this.formInfo.IncludeInPhaseForms"
+      (ngModelChange)="this.onIncludeInPhaseFormsChange();"></ion-checkbox>
+    &nbsp;
+    <ion-label>Show Under Phase Forms</ion-label>
+  </ion-item>
+  <!-- 
+    [IncludeDateField]
+    If [IncludeInPhaseForms] is true, this field isn't editable by the user.
+    The same logic is applied in the API when saving a form. -->
+  <ion-item>
+    <ion-checkbox color="primary" [(ngModel)]="this.formInfo.IncludeDateField"
+      [disabled]="this.formInfo.IncludeInPhaseForms"></ion-checkbox>
+    &nbsp;
+    <ion-label>Include Date Field <em *ngIf="this.formInfo.IncludeInPhaseForms">(required for phase forms)</em></ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-checkbox color="primary" [(ngModel)]="this.formInfo.Collapsible"></ion-checkbox>
+    &nbsp;
+    <ion-label>Group by Date</ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-checkbox color="primary" [(ngModel)]="this.formInfo.CanBeExported"></ion-checkbox>
+    &nbsp;
+    <ion-label>Can Be Exported</ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-checkbox color="primary" [(ngModel)]="this.formInfo.InstructionsEnabled"></ion-checkbox>
+    &nbsp;
+    <ion-label>Instructions Enabled</ion-label>
+  </ion-item>
+  <!-- Form [Instructions] content rich text editor. 
+      Placed at the bottom of the form because it is going to grow vertically as user adds content.
+      This change in size would force other fields out of view and might cause usability issues. -->
+  <div [hidden]="!this.formInfo.InstructionsEnabled">
+    <ion-item lines="none">
+      <ion-label>Instructions</ion-label>
+    </ion-item>
+    <ckeditor [editor]="this.ckeditorInstance" [config]="this.ckeditorConfig" [(ngModel)]="this.formInfo.Instructions">
+    </ckeditor>
+  </div>
+</div>

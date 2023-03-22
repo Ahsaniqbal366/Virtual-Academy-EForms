@@ -1,0 +1,39 @@
+.report-table-element {
+  thead > tr{
+    border-bottom: 1px solid #ddd;
+  }
+  tbody > tr {
+    border-bottom: 1px solid #ddd;
+    &:last-child{
+      border-bottom: none;
+    }
+  }
+
+  th,
+  td {
+    border-right: 1px solid #ddd;
+    &:last-child{
+      border-right: none;
+    }
+
+    text-align: left;
+    padding: 3px;
+
+    &.report-table-indent-cell {
+      width: 16px;
+    }
+
+    &.report-table-success {
+      background-color: var(--ion-color-bootstrap-bg-success);
+    }
+    &.report-table-warning {
+      background-color: var(--ion-color-bootstrap-bg-warning);
+    }
+    &.report-table-danger {
+      background-color: var(--ion-color-bootstrap-bg-danger);
+    }
+    &.text-align-center {
+      text-align: center;
+    }
+  }
+}

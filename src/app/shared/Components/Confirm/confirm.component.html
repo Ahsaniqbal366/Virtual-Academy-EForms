@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>{{data.title}}</h2>
+
+<mat-dialog-content style="margin-top:-10px;" >
+  {{data.body}}
+  </mat-dialog-content>
+
+<mat-dialog-actions>
+  <ion-button (click)="close()">Close</ion-button>
+  <ion-button (click)="confirm()">Confirm</ion-button>
+
+</mat-dialog-actions>

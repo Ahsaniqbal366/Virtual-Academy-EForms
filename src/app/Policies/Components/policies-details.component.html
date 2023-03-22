@@ -1,0 +1,184 @@
+<!-- <div id="loader">
+    <img src="../../../assets/images/loader.gif" alt="Description" />
+</div> -->
+
+<div class="policies-details-wrapper" *ngIf="this.initialized">
+    <form [formGroup]="updatePolicyForm">
+    <ion-card class="responsiveCard">
+        <ion-card-content>
+            <ion-row size="12" class="full-width-item">
+                <ion-col size="4">
+                    <mat-form-field [hideRequiredMarker]="true" class="full-width-item " floatLabel="always" appearance="outline">
+                        <mat-label>Policy Number *</mat-label>
+                        <input matInput formControlName="policyNumber" [maxlength]="50">
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="4">
+                    <mat-form-field [hideRequiredMarker]="true"  class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Policy Title *</mat-label>
+                        <input [disabled]="!this.policiesManagementService.canEditPolicies()" matInput formControlName="friendlyName" [maxlength]="100">
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="2">
+                    <mat-form-field [hideRequiredMarker]="true" class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Effective Date *</mat-label>
+                        <input [disabled]="!this.policiesManagementService.canEditPolicies()" matInput
+                            [matDatepicker]="completionDatePicker" placeholder="MM/DD/YYYY" style="min-width: 80px;"
+                            min="0" formControlName="effectiveDate"
+                            (dateChange)="onEffectiveDateChanged($event)">
+                            
+                        <mat-datepicker-toggle matSuffix [for]="completionDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #completionDatePicker></mat-datepicker>
+
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="2">
+                    <mat-form-field  [hideRequiredMarker]="true" class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Review Date *</mat-label>
+                        <input [disabled]="!this.policiesManagementService.canEditPolicies()" matInput
+                            [matDatepicker]="expirationDatePicker" placeholder="MM/DD/YYYY" style="min-width: 80px;"
+                            (ngModelChange)="this.onExpirationDateChanged(policiesInfo)" formControlName="reviewDate">
+                        <mat-datepicker-toggle matSuffix [for]="expirationDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #expirationDatePicker></mat-datepicker>
+                    </mat-form-field>
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col size="8">
+                    <ion-col>
+                        <mat-label floatLabel="always" class="matFormLabel" >Policy Information *</mat-label>
+                    </ion-col>
+                    <ion-col size="12">
+                        <ckeditor matInput [data]="policiesDetail?.body || ''" [editor]="Editor" tagName="textarea" required formControlName="description" (change)="onChange($event)" [config]="editorConfig"></ckeditor>
+                    </ion-col>
+                </ion-col>
+                <ion-col size="4">
+                    <ng-template [ngIf]="fileUploadInput">
+                        <sls-file-upload-component [disabled]="!(policiesManagementService.canEditPolicies() && initFrom == 'admin')"
+                            [inputData]="this.fileUploadInput"
+                            (output_onFileUploaded)="this.onPoliciesUploaded($event);"
+                            (removeButtonClickEvent)="this.onClearPoliciesUploadBtn()">
+                        </sls-file-upload-component>
+                    </ng-template>
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col size="12" *ngIf="initFrom == 'admin'">
+                    <div class="center" style="float: right;">
+                        <ion-button size="small" color="primary" (click)="this.showAssignedUsersTable()">
+                            Assigned Users
+                        </ion-button>
+                        <ion-button size="small" color="primary" (click)="this.showAssesmentButtonClick()">
+                        Assesment Settings
+                        </ion-button>
+                        <ion-button [disabled]="!this.policiesManagementService.canEditPolicies() || isArchive"
+                            size="small" color="primary"
+                            (click)="this.onReissueBtnClick()">
+                            Re-issue
+                        </ion-button>
+                        <ion-button [disabled]="!this.policiesManagementService.canEditPolicies() || isArchive"
+                            size="small" color="danger"
+                            (click)="this.onArchiveBtnClick()">
+                            Archive
+                        </ion-button>
+                        <ion-button [disabled]="!this.updatePolicyForm.valid || isArchive" size="small"
+                            color="success" (click)="this.onSaveBtnClick()">
+                            Save
+                        </ion-button>
+                    </div>
+                </ion-col>
+            </ion-row>
+            <ion-row class="full-width-item ion-align-items-center">
+                <ion-col>
+                    <!-- Spacer -->
+                </ion-col>
+                <!-- <ion-col size="auto" *ngIf="policiesInfo.IsDeleted">
+                    <mat-label>Reason For Archive:</mat-label>
+                    <br />
+                    <ion-text>{{policiesInfo.ReasonForArchive || 'N/A'}}</ion-text>
+                </ion-col> -->
+                <!-- <ion-col size="auto" *ngIf="this.policiesManagementService.isManagerView">
+                    <ion-button [disabled]="!this.policiesManagementService.canEditPolicies()" size="small"
+                        (click)="this.onViewAuditLogBtnClick()">
+                        Changelog
+                    </ion-button>
+                </ion-col> -->
+                <ion-col size="auto">
+                    
+                    <!-- <ion-button [disabled]="!this.policiesManagementService.canEditPolicies()"
+                        *ngIf="policiesInfo.IsDeleted" size="small" color="danger"
+                        (click)="this.onUnarchiveBtnClick()">
+                        Unarchive
+                    </ion-button> -->
+                    
+                </ion-col>
+            </ion-row> 
+            <ion-row class="full-width-item ion-align-items-center">
+                <ion-col size="12">
+                <ion-card class="responsiveCard" *ngIf="this.initialized">
+                    <ion-card-header color="primary" style="display: flex;">
+                       <ion-col style="text-align: right; margin-top: 6px;" >Signatures</ion-col>
+                        <ion-col style="text-align: right;">
+                            <ion-col >
+                                <ion-button 
+                                class="button-small" 
+                                fill="outline" 
+                                color="secondary" 
+                                title="Export PDF" 
+                                (click)="onClickExport(ExportType.Pdf)">
+                                    Export PDF
+                                </ion-button>
+                            </ion-col>
+                            <ion-col >
+                                <ion-button 
+                                class="button-small" 
+                                fill="outline" 
+                                color="secondary" 
+                                title="Export CSV" 
+                                (click)="onClickExport(ExportType.Csv)">
+                                    Export CSV
+                                </ion-button>
+                            </ion-col>
+                        </ion-col>
+                    </ion-card-header>
+                    <ion-card-content class="ion-no-padding">
+                        <ng-template [ngIf]="policiesDetail">
+                            <policies-signature-table 
+                            [initFrom]="initFrom" 
+                            (onDataUpdate)="handlePoliciesSignatureUpdate($event)" 
+                            [policiesInfo]="policiesInfo" 
+                            [policiesAssignments]="policiesDetail.policyAssignments" 
+                            [policiesAssessments]="policiesDetail.policyAssessments">
+                        </policies-signature-table>
+                        </ng-template>
+                    </ion-card-content>
+                </ion-card>
+            </ion-col>
+            </ion-row>
+        </ion-card-content>
+    </ion-card>
+    </form>
+    <div *ngIf="!this.initialized">
+        <ion-card>
+            <ion-card-header>
+                <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-row>
+                    <ion-col>
+                        <sls-skeleton-table [rows]="3" [columns]="4"></sls-skeleton-table>
+                    </ion-col>
+
+                </ion-row>
+            </ion-card-content>
+        </ion-card>
+    </div>
+    <ion-card class="responsiveCard" *ngIf="this.initialized && initFrom == 'admin'">
+        <ion-card-header color="primary" class="center">
+            Revisions
+        </ion-card-header>
+        <ion-card-content class="ion-no-padding">
+            <policies-history [policiesID]="policiesInfo.policyId"></policies-history>
+        </ion-card-content>
+    </ion-card>
+</div>

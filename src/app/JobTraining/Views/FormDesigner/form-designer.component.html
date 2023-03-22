@@ -1,0 +1,61 @@
+<ion-header>
+    <div *ngIf="this.initialized">
+        <app-header [defaultHref]="this.defaultBackHref" headerText="{{this.jobTrainingService.selectedProgram.Name}}"
+            [hideBackButton]="false">
+        </app-header>
+        <archived-program-header-component></archived-program-header-component>
+        <ion-toolbar color="white">
+            <ion-row class="ion-align-items-center" style="padding: 0 16px;">
+                <ion-col>
+                    <u
+                        style="font-size: 20px; padding-right: 4px;">{{this.formDesignerService.selectedFormInfo.Name}}</u>
+                </ion-col>
+                <ion-col size="auto">
+                    <ion-button fill="outline" (click)="this.onCloseFormClick();">
+                        Close
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-toolbar>
+    </div>
+</ion-header>
+<div *ngIf="this.initialized" style="max-height: 80vh; overflow-y: auto;">
+    <ion-row>
+        <ion-col>
+            <ion-segment (ionChange)="segmentChanged($event)" [value]="this.formDesignerService.selectedTabName">
+                <ion-segment-button value="settings">
+                    <ion-icon name="settings"></ion-icon>
+                    <ion-label>Form Settings</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="likert">
+                    <ion-icon name="options"></ion-icon>
+                    <ion-label>Likert</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="categories">
+                    <ion-icon name="apps"></ion-icon>
+                    <ion-label>Categories & Fields</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="none" [hidden]="true">
+                    <ion-label>None</ion-label>
+                </ion-segment-button>
+            </ion-segment>
+
+            <router-outlet></router-outlet>
+
+        </ion-col>
+        <ion-col style="max-height: 75vh; overflow-y: auto;">
+            <!-- We're using a pre-checked <ion-segment> button here just
+                to keep this columns header looks like it's sibling to the left. -->
+            <ion-segment value="preview">
+                <ion-segment-button value="preview" checked>
+                    <ion-icon name="image"></ion-icon>
+                    <ion-label>FORM PREVIEW</ion-label>
+                </ion-segment-button>
+            </ion-segment>
+            <div>
+                <form-display-component [isPreviewMode]="true" [formInfo]="this.formDesignerService.selectedFormInfo">
+                </form-display-component>
+            </div>
+        </ion-col>
+    </ion-row>
+</div>

@@ -1,0 +1,24 @@
+$footer-height: 60px;
+#footer-content{
+    background-color: black;
+    color: white;
+    height: $footer-height;
+}
+
+.center-vertically{
+    vertical-align: middle;
+    display: inline-block;
+    padding-bottom: calc($footer-height / 2);
+}
+
+.spacer{
+    margin-right: 10px;
+}
+
+.right-side-of-container{
+    float:right;
+}
+
+.clickable {
+    cursor: pointer;
+}

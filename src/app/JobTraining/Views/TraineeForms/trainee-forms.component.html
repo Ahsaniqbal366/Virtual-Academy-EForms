@@ -1,0 +1,170 @@
+<ion-header class="trainee-forms-wrapper">
+    <!-- the <ion-header> must be present from the start for the [appHideHeader] can function -->
+    <div *ngIf="this.initialized">
+        <app-header [defaultHref]="this.getBackHRef()" headerText="{{this.jobTrainingService.selectedProgram.Name}}"
+            [hideBackButton]="false">
+        </app-header>
+
+        <archived-program-header-component></archived-program-header-component>
+
+        <ion-toolbar color="white" *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+            <div style="padding: 8px 16px;">
+                <ion-row class="ion-align-items-center">
+                    <ion-col size-xs="12" size-sm="6" size-md>
+                        <ion-row class="ion-align-items-center">
+                            <ion-col size="auto">
+                                <img class="trainee-photo" [src]="this.traineeFormsService.traineeUserInfo.ProfilePhotoPath" />
+                            </ion-col>
+                            <ion-col>
+                                <div>
+                                    <span>{{this.traineeFormsService.traineeUserInfo.DisplayName}}</span>
+                                </div>
+                                <div>
+                                    <b>ID:</b>
+                                    <span>
+                                        {{this.traineeFormsService.traineeUserInfo.AcadisID}}
+                                    </span>
+                                </div>
+                                <!-- Trainee users cannot change their own phase or other trainees phases. 
+                                        - A plaintext element is shown if the user CANNOT edit.
+                                        - A <select> is shown if the user CAN edit. -->
+                                <div *ngIf="this.jobTrainingService.selectedProgram.IsTraineeUser">
+                                    <b>Phase:</b> {{this.traineeFormsService.traineeUserInfo.PhaseName}}
+                                </div>
+                            </ion-col>
+                        </ion-row>
+                    </ion-col>
+                    <ion-col *ngIf="!this.jobTrainingService.selectedProgram.IsTraineeUser">
+                        <ion-item lines="none" class="ion-no-padding">
+                            <b>
+                                Phase:
+                            </b>
+                            <ion-label style="display: none;">Change Phase</ion-label>
+                            <ion-select class="form-control" [(ngModel)]="this.traineeFormsService.traineeUserInfo.PhaseID"
+                                (ionChange)="onUpdateTraineePhase($event)">
+                                <ion-select-option *ngFor="let phaseOption of this.jobTrainingService.selectedProgram.Phases"
+                                    [value]="phaseOption.PhaseID">{{phaseOption.Name}}</ion-select-option>
+                            </ion-select>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="auto">
+                        <!-- Example output of the summary layout HTML below.
+                                -----------
+                                Hours: 24
+                                -----------
+                            -->
+                        <div *ngFor="let formattedData of traineeFormsService.traineeUserInfo.Summary.FormattedData">
+                            <ion-label>
+                                <b>
+                                    {{formattedData.DataName}}:
+                                </b>
+                                &nbsp;
+                                <span>
+                                    {{formattedData.DataValue}}
+                                </span>
+                            </ion-label>
+                        </div>
+                    </ion-col>
+                    <ion-col size="auto">
+                        <!-- Trainee users cannot add forms. 
+                        ---
+                        JTC 03/30/2020
+                        We hid this button temporarily when the user has the "TaskList" or "CallLog" open as well because
+                        adding misc. form while those views are opened is going to take too long to implement during
+                        this phase of the project. -->
+                        <ion-button color="success" fill="outline" (click)="openAddFormDialog()"
+                            *ngIf="!this.jobTrainingService.selectedProgram.IsTraineeUser && (this.formFilterMode !== 'tasklist') && (this.formFilterMode !== 'calllog')">
+                            <ion-icon name="add" slot="start"></ion-icon>Form
+                        </ion-button>
+                        <ion-button fill="outline" (click)="exportFormsToPDF()"
+                            *ngIf="this.jobTrainingService.selectedProgram.Permissions.CanExportForms">
+                            Export All
+                        </ion-button>
+                    </ion-col>
+                </ion-row>
+            </div>
+        </ion-toolbar>
+    </div>
+</ion-header>
+<div *ngIf="this.initialized"
+    class="trainee-forms-wrapper full-width-item">
+
+    <ion-row *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+        <ion-col size-xs="12" size-sm="12" size-md>
+            <ion-button size="small" fill="{{this.formFilterMode === 'dailyforms' ? 'outline' : 'solid'}}"
+                (click)="this.onFormFilterModeButtonClick('dailyforms');">
+                Today's Forms
+            </ion-button>
+            <ion-button size="small" fill="{{this.formFilterMode === 'calllog' ? 'outline' : 'solid'}}"
+                (click)="this.onFormFilterModeButtonClick('calllog');">
+                Call Log
+            </ion-button>
+            <ion-button size="small" fill="{{this.formFilterMode === 'tasklist' ? 'outline' : 'solid'}}"
+                (click)="this.onFormFilterModeButtonClick('tasklist');">
+                Task List
+            </ion-button>
+            <ion-button size="small" fill="{{this.formFilterMode === 'allforms' ? 'outline' : 'solid'}}"
+                (click)="this.onFormFilterModeButtonClick('allforms');">
+                All Forms
+                <!-- &nbsp;
+                <ion-badge color="tms-gold">5</ion-badge> -->
+            </ion-button>
+        </ion-col>
+        <ion-col size="auto">
+            <ion-item color="none" lines="none">
+                <ion-label>
+                    Hide Completed {{this.formFilterMode === 'tasklist' ? 'Tasks' : 'Forms'}}
+                </ion-label>
+                <ion-toggle 
+                    color="primary"
+                    [(ngModel)]="this.traineeFormsService.hideCompletedItems"
+                    (ionChange)="this.onHideCompletedItemsToggleSwitchChange();"></ion-toggle>
+            </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md>
+            <!-- This <ion-searchbar> element is connected to other search bars on the child views
+                through the [(ngModel)]. We show a loading spinner as soon as the user interacts with the
+                searchbar.
+                ----
+                The child views (<trainee-call-log-table>, <trainee-task-list-table>, etc...) 
+                have a debounce that delays the actual search event when the input changes.
+                We don't want a debounce here because that doubles up on the loading times. -->
+            <ion-searchbar class="ion-no-padding" [(ngModel)]="this.traineeFormsService.searchTextboxInputValue"
+                (ionInput)="this.traineeFormsService.isSearching = true;"
+                (ionClear)="this.traineeFormsService.isSearching = true;">
+            </ion-searchbar>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col class="ion-no-padding" [attr.size-xs]="this.traineeFormsService.hasFormOpenInInlineMode ? 0 : 12"
+            [attr.size-sm]="this.traineeFormsService.hasFormOpenInInlineMode ? 0 : 12"
+            [attr.size-md]="this.traineeFormsService.hasFormOpenInInlineMode ? 0 : 12"
+            [attr.size-lg]="this.traineeFormsService.hasFormOpenInInlineMode ? 3 : 12">
+            <div *ngIf="this.formFilterMode === 'dailyforms' || this.formFilterMode === 'allforms'">
+                <trainee-phase-forms-table #phaseFormsTable [formFilterMode]="this.formFilterMode">
+                </trainee-phase-forms-table>
+            </div>
+
+            <div *ngIf="this.formFilterMode === 'calllog'">
+                <trainee-call-log-table #callLogTable></trainee-call-log-table>
+            </div>
+
+            <div *ngIf="this.formFilterMode === 'tasklist'">
+                <trainee-task-list-table #taskListTable></trainee-task-list-table>
+            </div>
+        </ion-col>
+        <!-- Using [hidden] here to keep the <router-outlet> element in the GUI, even if the subview
+            that populates it isn't loaded yet. Router gets mad otherwise... -->
+        <ion-col [hidden]="!this.traineeFormsService.hasFormOpenInInlineMode" class="embedded-form-wrapper ion-no-padding"
+            size-xs="12" size-sm="12" size-md="12" size-lg="9">
+            <!-- This <router-outlet> element in the trainee forms views will serve up the child
+                routes of the trainee-forms-component, like [formDetailsComponent].
+                ---------
+                Using <router-outlet> instead of <ion-router-outlet> to NOT put this component on the
+                ionic page stack.
+                ---------
+                It just works. -->
+            <router-outlet></router-outlet>
+        </ion-col>
+    </ion-row>
+</div>

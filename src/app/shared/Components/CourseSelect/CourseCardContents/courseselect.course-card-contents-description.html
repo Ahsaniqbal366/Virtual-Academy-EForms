@@ -1,0 +1,17 @@
+﻿<!--The [data-] attributes below are for a bootstrap popover to use.
+Reference the bootstrap docs for more info.-->
+<ion-button *ngIf="course.HasCourseDescription && config.CourseDescriptionConfig.ShowFullDescription != true && config.CourseDescriptionConfig.ShowDescriptionButton" fill="clear"
+    class="course-description-popover " style="border: none !important; position: absolute;
+    bottom: 5px;
+    right: 5px;" data-content="" role="button"
+    tabindex="0" (click)="onPopoverDescriptionButtonClick($event,course.CourseDescription)">
+    <i class="icon icon-info-circle ion-float-right" style="font-size: 20px; margin-bottom: -4px;"></i>
+    <div class="ion-float-right">
+        Description
+    </div>
+   
+
+</ion-button>
+<span *ngIf="config.CourseDescriptionConfig.ShowFullDescription == true" >
+    {{course.CourseDescription}}
+</span>

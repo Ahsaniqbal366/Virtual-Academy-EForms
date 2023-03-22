@@ -1,0 +1,43 @@
+<ion-item *ngIf="!this.hasUsers" color="bootstrap-bg-warning">
+    <!-- No data message. Shown if like the initial input dataset is empty. -->
+    There are no users to show.
+</ion-item>
+<div *ngIf="this.hasUsers">
+    <ion-item *ngIf="this.showRoleFilter">
+        <ion-label>
+            Roles 
+        </ion-label>
+        <ion-select [(ngModel)]="this.filterToRoleIDs" multiple class="form-control"
+                    placeholder="Filter by role">
+                    <ion-select-option *ngFor="let role of this.roles" [value]="role.ProgramRoleID">
+                        {{role.Name}}
+                    </ion-select-option>
+                </ion-select>
+    </ion-item>
+    <ion-item *ngIf="this.showSearchBox">
+        <ion-label>
+            Search
+        </ion-label>
+        <input type="text" class="form-control" placeholder="Search for users"
+                    [(ngModel)]="this.filterByText" />
+    </ion-item>
+
+    <ion-list style="max-height: 60vh; overflow-y: auto;">
+        <ion-radio-group [(ngModel)]="this.selectedUserID" (ionChange)="this.emitSelectedUser();">
+            <ion-item *ngFor="let user of this.users | JTUserSelectorFilter: this.filterByText : this.filterToRoleIDs">
+                <ion-radio [value]="user.UserID"></ion-radio>
+                &nbsp;
+                <img class="jt-user-selector-profile-photo" [src]="user.ProfilePhotoPath" />
+                &nbsp;
+                <div>
+                    <ion-label>
+                        <u>{{user.DisplayName}}</u>
+                    </ion-label>
+                    <ion-label>
+                        <b>ID:</b> {{user.AcadisID}}
+                    </ion-label>
+                </div>
+            </ion-item>
+        </ion-radio-group>
+    </ion-list>
+</div>

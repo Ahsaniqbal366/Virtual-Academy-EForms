@@ -1,0 +1,32 @@
+<ion-header>
+    <app-header [defaultHref]="'/home'" [headerText]="'Programs'" [hideBackButton]="this.hideHeaderBackButton">
+    </app-header>
+</ion-header>
+<div *ngIf="this.initialized">
+    <ion-list lines="full" class="ion-no-padding">
+        <!-- routerLinks serve as a navigation tool. The parameter after the route name appends the variable given to the URL string
+            This string can be used in relative components using the paramMap function -->
+        <ion-item *ngFor="let program of this.jobTrainingService.programs"
+            class="listItem">
+            <ion-row class="full-width-item">
+                <ion-col (click)="this.navigateForward(program);" >
+                    <ion-label>
+                        <span>
+                            <ion-icon name="people"></ion-icon>
+                            <u style="margin-left: 8px;">{{program.Name}}</u>
+                        </span>
+                        <span *ngIf="program.IsArchived"> - Archived on {{(program.ArchivedOnDate | date:'MM/dd/yyyy')}}</span>
+                    </ion-label>
+                </ion-col>
+                <!-- <ion-col size="auto" *ngIf="this.jobTrainingService.serverInfo.CanEditPrograms">
+                    <ion-button (click)="this.onCloneTrainingProgramClick(program);">
+                        Clone
+                    </ion-button>
+                </ion-col> -->
+            </ion-row>
+        </ion-item>
+        <ion-item *ngIf="this.jobTrainingService.programs.length <= 0">
+            No programs available at this time.
+        </ion-item>
+    </ion-list>
+</div>

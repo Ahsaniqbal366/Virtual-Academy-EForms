@@ -1,0 +1,286 @@
+// Ionic Variables and Theming. For more info, please see:
+// http://ionicframework.com/docs/theming/
+
+/** Ionic CSS Variables **/
+:root {
+  /** 
+   * primary
+   * -----
+   * Modified to use TMS Blue (#0033A1).
+   * https://ionicframework.com/docs/theming/color-generator 
+   */
+  --ion-color-primary: #0033a1;
+  --ion-color-primary-rgb: 0, 51, 161;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #002d8e;
+  --ion-color-primary-tint: #1a47aa;
+
+  /** 
+   * secondary
+   * -----
+   * Modified to use a light gray (#e0e0e0).
+   * https://ionicframework.com/docs/theming/color-generator 
+   */
+  --ion-color-secondary: #e0e0e0;
+  --ion-color-secondary-rgb: 224, 224, 224;
+  --ion-color-secondary-contrast: #000000;
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-shade: #c5c5c5;
+  --ion-color-secondary-tint: #e3e3e3;
+
+  /** tertiary **/
+  --ion-color-tertiary: #7044ff;
+  --ion-color-tertiary-rgb: 112, 68, 255;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #633ce0;
+  --ion-color-tertiary-tint: #7e57ff;
+
+  /** 
+   * success
+   * -----
+   * Modified to use Vcamp Green (#6bc04b).
+   * https://ionicframework.com/docs/theming/color-generator
+   */
+  --ion-color-success: #6bc04b;
+  --ion-color-success-rgb: 107, 192, 75;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #5ea942;
+  --ion-color-success-tint: #7ac65d;
+
+  /** warning **/
+  --ion-color-warning: #ffce00;
+  --ion-color-warning-rgb: 255, 206, 0;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #e0b500;
+  --ion-color-warning-tint: #ffd31a;
+
+  /** danger **/
+  --ion-color-danger: #f04141;
+  --ion-color-danger-rgb: 245, 61, 61;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d33939;
+  --ion-color-danger-tint: #f25454;
+
+  /** dark **/
+  --ion-color-dark: #222428;
+  --ion-color-dark-rgb: 34, 34, 34;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #000000;
+  --ion-color-dark-tint: #383a3e;
+
+  /** 
+   * medium
+   * -----
+   * Modified to use TMS Light Gray (#d0d3d4).
+   * https://ionicframework.com/docs/theming/color-generator 
+   */
+  --ion-color-medium: #d0d3d4;
+  --ion-color-medium-rgb: 208, 211, 212;
+  --ion-color-medium-contrast: #000000;
+  --ion-color-medium-contrast-rgb: 0, 0, 0;
+  --ion-color-medium-shade: #b7babb;
+  --ion-color-medium-tint: #d5d7d8;
+
+  /** light **/
+  --ion-color-light: #f4f5f8;
+  --ion-color-light-rgb: 244, 245, 248;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+
+  /** Additional Colors 
+   * -----
+   * Ionic uses -shade and -tint value for hover effects, if avaiable. 
+   * To ensure those effects work, the 3 colors should be unique. These colors may not be unique
+   *
+   * https://ionicframework.com/docs/theming/color-generator 
+   */
+
+  /* True Black */
+  --ion-color-black: #000000;
+  --ion-color-black-rgb: 0, 0, 0;
+  --ion-color-black-contrast: #ffffff;
+  --ion-color-black-contrast-rgb: 255, 255, 255;
+  --ion-color-black-shade: #000000;
+  --ion-color-black-tint: #1a1a1a;
+
+  /* True White */
+  --ion-color-white: #ffffff;
+  --ion-color-white-rgb: 255, 255, 255;
+  --ion-color-white-contrast: #000000;
+  --ion-color-white-contrast-rgb: 0, 0, 0;
+  --ion-color-white-shade: #e0e0e0;
+  --ion-color-white-tint: #ffffff;
+
+  --ion-color-tms-gold: #ffb700;
+  --ion-color-tms-gold-rgb: 255, 183, 0;
+  --ion-color-tms-gold-contrast: #000000;
+  --ion-color-tms-gold-contrast-rgb: 0, 0, 0;
+  --ion-color-tms-gold-shade: #e0a100;
+  --ion-color-tms-gold-tint: #ffbe1a;
+
+  /* VA Dark Grey (#5b6770) */
+  --ion-color-tms-dark-grey: #5b6770;
+  --ion-color-tms-dark-grey-rgb: 91, 103, 112;
+  --ion-color-tms-dark-grey-contrast: #ffffff;
+  --ion-color-tms-dark-grey-contrast-rgb: 255, 255, 255;
+  --ion-color-tms-dark-grey-shade: #505b63;
+  --ion-color-tms-dark-grey-tint: #6b767e;
+
+    /* VA Light Gray (#d0d3d4) */
+    --ion-color-tms-light-gray: #d0d3d4;
+    --ion-color-tms-light-gray-rgb: 208,211,212;
+    --ion-color-tms-light-gray-contrast: #000000;
+    --ion-color-tms-light-gray-contrast-rgb: 0,0,0;
+    --ion-color-tms-light-gray-shade: #b7babb;
+    --ion-color-tms-light-gray-tint: #d5d7d8;
+
+  /* Message Center Table Light */
+  --ion-color-mc-light: #f7f7f7;
+  --ion-color-mc-light-rgb: 247,247,247;
+  --ion-color-mc-light-contrast: #000000;
+  --ion-color-mc-light-contrast-rgb: 0,0,0;
+  --ion-color-mc-light-shade: #d9d9d9;
+  --ion-color-mc-light-tint: #f8f8f8;
+
+  /** 
+   * JTC 4/22/2020
+   * Custom Bootstrap 3 bg-success (#dff0d8).
+   * https://ionicframework.com/docs/theming/color-generator **/
+  --ion-color-bootstrap-bg-success: #dff0d8;
+  --ion-color-bootstrap-bg-success-rgb: 223, 240, 216;
+  --ion-color-bootstrap-bg-success-contrast: #000000;
+  --ion-color-bootstrap-bg-success-contrast-rgb: 0, 0, 0;
+  --ion-color-bootstrap-bg-success-shade: #c4d3be;
+  --ion-color-bootstrap-bg-success-tint: #e2f2dc;
+
+  /** 
+   * JTC 4/22/2020
+   * Custom Bootstrap 3 bg-warning (#fcf8e3).
+   * https://ionicframework.com/docs/theming/color-generator **/
+  --ion-color-bootstrap-bg-warning: #fcf8e3;
+  --ion-color-bootstrap-bg-warning-rgb: 252, 248, 227;
+  --ion-color-bootstrap-bg-warning-contrast: #000000;
+  --ion-color-bootstrap-bg-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-bootstrap-bg-warning-shade: #dedac8;
+  --ion-color-bootstrap-bg-warning-tint: #fcf9e6;
+
+  /** 
+   * JTC 4/22/2020
+   * Custom Bootstrap 3 bg-danger (#f2dede).
+   * https://ionicframework.com/docs/theming/color-generator **/
+   --ion-color-bootstrap-bg-danger: #f2dede;
+   --ion-color-bootstrap-bg-danger-rgb: 242,222,222;
+   --ion-color-bootstrap-bg-danger-contrast: #000000;
+   --ion-color-bootstrap-bg-danger-contrast-rgb: 0,0,0;
+   --ion-color-bootstrap-bg-danger-shade: #d5c3c3;
+   --ion-color-bootstrap-bg-danger-tint: #f3e1e1;
+
+  /**
+   * JTC - Overriding default font-family to use the desired TMS font.
+   * - Changed from Roboto to Monsterrat.
+   * - https://ionicframework.com/docs/theming/advanced
+   */
+  --ion-font-family: "Monsterrat", "Lucida Sans Unicode", "Lucida Grande",
+    sans-serif;
+}
+
+/** 
+ * https://forum.ionicframework.com/t/ionic-4-custom-colors-problem/162734/23
+ * Applying additions 'custom' colors to use requires that they be defined above in root 
+ * and applied here, outside of root. This allows you to use them exactly as you would preset
+ * colors, like:
+ * <ion-toolbar color='black'>
+ */
+.ion-color-black {
+  --ion-color-base: var(--ion-color-black) !important;
+  --ion-color-base-rgb: var(--ion-color-black-rgb) !important;
+  --ion-color-contrast: var(--ion-color-black-contrast) !important;
+  --ion-color-contrast-rgb: var(--ion-color-black-contrast-rgb) !important;
+  --ion-color-shade: var(--ion-color-black-shade) !important;
+  --ion-color-tint: var(--ion-color-black-tint) !important;
+}
+
+.ion-color-white {
+  --ion-color-base: var(--ion-color-white) !important;
+  --ion-color-base-rgb: var(--ion-color-white-rgb) !important;
+  --ion-color-contrast: var(--ion-color-white-contrast) !important;
+  --ion-color-contrast-rgb: var(--ion-color-white-contrast-rgb) !important;
+  --ion-color-shade: var(--ion-color-white-shade) !important;
+  --ion-color-tint: var(--ion-color-white-tint) !important;
+}
+
+.ion-color-tms-gold {
+  --ion-color-base: var(--ion-color-tms-gold);
+  --ion-color-base-rgb: var(--ion-color-tms-gold-rgb);
+  --ion-color-contrast: var(--ion-color-tms-gold-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-tms-gold-contrast-rgb);
+  --ion-color-shade: var(--ion-color-tms-gold-shade);
+  --ion-color-tint: var(--ion-color-tms-gold-tint);
+}
+
+.ion-color-tms-dark-grey {
+  --ion-color-base: var(--ion-color-tms-dark-grey) !important;
+  --ion-color-base-rgb: var(--ion-color-tms-dark-grey-rgb) !important;
+  --ion-color-contrast: var(--ion-color-tms-dark-grey-contrast) !important;
+  --ion-color-contrast-rgb: var(
+    --ion-color-tms-dark-grey-contrast-rgb
+  ) !important;
+  --ion-color-shade: var(--ion-color-tms-dark-grey-shade) !important;
+  --ion-color-tint: var(--ion-color-tms-dark-grey-tint) !important;
+}
+
+.ion-color-mc-light {
+  --ion-color-base: var(--ion-color-mc-light);
+  --ion-color-base-rgb: var(--ion-color-mc-light-rgb);
+  --ion-color-contrast: var(--ion-color-mc-light-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-mc-light-contrast-rgb);
+  --ion-color-shade: var(--ion-color-mc-light-shade);
+  --ion-color-tint: var(--ion-color-mc-light-tint);
+}
+
+.ion-color-bootstrap-bg-success {
+  --ion-color-base: var(--ion-color-bootstrap-bg-success) !important;
+  --ion-color-base-rgb: var(--ion-color-bootstrap-bg-success-rgb) !important;
+  --ion-color-contrast: var(
+    --ion-color-bootstrap-bg-success-contrast
+  ) !important;
+  --ion-color-contrast-rgb: var(
+    --ion-color-bootstrap-bg-success-contrast-rgb
+  ) !important;
+  --ion-color-shade: var(--ion-color-bootstrap-bg-success-shade) !important;
+  --ion-color-tint: var(--ion-color-bootstrap-bg-success-tint) !important;
+}
+
+.ion-color-bootstrap-bg-warning {
+  --ion-color-base: var(--ion-color-bootstrap-bg-warning) !important;
+  --ion-color-base-rgb: var(--ion-color-bootstrap-bg-warning-rgb) !important;
+  --ion-color-contrast: var(
+    --ion-color-bootstrap-bg-warning-contrast
+  ) !important;
+  --ion-color-contrast-rgb: var(
+    --ion-color-bootstrap-bg-warning-contrast-rgb
+  ) !important;
+  --ion-color-shade: var(--ion-color-bootstrap-bg-warning-shade) !important;
+  --ion-color-tint: var(--ion-color-bootstrap-bg-warning-tint) !important;
+}
+
+.ion-color-bootstrap-bg-danger {
+  --ion-color-base: var(--ion-color-bootstrap-bg-danger) !important;
+  --ion-color-base-rgb: var(--ion-color-bootstrap-bg-danger-rgb) !important;
+  --ion-color-contrast: var(
+    --ion-color-bootstrap-bg-danger-contrast
+  ) !important;
+  --ion-color-contrast-rgb: var(
+    --ion-color-bootstrap-bg-danger-contrast-rgb
+  ) !important;
+  --ion-color-shade: var(--ion-color-bootstrap-bg-danger-shade) !important;
+  --ion-color-tint: var(--ion-color-bootstrap-bg-danger-tint) !important;
+}

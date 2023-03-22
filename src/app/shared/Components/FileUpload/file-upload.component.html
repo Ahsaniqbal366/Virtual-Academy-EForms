@@ -1,0 +1,117 @@
+<div *ngIf="!this.initialized" style="padding: 16px;">
+    <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+    <ion-label>
+        <h3>
+            <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+        </h3>
+        <p>
+            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </p>
+        <p>
+            <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        </p>
+    </ion-label>
+</div>
+<div [hidden]="!this.initialized">
+    <!-- The segments will act as the navigational tabs -->
+    <ion-segment color="tertiary" [value]="this.selectedTab" (ionChange)="this.onTabSegmentChanged($event)"
+        *ngIf="this.showTabs">
+        <ion-segment-button value="File" *ngIf="this.showGeneralFileTab">
+            <ion-label>General</ion-label>
+            <ion-icon name="cloud-upload"></ion-icon>
+        </ion-segment-button>
+        <ion-segment-button value="Audio" *ngIf="this.showAudioFileTab">
+            <ion-label>Audio</ion-label>
+            <ion-icon name="mic"></ion-icon>
+        </ion-segment-button>
+        <ion-segment-button value="Video" *ngIf="this.showVideoFileTab">
+            <ion-label>Video</ion-label>
+            <ion-icon name="videocam"></ion-icon>
+        </ion-segment-button>
+    </ion-segment>
+
+    <!-- Error State -->
+    <ion-item *ngIf="this.hasError" color="danger">
+        <ion-label>
+            <h3>
+                <ion-text animated style="width: 50%">
+                    An Error Occurred
+                </ion-text>
+            </h3>
+            <p>
+                <ion-text animated style="width: 80%">
+                    Please Try Again
+                </ion-text>
+            </p>
+        </ion-label>
+    </ion-item>
+
+    <ion-item-divider *ngIf="inputData.showInstructions" color="secondary">
+        {{this.getFileUploadRequirementsString}}
+    </ion-item-divider>
+
+
+
+    <!-- No matter the type of content they desire, we'll offer manual uploads -->
+    <ion-row>
+        <ion-col>
+            <!-- Manual Upload -->
+            <ion-title class="ion-no-padding" style="margin-left: 8px; font-size:14px; margin-bottom: 12px;">
+                <ion-label *ngIf="!inputData.useCustomTitle">
+                    Upload {{this.selectedTab}}
+                    <ion-icon *ngIf="this.isUploaded" name="checkmark-circle" color="success"></ion-icon>
+                </ion-label>
+                <ion-label *ngIf="inputData.useCustomTitle">
+                    {{this.isUploaded ? '' : 'Upload '}}{{this.inputData.customTitleText}}
+                    <ion-icon *ngIf="this.isUploaded" name="checkmark-circle" color="success"></ion-icon>
+                </ion-label>
+            </ion-title>
+            <input style="display: none;" id="files" [disabled]="disabled" *ngIf="!this.isUploaded || !this.inputData.showFileUploadedCard" (change)="this.fileUploadChangeListener($event)" type="file" name="file"/>
+            <label for="files" *ngIf="!this.isUploaded || !this.inputData.showFileUploadedCard" style="background-color: #ECEFF1; padding: 5px 18px; border-radius: 5px;margin-left: 15px; box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%); cursor: pointer;">Choose file</label>
+            <!-- <ion-input [disabled]="disabled" *ngIf="!this.isUploaded || !this.inputData.showFileUploadedCard" (change)="this.fileUploadChangeListener($event)" type="file" name="file">
+            </ion-input> -->
+            <file-uploaded-component [disabled]="disabled" *ngIf="this.isUploaded && this.inputData.showFileUploadedCard" [uploadedFile]="this.uploadedFile" (removeButtonClickEvent)="this.onRemoveButtonClick()"></file-uploaded-component>
+            <ion-progress-bar *ngIf="this.isUploading" type="indeterminate"></ion-progress-bar>
+        </ion-col>
+        <ion-col [hidden]="this.selectedTab == 'File'" style="border-left: 1px solid #aaa;">
+            <!-- Record Content, vid vs audio controlled by switch. -->
+            <ion-title>
+                <ion-label>
+                    Record {{this.selectedTab}}
+                </ion-label>
+            </ion-title>
+            <!-- No need for a 'create' File option -->
+            <div *ngIf="(this.selectedTab == 'Video' || this.selectedTab == 'Audio')">
+                <ion-row>
+                    <ion-col size="12" class="ion-text-center ion-align-items-center" style="font-size: 64px;">
+                        <div [hidden]="this.selectedTab == 'Video'">
+                            <ion-icon name="mic-outline" *ngIf="!this.isRecording" class="ion-padding">
+                            </ion-icon>
+                            <ion-icon [hidden]="this.isRecorded" name="mic" *ngIf="this.isRecording" class="ion-padding"></ion-icon>
+                            <audio [hidden]="!this.isRecorded" controls hidden preload="metadata"></audio>
+                        </div>
+                        <div [hidden]="this.selectedTab == 'Audio'">
+                            <ion-icon [hidden]="this.isRecorded" name="videocam-outline"
+                                *ngIf="!this.isRecording" class="ion-padding">
+                            </ion-icon>
+                            <ion-icon [hidden]="this.isRecorded" name="videocam" *ngIf="this.isRecording"
+                                class="ion-padding"></ion-icon>
+                            <video [hidden]="!this.isRecorded" style="width: 100%;" controls></video>
+                        </div>
+                    </ion-col>
+                </ion-row>
+                <ion-row>
+                    <ion-col size="12" class="ion-text-center">
+                        <div *ngIf="this.isRecording">{{this.getRecordingElapsedTime()}}</div>
+                        <ion-button [disabled]="disabled" (click)="this.startRecording()" *ngIf="!this.isRecording" color="primary">
+                            Start Recording
+                        </ion-button>
+                        <ion-button [disabled]="disabled" (click)="this.stopRecording()" *ngIf="this.isRecording" color="primary">
+                            Stop Recording
+                        </ion-button>
+                    </ion-col>
+                </ion-row>
+            </div>
+        </ion-col>
+    </ion-row>
+</div>

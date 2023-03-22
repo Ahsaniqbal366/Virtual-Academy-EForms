@@ -1,0 +1,16 @@
+  <div *ngIf="Trend>0">
+    <ion-label color="success">
+      <h3>
+        <ion-icon name="trending-up" slot="start"></ion-icon>
+        {{this.Trend}}
+      </h3>
+    </ion-label>    
+  </div>
+  <div *ngIf="Trend<0">
+    <ion-label color="danger">
+      <h2>
+        <ion-icon name="trending-down" slot="start"></ion-icon>
+        {{this.Trend}}
+      </h2>
+    </ion-label>    
+  </div>

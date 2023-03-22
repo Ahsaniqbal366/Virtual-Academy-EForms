@@ -1,0 +1,542 @@
+import { Component, OnInit } from '@angular/core';
+
+import { NavController, AlertController, PopoverController, ModalController } from '@ionic/angular';
+
+import { LoadingService } from '../../../shared/Loading.Service';
+import { ToastService } from '../../../shared/Toast.Service';
+import { DNNEmbedService } from '../../../shared/DNN.Embed.Service';
+import { Router } from '@angular/router';
+import { InventoryProvider } from '../../Providers/Service';
+import * as InventoryModel from '../../Providers/Model';
+
+import { CategoryEditPopoverFactory } from '../../Components/PopoverMenus/category-edit-popover';
+import { EditInventoryFieldDialog } from '../../Components/Dialogs/edit-inventory-field-dialog';
+import {AssignInventoryItemDialog} from '../../Components/Dialogs/assign-inventory-item-dialog';
+
+// define component
+@Component({
+  selector: 'inventory-list-component',
+  templateUrl: 'inventory-list.html',
+  styleUrls: ['../../page.scss']
+})
+
+// create class for export
+export class InventoryListPage implements OnInit {
+  // constructor -- define service provider
+  // The service provider will persist along routes
+  constructor(
+    public navController: NavController,
+    private alertController: AlertController,
+    public router: Router,
+    public inventoryProvider: InventoryProvider,
+    public loadingService: LoadingService,
+    public toastService: ToastService,
+    private modalController: ModalController,
+    private dnnEmbedService: DNNEmbedService,
+    private categoryEditPopoverFactory: CategoryEditPopoverFactory) {
+  }
+
+  /*******************************************
+  * PUBLIC VARIABLES
+  *******************************************/
+  public initialized: boolean;
+
+  /**
+   * [hideHeaderBackButton] is set on _init. Used to hide the header's back button when the ionic app
+   * is embedded in the DNN site.
+   *
+   * We don't hide the back button on every page/view within this module, just the initial page.
+   */
+  public hideHeaderBackButton: boolean;
+
+  public selectedCategory: InventoryModel.InventoryCategoryInfo = new InventoryModel.InventoryCategoryInfo;
+
+  /**
+   * The selected item in the inventory tree (this will display the content in the view panel)
+   */
+  public selectedItem: InventoryModel.InventoryItemInfo = new InventoryModel.InventoryItemInfo;
+
+  /*******************************************
+  * PUBLIC METHODS
+  *******************************************/
+
+  /**
+   * [onCategoryClick] - defines the event for when a category is selected in the tree
+   * @param event 
+   * @param item 
+   */
+  public onCategoryOpenClick(event: Event, category: InventoryModel.InventoryCategoryInfo) {
+    event.stopImmediatePropagation();
+
+    //set the open bit
+    category.GUIData.IsOpen = !category.GUIData.IsOpen;
+  }
+
+  public onCategoryClick(event: Event, category: InventoryModel.InventoryCategoryInfo) {
+    event.stopImmediatePropagation();
+
+    //set the open bit
+    category.GUIData.IsSelected = !category.GUIData.IsSelected;
+    this.selectedCategory = category;
+  }
+
+  /**
+   * [onCategoryItemClick] - defines the event for when a category item is selected in the tree
+   * @param event 
+   * @param item 
+   */
+  public onCategoryItemClick(event: Event, item: InventoryModel.InventoryItemInfo) {
+    event.stopImmediatePropagation();
+
+    //set the selected bit
+    item.GUIData.IsSelected = !item.GUIData.IsSelected;
+    //set the selected inventory tree item
+    this.selectedItem = item;
+  }
+
+  /**
+   * [displayCategoryOptions] - opens a category options popover for the selected category.
+   * @param category 
+   */
+  public displayCategoryOptions(category) {
+    this.categoryEditPopoverFactory.openPopover(category).then((passBackData: any) => {
+      // If there is data returned and an option was selected
+      if ((passBackData) && (passBackData.data)) {
+        switch (passBackData.data.passBackData) {
+          case "Rename":
+            //rename the selected category
+            this._renameCategory(category);
+            break;
+          case "Add Subcategory":
+            //add a new subcategory
+            this._addCategory(category);
+            break;
+          case "Add Item":
+            this._addCategoryItem(category);
+            break;
+          case "Delete":
+            //delete the selected category
+            this._deleteCategory(category);
+            break;
+          default:
+            break;
+        }
+
+      }
+    },
+      (Error) => {
+        console.log('Error: ', Error);
+      });
+  }
+
+  /**
+   * [onAddFieldClick] - defines the click event of the 'Add New Field' button
+   */
+  public onAddFieldClick() {
+    // [isEditMode] as false because this the "add" button click event.
+    const isEditMode = false;
+    this._openEditFieldDialog(isEditMode, null);
+  }
+
+  public onAssignItemClick(){
+    this._openAssignItemDialog();
+  }
+
+  /**
+   * [onEditFieldClick] - defines the click event of the Edit button on each field row
+   */
+  public onEditFieldClick(field: InventoryModel.InventoryItemFieldInfo) {
+    // [isEditMode] as true because this the "edit" button click event.
+    const isEditMode = true;
+    //pass in the selected field as well
+    this._openEditFieldDialog(isEditMode, field);
+  }
+
+  /*******************************************
+   * PRIVATE METHODS
+   *******************************************/
+
+  /**
+  * [_renameCategory] - allows the user to rename the selected category with the input control provided by the alert dialog.
+  * @param category 
+  */
+  private _renameCategory(category: InventoryModel.InventoryCategoryInfo) {
+    //initialize a new alert object
+    const alert = document.createElement('ion-alert');
+
+    //asign header
+    alert.header = 'Rename';
+
+    //define input objects
+    alert.inputs = [
+      {
+        name: 'newCategoryName',
+        value: category.Name
+      }
+    ];
+
+    //define buttons and their handlers
+    alert.buttons = [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        cssClass: 'secondary',
+        handler: () => {
+          console.log('Confirm Cancel')
+        }
+      }, {
+        text: 'Ok',
+        handler: (data) => {
+          //if OK is selected, alter the category's name
+          category.Name = data.newCategoryName
+        }
+      }
+    ];
+
+    //append and present the alert
+    document.body.appendChild(alert);
+    return alert.present();
+  }
+
+  /**
+   * [_addCategory] - defines the process of adding a new category object
+   * @param category 
+   */
+  private _addCategory(category: InventoryModel.InventoryCategoryInfo) {
+    //define a new alert object instance
+    const alert = document.createElement('ion-alert');
+
+    //define the header
+    alert.header = 'Add new category';
+
+    //define the inputs
+    alert.inputs = [
+      {
+        name: 'newCategoryName',
+        placeholder: 'Category Name'
+      }
+    ];
+
+    //define the available buttons
+    alert.buttons = [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        cssClass: 'secondary',
+        handler: () => {
+          console.log('Confirm Cancel')
+        }
+      }, {
+        text: 'Ok',
+        handler: (data) => {
+          //when 'OK' is selected, display the dialog to allow the user to define the new category's settings
+          const newCategory = new InventoryModel.InventoryCategoryInfo();
+          newCategory.Name = data.newCategoryName;
+
+          //push the new category object to the tree
+          category.ChildItems.push(newCategory);
+        }
+      }
+    ];
+
+    //append and present the alert dialog
+    document.body.appendChild(alert);
+    return alert.present();
+  }
+
+  /**
+   * [_addCategory] - defines the process of adding a new category object
+   * @param category 
+   */
+  private _addCategoryItem(category: InventoryModel.InventoryCategoryInfo) {
+    //define a new alert object instance
+    const alert = document.createElement('ion-alert');
+
+    //define the header
+    alert.header = 'Add new item';
+
+    //define the inputs
+    alert.inputs = [
+      {
+        name: 'newItemName',
+        placeholder: 'Item Name'
+      }
+    ];
+
+    //define the available buttons
+    alert.buttons = [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        cssClass: 'secondary',
+        handler: () => {
+          console.log('Confirm Cancel')
+        }
+      }, {
+        text: 'Ok',
+        handler: (data) => {
+          console.log(data);
+          //when 'OK' is selected, display the dialog to allow the user to define the new category's settings
+          const newCategoryItem = new InventoryModel.InventoryItemInfo();
+          newCategoryItem.Name = data.newItemName;
+
+          //push the new category object to the tree
+          category.CategoryItems.push(newCategoryItem);
+        }
+      }
+    ];
+
+    //append and present the alert dialog
+    document.body.appendChild(alert);
+    return alert.present();
+  }
+
+  /**
+   * [_deleteCategory] - defines the process of selecting a category for deletion
+   * @param category 
+   */
+  private _deleteCategory(category: InventoryModel.InventoryCategoryInfo) {
+    //TODO: attach API method here
+  }
+
+  /**
+   * [_openEditFieldDialog] - generates and renders the add/edit modal dialog for Inventory Item fields
+   * @param isEditMode 
+   * @param fieldToEdit 
+   */
+  private async _openEditFieldDialog(isEditMode: boolean, fieldToEdit: InventoryModel.InventoryItemFieldInfo) {
+    //define the modal
+    const modal = await this.modalController.create({
+      backdropDismiss: false,
+      component: EditInventoryFieldDialog,
+      componentProps: {
+        isEditMode,
+        fieldInput: fieldToEdit
+      }
+    });
+
+    //define the actions taken when the dialog is dismissed
+    modal.onDidDismiss().then((result) => {
+      //if the add/edit is confirmed and now cancelled
+      if (result.data.confirmed) {
+
+        //if an item is being edited, apply the changes, otherwise add the new item
+        if (isEditMode) {
+
+          //TODO: Call API to update item here
+          fieldToEdit.FieldName = result.data.fieldData.FieldName;
+          fieldToEdit.Value = result.data.fieldData.Value;
+        } else {
+          const newItemField = new InventoryModel.InventoryItemFieldInfo(result.data.fieldData);
+          //TODO: Call API to save new item here
+          this.selectedItem.FieldInfo.push(newItemField);
+        }
+
+      }
+
+    });
+
+    //present the modal control
+    return await modal.present();
+  }
+
+  private async _openAssignItemDialog() {
+    //define the modal
+    const modal = await this.modalController.create({
+      backdropDismiss: false,
+      component: AssignInventoryItemDialog,
+      componentProps: {
+      }
+    });
+
+    //define the actions taken when the dialog is dismissed
+    modal.onDidDismiss().then((result) => {
+      
+
+    });
+
+    //present the modal control
+    return await modal.present();
+  }
+
+  /*******************************************
+  * SELF INIT
+  *******************************************/
+
+
+  private _init() {
+    this.loadingService.presentLoading('Loading inventory...');
+
+    /*****TEMP DATA FOR TESTING */
+    this.inventoryProvider.inventoryInfo = [{
+      InventoryCategoryID: 1,
+      Name: "Test Category",
+      ParentCategoryID: 0,
+      CreatedByUserID: 0,
+      CreatedOn: new Date,
+      LastModifiedByUserID: 0,
+      LastModifiedOn: new Date,
+      IsDeleted: false,
+      GUIData: new InventoryModel.InventoryCategoryGUIData,
+      ChildItems: [{
+        InventoryCategoryID: 2,
+        Name: "Child Category A",
+        ParentCategoryID: 1,
+        CreatedByUserID: 0,
+        CreatedOn: new Date,
+        LastModifiedByUserID: 0,
+        LastModifiedOn: new Date,
+        IsDeleted: false,
+        GUIData: new InventoryModel.InventoryCategoryGUIData,
+        ChildItems: [{
+          InventoryCategoryID: 2,
+          Name: "Child Category1",
+          ParentCategoryID: 1,
+          CreatedByUserID: 0,
+          CreatedOn: new Date,
+          LastModifiedByUserID: 0,
+          LastModifiedOn: new Date,
+          IsDeleted: false,
+          ChildItems: [],
+          CategoryItems: [],
+          GUIData: new InventoryModel.InventoryCategoryGUIData,
+        },
+        {
+          InventoryCategoryID: 2,
+          Name: "Child Category2",
+          ParentCategoryID: 1,
+          CreatedByUserID: 0,
+          CreatedOn: new Date,
+          LastModifiedByUserID: 0,
+          LastModifiedOn: new Date,
+          IsDeleted: false,
+          ChildItems: [],
+          CategoryItems: [],
+          GUIData: new InventoryModel.InventoryCategoryGUIData,
+        }],
+        CategoryItems: []
+      }],
+      CategoryItems: [{
+        InventoryItemID: 1,
+        Name: "Test",
+        Details: "",
+        CreatedByUserID: 0,
+        CreatedOn: new Date,
+        LastModifiedByUserID: 0,
+        LastModifiedOn: new Date,
+        IsDeleted: false,
+
+        GUIData: new InventoryModel.InventoryItemGUIData,
+        InventoryItemAssignmentInfo: new InventoryModel.InventoryItemAssignmentInfo,
+        FieldInfo: [{
+          InventoryItemFieldID: 1,
+          FieldName: "Test",
+          Value: "Test"
+        }]
+      }]
+    },
+    {
+      InventoryCategoryID: 3,
+      Name: "Second Tier",
+      ParentCategoryID: 0,
+      CreatedByUserID: 0,
+      CreatedOn: new Date,
+      LastModifiedByUserID: 0,
+      LastModifiedOn: new Date,
+      IsDeleted: false,
+      GUIData: new InventoryModel.InventoryCategoryGUIData,
+      ChildItems: [{
+        InventoryCategoryID: 4,
+        Name: "Child",
+        ParentCategoryID: 3,
+        CreatedByUserID: 0,
+        CreatedOn: new Date,
+        LastModifiedByUserID: 0,
+        LastModifiedOn: new Date,
+        IsDeleted: false,
+        GUIData: new InventoryModel.InventoryCategoryGUIData,
+        ChildItems: [{
+          InventoryCategoryID: 5,
+          Name: "Child 2",
+          ParentCategoryID: 4,
+          CreatedByUserID: 0,
+          CreatedOn: new Date,
+          LastModifiedByUserID: 0,
+          LastModifiedOn: new Date,
+          IsDeleted: false,
+          ChildItems: [],
+          CategoryItems: [],
+          GUIData: new InventoryModel.InventoryCategoryGUIData,
+        },
+        {
+          InventoryCategoryID: 6,
+          Name: "Another Child",
+          ParentCategoryID: 4,
+          CreatedByUserID: 0,
+          CreatedOn: new Date,
+          LastModifiedByUserID: 0,
+          LastModifiedOn: new Date,
+          IsDeleted: false,
+          ChildItems: [],
+          CategoryItems: [],
+          GUIData: new InventoryModel.InventoryCategoryGUIData,
+        }],
+        CategoryItems: []
+      }],
+      CategoryItems: [{
+        InventoryItemID: 1,
+        Name: "Some Item",
+        Details: "",
+        CreatedByUserID: 0,
+        CreatedOn: new Date,
+        LastModifiedByUserID: 0,
+        LastModifiedOn: new Date,
+        IsDeleted: false,
+        InventoryItemAssignmentInfo: new InventoryModel.InventoryItemAssignmentInfo,
+        GUIData: new InventoryModel.InventoryItemGUIData,
+        FieldInfo: [{
+          InventoryItemFieldID: 1,
+          FieldName: "Test",
+          Value: "Test"
+        }]
+      },
+      {
+        InventoryItemID: 2,
+        Name: "Another Item",
+        Details: "",
+        CreatedByUserID: 0,
+        CreatedOn: new Date,
+        LastModifiedByUserID: 0,
+        LastModifiedOn: new Date,
+        IsDeleted: false,
+        InventoryItemAssignmentInfo: new InventoryModel.InventoryItemAssignmentInfo,
+        GUIData: new InventoryModel.InventoryItemGUIData,
+        FieldInfo: [{
+          InventoryItemFieldID: 1,
+          FieldName: "Test",
+          Value: "Test"
+        }]
+      }]
+    }
+    ];
+
+    // this.jobTrainingService.getServerInfo().subscribe(
+    //   // #TODO - Cache training programs objects on class and get variable data into DOM.
+    //   (serverInfo: Model.ServerInfo[]) => {
+
+    //   },
+    //   (error) => {
+    //     console.log('trainingPrograms-error: ', error);
+    //     this.loadingService.dismissLoading();
+    //   }
+
+    // );
+    this.initialized = true;
+    this.loadingService.dismissLoading();
+  }
+
+  ngOnInit() {
+    this.hideHeaderBackButton = this.dnnEmbedService.getConfig().IsEmbedded;
+    this._init();
+  }
+}

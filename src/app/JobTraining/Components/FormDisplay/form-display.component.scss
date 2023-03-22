@@ -1,0 +1,74 @@
+.form-display-wrapper {
+    .category-header-collapsed {
+      border-bottom: 2px solid var(--ion-color-secondary-shade);
+    }
+  
+    .field-card-divider {
+      border-bottom: 1px solid var(--ion-color-secondary);
+      margin-bottom: 8px;
+    }
+  
+    .field-incomplete {
+      border-left: var(--ion-color-warning);
+      border-left-style: solid;
+      border-left-width: thick;
+    }
+  
+    .field-error {
+      border-left: var(--ion-color-danger);
+      border-left-style: solid;
+      border-left-width: thick;
+    }
+  
+    .likert-radio,
+    .yes-no-radio {
+      vertical-align: middle;
+      margin: 6px;
+    }
+  
+    /**
+     * [.item-radio-checked] css class is added automatically by ionic to the parent <ion-item> element when
+     * the child <ion-radio> element is checked.
+     */
+  
+    ion-item.radio-field-item-wrapper.item-radio-checked {
+      border-bottom: 2px solid var(--ion-color-primary);
+  
+      /**
+       * As part of default behavior the <ion-label> element will get made opaque when the <ion-radio>
+       * is disabled. We make the checked/selected label element still appear dark for read-only mode.
+       * This works because in the style selector above we limit to just the [.item-radio-checked]
+       * parent class.
+       */
+      ion-label {
+        opacity: 1;
+      }
+    }
+  
+    /**
+     * We use a [pre-wrap] css because that will preserve any spaces or line-breaks the user enters into
+     * the edit-mode <textarea> element.
+     */
+    .textarea-field-read-only {
+      white-space: pre-wrap;
+    }
+  
+    .entry-textarea {
+      max-height: 300px;
+    }
+  
+    .report-table-element {
+      th {
+        text-align: left;
+      }
+      td {
+        text-align: left;
+        padding-right: 8px;
+      }
+  
+      tr{
+        border-bottom: 1px solid #ddd;
+      }
+    }
+  }
+  

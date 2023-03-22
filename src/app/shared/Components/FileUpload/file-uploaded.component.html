@@ -1,0 +1,13 @@
+<ion-card [title]="this.uploadedFile.name" button (click)="this.onFileCardClicked()" class="file-uploaded-card">
+    <ion-card-header class="ion-no-padding file-uploaded-card-header">
+        <ion-button [disabled]="disabled" class="ion-no-padding file-uploaded-close-button" fill="clear" (click)="this.onRemoveButtonClick($event)">
+            <ion-icon class="file-uploaded-close-icon ion-no-padding" name="close" slot="icon-only"></ion-icon>
+        </ion-button>
+    </ion-card-header>
+    <ion-card-content class="ion-no-padding file-uploaded-card-content">
+        <ion-icon name="document-attach-outline" class="file-uploaded-card-icon"></ion-icon>
+    </ion-card-content>
+    <ion-card-header class="ion-no-padding file-uploaded-card-footer">
+        <ion-text class="file-uploaded-text">{{this.uploadedFile.name}}</ion-text>
+    </ion-card-header>
+</ion-card>

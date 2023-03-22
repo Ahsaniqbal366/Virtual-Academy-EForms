@@ -1,0 +1,11 @@
+<ion-label *ngIf="PossibleMarkedFields != 0">
+  <h2>
+    <ion-icon name="checkbox-outline" slot="start"></ion-icon>
+    {{TotalMarkedFields}} / {{PossibleMarkedFields}}
+  </h2>
+</ion-label>
+<ion-label *ngIf="PossibleMarkedFields == 0">
+  <h2>
+    N/A
+  </h2>
+</ion-label>

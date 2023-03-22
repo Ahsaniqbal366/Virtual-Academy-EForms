@@ -1,0 +1,42 @@
+<div class="main-page-wrapper">
+  <div class="Tabs-wrapper">
+    <mat-tab-group class="custom-tabs" (selectedTabChange)="tabChanged($event)">
+
+      <mat-tab label="E Form Requests">
+        <div class="search-bar-wrapper">
+          <form class="example" action="/action_page.php" style="max-width:479px">
+            <input class="inner-search" type="text" placeholder="search by requestor name, agency, date....."
+              name="search2">
+            <button class="search-icon" type="submit"><i class="fa fa-search"></i></button>
+          </form>
+        </div>
+        <div class="e-form-request">
+          <app-admin-eform-requests></app-admin-eform-requests>
+        </div>
+      </mat-tab>
+      <!-- 2nd tab -->
+      <mat-tab label="Available Forms">
+        <div class="search-bar-wrapper">
+          <form class="example" action="/action_page.php" style="max-width:479px">
+            <input class="inner-search" type="text" placeholder="search by requestor name, agency, date....."
+              name="search2">
+            <button class="search-icon" type="submit"><i class="fa fa-search"></i></button>
+          </form>
+        </div>
+        <div class="available-forms">
+          <app-admin-available-forms></app-admin-available-forms>
+        </div>
+      </mat-tab>
+      <form class="example" action="/action_page.php" style="margin:auto;max-width:300px">
+        <input type="text" placeholder="Search.." name="search2">
+        <button type="submit"><i class="fa fa-search"></i></button>
+      </form>
+    </mat-tab-group>
+    <div *ngIf="eFormRequestsActive">
+      <button class="new-form-btn btn"> 
+        <img src="../../../../../../assets/images/Plus-btn.svg" alt="">
+        Create a New Form
+      </button>
+    </div>
+  </div>
+</div>

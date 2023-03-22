@@ -1,0 +1,80 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss(null, false)">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Add User
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content *ngIf="initialized">
+  <div *ngIf="this.hasAvailableUsers">
+
+
+    <ion-item>
+      <ion-label>User</ion-label>
+      <ion-select [(ngModel)]="this.selectedUserID" class="form-control" placeholder="Select user...">
+        <ion-select-option *ngFor="let userOption of this.availableUsers" [value]="userOption.UserID">
+          {{userOption.DisplayName}}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- "Is Trainee User" toggle switch will be hidden if the user cannot change the value. -->
+    <ion-item [hidden]="this.dialogInput.forceTraineeUser">
+      <ion-label>
+        Is Trainee User
+      </ion-label>
+      <ion-toggle [disabled]="this.dialogInput.forceTraineeUser" [(ngModel)]="this.isTraineeUser"></ion-toggle>
+    </ion-item>
+
+    <!-- "Shift" selector - only relevant for trainee users. -->
+    <ion-item *ngIf="this.isTraineeUser">
+      <ion-label>
+        Shift
+      </ion-label>
+      <ion-select [(ngModel)]="this.selectedShiftID" class="form-control" placeholder="Select shift...">
+        <ion-select-option *ngFor="let shiftOption of this.jobTrainingService.selectedProgram.ShiftInfo"
+          [value]="shiftOption.ShiftID">
+          {{shiftOption.Name}}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- Role multi-selector - only relevant for NON-trainee users. -->
+    <ion-item *ngIf="!this.isTraineeUser">
+      <ion-label>
+        Roles
+      </ion-label>
+      <ion-select multiple [(ngModel)]="this.selectedRoleIDs" class="form-control" placeholder="Select roles...">
+        <ion-select-option *ngFor="let role of this.jobTrainingService.selectedProgram.NonTraineeRoles"
+          [value]="role.ProgramRoleID">
+          {{role.Name}}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+  </div>
+
+  <ion-item *ngIf="!this.hasAvailableUsers">
+    <ion-label>
+      No users to add.
+    </ion-label>
+  </ion-item>
+
+</ion-content>
+
+<ion-footer *ngIf="this.hasAvailableUsers">
+  <ion-toolbar>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="onConfirmAddition()" slot="end" color="success" fill="solid">
+        <ion-icon name="add"></ion-icon>
+        Add Selected
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

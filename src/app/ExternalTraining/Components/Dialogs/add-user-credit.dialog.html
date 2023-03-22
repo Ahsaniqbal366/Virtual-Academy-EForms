@@ -1,0 +1,28 @@
+<h2 mat-dialog-title style="margin: -18px -16px 4px -16px">
+  <ion-row class="full-width-item ion-align-items-center">
+    <ion-col>
+      Add Credit
+    </ion-col>
+    <ion-col size="auto">
+      <ion-button (click)="this.closeDialog();" fill="clear">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</h2>
+<mat-dialog-content class="" style="padding: 0;">
+  <user-selector-table (onUsersSelected)="this.onUserSelectionChanged($event)"></user-selector-table>
+</mat-dialog-content>
+<mat-dialog-actions style="margin: -8px -12px -12px -12px">
+  <ion-row class="full-width-item ion-align-items-center">
+    <ion-col>
+
+    </ion-col>
+
+    <ion-col size="auto">
+      <button mat-stroked-button class=" gray-border-button" (click)="this.onSubmitBtnClick();" size="small" color="success">
+        Submit
+      </button>
+    </ion-col>
+  </ion-row>
+</mat-dialog-actions>

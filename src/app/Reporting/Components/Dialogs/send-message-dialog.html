@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="this.dismiss(false);">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <span>
+        Send Message to {{this.LearnerName}}
+      </span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-row>
+    <ion-col>
+      <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+        <mat-label>Subject</mat-label>
+        <input matInput [(ngModel)]="this.messageSubject">
+      </mat-form-field>
+
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+        <mat-label>Message</mat-label>
+        <textarea matInput [(ngModel)]="this.messageText"></textarea>
+      </mat-form-field>
+
+    </ion-col>
+  </ion-row>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="this.dismiss(false);" fill="outline">
+        Cancel
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="this.onConfirm();" color="success" fill="outline">
+        Send
+      </ion-button>
+
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

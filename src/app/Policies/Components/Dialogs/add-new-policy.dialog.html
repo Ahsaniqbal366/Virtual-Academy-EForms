@@ -1,0 +1,156 @@
+<h2 mat-dialog-title class="policy-modal-title" style="background-color: #1a43a9; color:white;">
+  <ion-row class="full-width-item ion-align-items-center">
+    <ion-col class="ion-padding-start">
+      {{this.headerText}}
+    </ion-col>
+    <ion-col size="auto">
+      <ion-button (click)="this.closeDialog();" fill="clear">
+        <ion-icon name="close" slot="icon-only" color="white"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</h2>
+<mat-dialog-content id="addNewFirst"  style="padding: 0; margin: 0;">
+  <ion-row style="margin: 0 13px;">
+    <ion-col [size]="colSize">
+      <form [formGroup]="addPolicyForm" *ngIf="this.initialized">
+        <ion-row>
+          <ion-col size="4" *ngIf="this.isNewPolicy || this.isPolicyRenew">
+            <ion-item lines="none" class="zero-padding">
+              <p class="w-100 ion-no-margin">
+              <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+                <mat-label>Policy Number</mat-label>
+                <input  type="text" matInput formControlName="policyNumber" required [maxlength]="50">
+                <mat-error *ngIf="addPolicyForm.controls.policyNumber.invalid">
+                  {{this.getFieldErrorMessage(addPolicyForm.controls.policyNumber)}}
+                </mat-error>
+              </mat-form-field>
+              </p>
+            </ion-item>
+          </ion-col>
+          <ion-col size="8" *ngIf="this.isNewPolicy || this.isPolicyRenew">
+            <ion-item lines="none" class="zero-padding">
+              <p class="w-100 ion-no-margin">
+              <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+                <mat-label>Policy Title</mat-label>
+                <input matInput formControlName="friendlyName" required [maxlength]="100">
+                <mat-error *ngIf="addPolicyForm.controls.friendlyName.invalid">
+                  {{this.getFieldErrorMessage(addPolicyForm.controls.friendlyName)}}
+                </mat-error>
+              </mat-form-field>
+              </p>
+            </ion-item>
+
+          </ion-col>
+          <ion-col size="4" *ngIf="this.isNewPolicy || this.isPolicyRenew">
+            <ion-item lines="none" class="zero-padding">
+<p class="w-100 ion-no-margin">
+              <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+                <mat-label>Effective Date</mat-label>
+                <input matInput [matDatepicker]="completionDatePicker" placeholder="MM/DD/YYYY"
+                  formControlName="effectiveDate" required [max]="fieldDOBMaxValue" style="min-width: 80px;" (dateChange)="onEffectiveDateChanged($event)">
+                  <mat-datepicker-toggle matSuffix [for]="completionDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #completionDatePicker></mat-datepicker>
+                <mat-error *ngIf="addPolicyForm.controls.effectiveDate.invalid">
+                  {{this.getFieldErrorMessage(addPolicyForm.controls.effectiveDate)}}
+                </mat-error>
+              </mat-form-field>
+  </p>
+            </ion-item>
+
+          </ion-col>
+          <ion-col size="4" *ngIf="this.isNewPolicy || this.isPolicyRenew">
+            <ion-item lines="none" class="zero-padding">
+              <p class="w-100 ion-no-margin">
+              <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+                <mat-label>Review Date</mat-label>
+                
+                <input matInput [matDatepicker]="expirationDatePicker" placeholder="MM/DD/YYYY"
+                  formControlName="reviewDate" required style="min-width: 80px;">
+               
+                  <mat-datepicker-toggle matSuffix [for]="expirationDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #expirationDatePicker></mat-datepicker>
+                <mat-error *ngIf="addPolicyForm.controls.reviewDate.invalid">
+                  {{this.getFieldErrorMessage(addPolicyForm.controls.reviewDate)}}
+                </mat-error>
+              </mat-form-field>
+              </p>
+            </ion-item>
+          </ion-col>
+
+          <ion-col size="4" style="padding-left: 4px;">
+            <sls-file-upload-component [inputData]="this.fileUploadInput" (output_onFileUploaded)="this.onPoliciesUploaded($event)"
+            (removeButtonClickEvent)="this.onClearPoliciesUploadBtn()">
+            </sls-file-upload-component>
+          </ion-col>
+        </ion-row>
+        <ion-row class="full-width-item">
+          <ion-col size="12">
+                <mat-label floatLabel="always" class="matFormLabel" >Policy Information *</mat-label>
+          </ion-col>
+          <ion-col size="12">
+                <ckeditor  matInput [editor]="Editor" tagName="textarea" required formControlName="description" [config]="editorConfig"></ckeditor>
+                <mat-error *ngIf="addPolicyForm.controls.description.invalid">
+                  {{this.getFieldErrorMessage(addPolicyForm.controls.description)}}
+                </mat-error>
+          </ion-col>
+        </ion-row>
+        <ion-row class="full-width-item">
+          <!-- <ion-col size="6" *ngIf="this.isNewPolicy">
+            <ion-item lines="none" class="ion-no-padding">
+              <select-users-assignment (onDropdownChange)="assignmentUser($event)" class="full-width-item" required></select-users-assignment>
+            </ion-item>
+          </ion-col> -->
+          <!-- <ion-col size="6" *ngIf="this.isPolicyRenew">
+            <ion-item lines="none" class="ion-no-padding">
+            <select-users-assignment (onDropdownChange)="assignmentUser($event)" [selectedValues]="policiesInfo.policyAssignments" class="full-width-item" required></select-users-assignment> -->
+        <!-- <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                <mat-label>Policy Assignment</mat-label>
+                <mat-select placeholder="Select..." formControlName="AssesmentTitle">
+                  <mat-option *ngFor="let user of this.policiesUserInfo" [value]="user.id">
+                    {{user.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field> -->
+            <!-- </ion-item>
+          </ion-col> -->
+          <ion-col size="6">
+            <ion-button class="button-medium" color="primary" (click)="this.showAssesmentButtonClick()">
+              <ion-icon name="add" slot="icon-only"></ion-icon>
+              Add Assessment
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </form>
+      <ion-row>
+        <ion-col size="2">
+          <h4> Assign to: </h4>
+        </ion-col>
+        <ion-col size="9" style="margin-top: 16px; margin-bottom: 10px;">
+          <ion-text>Select All: </ion-text> 
+          <ion-checkbox 
+          [(ngModel)]="this.isSelectAllUser"
+          (ionChange)="selectAllChecked($event)"
+          ></ion-checkbox>
+        </ion-col>
+      </ion-row>
+      <user-selector-table *ngIf="this.isNewPolicy" (onUsersSelected)="assignmentUser($event)" [isSelectAll]="this.isSelectAllUser"></user-selector-table>
+      <user-selector-table *ngIf="this.isPolicyRenew"(onUsersSelected)="assignmentUser($event)" [selectedValues]="sendUserData()" [isSelectAll]="this.isSelectAllUser"></user-selector-table>
+    </ion-col>
+    <ion-col size="5" style="display: none; border: 1px solid #E1E4E7;border-radius: 25px;" id="assessmentSection">
+      <h4 style="background-color: #1A43A9;margin: 0;padding: 7px 15px;border-radius: 19px 19px 0 0;color: #fff;"> Add Assessment Questions </h4>
+      <ion-button (click)="this.hideAssesmentOnClick();" fill="clear" class="new-policy-close" style="float: right;">
+        <ion-icon name="close" slot="icon-only" color="white"></ion-icon>
+      </ion-button>
+      <add-new-assesment-dialog *ngIf="isNewPolicy" (sendQuestionsData)="sendQuestionsData($event)" [assignmentTitle]="addPolicyForm.controls.friendlyName.value"> </add-new-assesment-dialog>
+      <add-new-assesment-dialog *ngIf="isPolicyRenew" (sendQuestionsData)="sendQuestionsData($event)" [assignmentTitle]="addPolicyForm.controls.friendlyName.value"  [assesmentData]="policiesInfo.policyAssessments"> </add-new-assesment-dialog>
+    </ion-col>
+  </ion-row>
+</mat-dialog-content>
+<mat-dialog-actions style="width: 100%; padding: 14px;">
+    <ion-col size="12">
+      <ion-button (click)="onSubmitBtnClick();" [disabled]="!addPolicyForm.valid" size="small" color="success"  style="margin-left: 80%; width: 19.6%;">
+        Submit
+      </ion-button>
+    </ion-col>
+</mat-dialog-actions>

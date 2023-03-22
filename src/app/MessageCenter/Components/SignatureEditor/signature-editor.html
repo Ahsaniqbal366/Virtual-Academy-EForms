@@ -1,0 +1,26 @@
+<ion-header>
+    <ion-title style="padding-bottom: 20px; padding-top: 20px;">
+        <b>Signature Editor</b>
+    </ion-title>
+</ion-header>
+<ion-content>
+    <ckeditor [editor]="this.ckeditorInstance" [config]="this.ckeditorConfig"
+    [(ngModel)]="this.signatureToEdit">
+    </ckeditor>
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+        <ion-progress-bar [type]="'indeterminate'" *ngIf="this.messageCenterProvider.isLoading"></ion-progress-bar>
+        <ion-buttons style="justify-content: center; justify-content: space-evenly;">
+            <ion-button [disabled]="this.disableButtons" (click)="this.dismiss(false);" color="danger" fill="outline">
+                <b>Cancel</b>
+            </ion-button>
+            <ion-button [disabled]="this.disableButtons" (click)="this.autoFill();" color="primary" fill="outline">
+                <b>Auto Fill</b>
+            </ion-button>
+            <ion-button [disabled]="this.disableButtons" (click)="this.onConfirm();" color="primary" fill="outline">
+                <b>Submit Changes</b>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>

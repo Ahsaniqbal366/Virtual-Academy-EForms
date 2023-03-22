@@ -1,0 +1,114 @@
+<div class="external-training-details-wrapper">
+    <ion-card class="responsiveCard">
+        <ion-card-header>
+            <ion-row class="full-width-item ion-align-items-center">
+                <ion-col>
+                    Course Details
+                </ion-col>
+                <ion-col size="auto">
+                    <button mat-stroked-button *ngIf="externalTrainingInfo.IsDeleted" class=" gray-border-button " (click)="this.onUnarchiveBtnClick();" size="small" color="success">
+                        Unarchive
+                      </button>
+                      <button mat-stroked-button *ngIf="!externalTrainingInfo.IsDeleted" class=" gray-border-button" (click)="this.onArchiveBtnClick()" size="small" color="success">
+                        Archive
+                      </button>
+                    
+                </ion-col>
+                <ion-col size="auto">
+                    <button mat-stroked-button class=" gray-border-button" (click)="this.onSaveBtnClick()" size="small" color="success">
+                        Save
+                      </button>
+                    
+                </ion-col>
+            </ion-row>
+        </ion-card-header>
+        <ion-card-content>
+            <ion-row size="12" class="full-width-item">
+                <ion-col size="3">
+                    <div class="custom-mat-form-field">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Course Name</mat-label>
+                        <input matInput [(ngModel)]="externalTrainingInfo.Name">
+                    </mat-form-field>
+                    </div>
+                </ion-col>
+                <ion-col size="3">
+                    <div class="custom-mat-form-field">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Credit Type</mat-label>
+                        <mat-select placeholder="Select..." class="standard-input" [(ngModel)]="externalTrainingInfo.CreditTypeID">
+                            <mat-option *ngFor="let type of this.externalTrainingService.externalTrainingTypes"
+                                [value]="type.ExternalCreditTypeID">
+                                {{type.Name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    </div>
+                </ion-col>
+                <ion-col size="2">
+                    <div class="custom-mat-form-field">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Hours</mat-label>
+                        <input matInput [(ngModel)]="externalTrainingInfo.Hours">
+                    </mat-form-field>
+                    </div>
+                </ion-col>
+                <ion-col size="2">
+                    <div class="custom-mat-form-field">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Instructor</mat-label>
+                        <input matInput [(ngModel)]="externalTrainingInfo.SME">
+                    </mat-form-field>
+                    </div>
+                </ion-col>
+                
+                <ion-col size="2">
+
+                    <mat-slide-toggle style="padding-top:15px;" class="example-margin" color="primary"
+                        [(ngModel)]="externalTrainingInfo.IsStateApproved">
+                        State Approved?
+                    </mat-slide-toggle>
+
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col size="3">
+                    <div class="custom-mat-form-field">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Additional Info</mat-label>
+                        <textarea matInput rows="3" cols="40"
+                            [(ngModel)]="externalTrainingInfo.AdditionalDetails"></textarea>
+                    </mat-form-field>
+                    </div>
+                </ion-col>
+                <ion-col size="9">
+                    <sls-file-upload-component [disabled]="!this.externalTrainingService.canEditExternalTraining()"
+                        [inputData]="this.fileUploadInput"
+                        (output_onFileUploaded)="this.onExternalTrainingUploaded($event);"
+                        (removeButtonClickEvent)="this.onClearExternalTrainingUploadBtn()">
+                    </sls-file-upload-component>
+                </ion-col>
+
+            </ion-row>
+            
+        </ion-card-content>
+    </ion-card>
+    <div *ngIf="!this.initialized">
+        <ion-card>
+            <ion-card-header>
+                <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-row>
+                    <ion-col>
+                        <sls-skeleton-table [rows]="3" [columns]="4"></sls-skeleton-table>
+                    </ion-col>
+
+                </ion-row>
+            </ion-card-content>
+        </ion-card>
+    </div>
+    <external-training-roster [courseInfo]="externalTrainingInfo">
+    </external-training-roster>
+
+</div>

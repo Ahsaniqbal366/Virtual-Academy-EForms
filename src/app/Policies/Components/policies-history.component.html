@@ -1,0 +1,114 @@
+<div *ngIf="!this.initialized">
+
+  <ion-card-content *ngIf="this.noreview" class="ion-no-padding">
+  <ion-item color="bootstrap-bg-warning" lines="none">
+    <div>
+      No Revisions available for this policy.
+    </div>
+  </ion-item>
+</ion-card-content>
+      <ion-row *ngIf="!this.noreview">
+        <ion-col>
+          <sls-skeleton-table [rows]="1" [columns]="4"></sls-skeleton-table>
+        </ion-col>
+
+      </ion-row>
+</div>
+<div class="policies-history-wrapper" *ngIf="this.initialized">
+  <table mat-table [dataSource]="policiesHistoryDataSource" multiTemplateDataRows class="jt-mat-table" style="width:100%;">
+
+    <ng-container matColumnDef="Policy Number">
+      <th mat-sort-header="type" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+        Policy Number
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+        {{policy.policyNumber}}
+      </td>
+
+    </ng-container>
+    <ng-container matColumnDef="Title">
+      <th mat-sort-header="title" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+        Policy Title
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="tms-table-cell ">
+        {{policy.friendlyName}}
+      </td>
+
+    </ng-container>
+    <ng-container matColumnDef="EffectiveDate">
+      <th mat-sort-header="completion" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+        Effective Date
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+        {{policy.effectiveDate | date:'MM/dd/yyyy'}}
+      </td>
+
+    </ng-container>
+    <ng-container matColumnDef="ReviewDate">
+      <th mat-sort-header="expiration" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+        Review Date
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell"
+        [class.policy-cell-danger]='policy.IsExpired'
+        [class.policy-cell-valid]='policy.IsValid'
+        [class.policy-cell-nearing]='policy.IsNearing'
+        [class.policy-cell-moderate]='policy.IsModerate'>
+        {{policy.reviewDate | date:'MM/dd/yyyy'}}
+      </td>
+
+    </ng-container>
+    <ng-container matColumnDef="View">
+      <th mat-header-cell *matHeaderCellDef class="tms-table-cell ion-text-center ">
+        View
+      </th>
+
+      <td mat-cell *matCellDef="let policy" id="{{policy.policyId}}" class="tms-table-cell  ion-text-center small-status-cell"
+      (click)="expandedElement = expandedElement === policy ? null : policy">
+        <ion-button size="small" color="primary" fill="clear" title="View policy">
+          <ion-icon name="eye-outline" *ngIf="expandedElement != policy"></ion-icon>
+          <ion-icon name="chevron-up-outline" *ngIf="expandedElement == policy"></ion-icon>
+        </ion-button>
+
+      </td>
+
+    </ng-container>
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let policy"
+        [attr.colspan]="policiesHistory_matTable_displayedColumns.length" style="padding:0px !important;">
+        <div *ngIf="this.policiesManagementService.isAdmin" class="expanded-element-detail"
+          [@detailExpand]="policy == expandedElement ? 'expanded' : 'collapsed'">
+          <!--EXPANDABLE ROW CONTENTS HERE-->
+          <policies-details *ngIf="policy == expandedElement"
+            [policiesInfo]="policy"
+            [initFrom]="'revision'"></policies-details>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="policiesHistory_matTable_displayedColumns"
+      class="jt-table-row table-header-row"></tr>
+
+    <tr mat-row
+      *matRowDef="let policy; columns: policiesHistory_matTable_displayedColumns;" role="button"
+      class="jt-table-row table-body-row inner-body-row expanded-element-row">
+      [class.expanded-row]="expandedElement === policy" [class.deleted-row]="policy.IsDeleted"></tr>
+
+    <!-- Row shown when there is no matching data. -->
+    <tr class="mat-row" *matNoDataRow>
+      <td [attr.colspan]="policiesHistory_matTable_displayedColumns.length">
+        <div>
+          <span>
+            There is no policy data to review.
+          </span>
+        </div>
+      </td>
+    </tr>
+
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></tr>
+  </table>
+
+</div>

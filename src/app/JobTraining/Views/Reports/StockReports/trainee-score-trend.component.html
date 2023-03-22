@@ -1,0 +1,80 @@
+<div class="reports-wrapper">
+  <ion-toolbar color="tms-dark-grey" style="padding: 0 8px;">
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        Trainee Score Trend
+      </ion-col>
+      <ion-col size="auto">
+        <ion-button color="white" (click)="this.onCloseReportClick();">
+          Close
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+  <div *ngIf="this.initialized">
+    <ion-row>
+      <ion-col>
+        <ion-header color="white">
+          <ion-item lines="none">
+            Trainees
+          </ion-item>
+        </ion-header>
+        <jt-user-selector-component [users]="this.users" [preSelectedUserID]="this.selectedUserID"
+          (onUserSelected)="this.setSelectedUser($event);">
+        </jt-user-selector-component>
+      </ion-col>
+      <ion-col>
+        <ion-header>
+          <ion-item lines="none">
+            Options
+          </ion-item>
+        </ion-header>
+        <ion-item>
+          <ion-label>From Date</ion-label>
+          <!-- Form [Date] filter control. From Date, or the min date to include.-->
+          <app-datepicker-button slot="end" [inputDate]="this.filterFromDate"
+            (outputDate)="this.updateFilterFromDate($event)">
+          </app-datepicker-button>
+        </ion-item>
+        <ion-item>
+          <ion-label>To Date</ion-label>
+          <!-- Form [Date] filter control. To Date, or the max date to include.-->
+          <app-datepicker-button slot="end" [inputDate]="this.filterToDate"
+            (outputDate)="this.updateFilterToDate($event)">
+          </app-datepicker-button>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-toolbar color="tms-dark-grey" style="padding: 0 8px;">
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+          <span *ngIf="!this.hasReport">
+            No report ran yet.
+          </span>
+        </ion-col>
+        <ion-col size="auto">
+          <ion-button (click)="this.onGoClick();">
+            Generate
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+
+    <ion-card *ngIf="this.hasReport" color="white">
+      <ion-card-content>
+        <div>
+          {{this.report.HeaderMessage}}
+        </div>
+        <ion-row>
+          <ion-col size-xs="12" size-xs="12" size-md="6" size-lg="4" size-xl="3"
+            *ngFor="let field of this.report.Fields">
+            <canvas baseChart [data]="field.chartData" [labels]="field.xAxisLabels" [options]="field.chartOptions"
+              [legend]="this.chartLegend" [type]="this.chartType">
+            </canvas>
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</div>

@@ -1,0 +1,302 @@
+<div class="ion-page">
+  <ion-content color="secondary">
+    <ion-row>
+      <ion-col size="12">
+        <ion-item  color="secondary" lines="none">
+          <div>
+            <!-- Search bar for records.
+                ----
+                [debounce] only makes us wait for the (ionChange) to run.
+                (ionInput) & (ionClear) will run immediately to show our loading spinner.-->
+            <ion-searchbar class="ion-no-padding" debounce="300" [(ngModel)]="this.searchTextboxInputValue"
+              (ionInput)="this.isSearching = true;" (ionClear)="this.isSearching = true;"
+              (ionChange)="this.setFilteredRecords();">
+            </ion-searchbar>
+          </div>
+
+          <ion-row class="full-width-item ion-align-items-center">
+            <ion-col style="padding-left: 0;">
+              <!--Spacer-->
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button [disabled]="!this.certificationManagementService.canEditCertification()" color="success" title="Add new certification" (click)="this.onAddCertificationBtnClick()">
+                <ion-icon name="add"></ion-icon>&nbsp;New Certification
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button class="button-small" color="primary" title="Export" (click)="onExportClick()">
+                Export
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto" *ngIf="this.certificationManagementService.isManagerView">
+              <ion-button class="button-small custom-class" color="primary" title="Review Changes" (click)="onReviewChangesBtnClick()">
+                {{this.certificationManagementService.isReviewingCertificationChanges ? 'Exit' : 'View'}} Changes
+                <ion-badge *ngIf="this.unverifiedChangedExist" class="warning-badge" color="danger" >&#8203;</ion-badge>
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button class="button-small" color="primary" title="Export" (click)="onArchivesClick()">
+                {{this.isViewingArchives ? 'Exit' : 'View'}} Archives
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-item>
+
+        <ion-card class="responsiveCard" style="margin-top: 0;">
+          <!--Skeleton Table to display when data is being loaded/searched-->
+          <div *ngIf="!this.initialized || this.isSearching">
+            <ion-card-header>
+              <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content *ngIf="!this.initialized || this.isSearching">
+              <ion-row>
+                <ion-col>
+                  <sls-skeleton-table [rows]="3" [columns]="9"></sls-skeleton-table>
+                </ion-col>
+              </ion-row>
+            </ion-card-content>
+          </div>
+
+          <!--No Data Available content when there are no records to display-->
+          <ion-card-content
+            *ngIf="this.certificationsDataSource.data.length == 0 && this.initialized && !this.isSearching"
+            class="ion-no-padding">
+            <ion-item color="bootstrap-bg-warning" lines="none">
+              <div *ngIf="!this.searchTextboxInputValue">
+                No certifications available.
+              </div>
+              <div *ngIf="this.searchTextboxInputValue">
+                No certifications that match '{{this.searchTextboxInputValue}}'.
+              </div>
+            </ion-item>
+          </ion-card-content>
+
+          <!--Data View containing mat-table column definitions-->
+          <ion-card-content class="ion-no-padding">
+            <ion-item *ngIf="this.certificationsDataSource.data.length > 0 && this.searchTextboxInputValue && !this.isSearching" color="bootstrap-bg-warning" lines="none">
+              <div>
+                Searching for '{{this.searchTextboxInputValue}}', showing both archived and not.
+              </div>
+            </ion-item>
+
+            <div [hidden]="this.certificationsDataSource.data.length == 0 || !this.initialized || this.isSearching">
+
+              <table matSort mat-table [dataSource]="this.certificationsDataSource" class="tms-mat-table"
+                style="width:100%;" multiTemplateDataRows (matSortChange)="this.certificateSortChange($event)">
+
+                <ng-container matColumnDef="User">
+                  <th mat-sort-header="user" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    User
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell ">
+                    {{certification.UserDisplayName}}
+                  </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="Title">
+                  <th mat-sort-header="title" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Title
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell ">
+                    {{certification.Title}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Type">
+                  <th mat-sort-header="type" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Type
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell tms-table-cell">
+                    {{certification.TypeInfo.Name}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Hours">
+                  <th mat-sort-header="hours" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Hours
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell tms-table-cell">
+                    {{certification.TrainingHours}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="CompletionDate">
+                  <th mat-sort-header="completion" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Completion Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell tms-table-cell">
+                    {{certification.CompletionDate | date:'MM/dd/yyyy'}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="ExpirationDate">
+                  <th mat-sort-header="expiration" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Expiration Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell tms-table-cell"
+                    [class.certification-cell-danger]='certification.IsExpired'
+                    [class.certification-cell-valid]='certification.IsValid'
+                    [class.certification-cell-nearing]='certification.IsNearing'
+                    [class.certification-cell-moderate]='certification.IsModerate'>
+                    {{certification.ExpirationDate | date:'MM/dd/yyyy'}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="AlertDate">
+                  <th mat-sort-header="alert" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Alert Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell tms-table-cell">
+                    <span *ngIf="certification.AlertDate">
+                      {{certification.AlertDate | date:'MM/dd/yyyy'}}
+                    </span>
+                    <span *ngIf="!certification.AlertDate">
+                      --
+                    </span>
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="View">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell ion-text-center ">
+                    View
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell  ion-text-center small-status-cell">
+                    <ion-button size="small" color="primary" fill="clear" title="View certification">
+                      <ion-icon name="eye-outline" *ngIf="expandedElement != certification"></ion-icon>
+                      <ion-icon name="chevron-up-outline" *ngIf="expandedElement == certification"></ion-icon>
+                    </ion-button>
+
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Edit">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell">
+
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell  ion-text-center small-status-cell">
+                    <ion-button [disabled]="!this.certificationManagementService.canEditCertification()" size="small" color="primary" fill="clear" title="View certification"
+                      (click)="this.onEditCertificationBtnClick(certification)">
+                      <ion-label>
+                        Edit
+                      </ion-label>
+                    </ion-button>
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Renew">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell ion-text-center">
+                    <span *ngIf="this.certificationManagementService.isReviewingCertificationChanges">
+                      Changelog
+                    </span>
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell ion-text-center medium-status-cell">
+                    <!--Don't show the RENEW button if the certification is marked as archived. Instead, show them the option to unarchive-->
+                    <ion-button size="small" color="primary" fill="clear" title="Renew certification"
+                      (click)="this.onRenewCertificationBtnClick($event,certification)" *ngIf="!certification.IsDeleted && !this.certificationManagementService.isReviewingCertificationChanges">
+                      <ion-label>
+                        Renew
+                      </ion-label>
+                    </ion-button>
+                    <ion-button size="small" color="primary" fill="clear" title="Unarchive certification"
+                      (click)="this.onUnarchiveCertificationBtnClick($event,certification)" *ngIf="certification.IsDeleted && !this.certificationManagementService.isReviewingCertificationChanges">
+                      <ion-label>
+                        Unarchive
+                      </ion-label>
+                    </ion-button>
+                    <ion-button *ngIf="this.certificationManagementService.isReviewingCertificationChanges"
+                       size="small"  fill="clear" title="Changelog"
+                      (click)="this.onViewCertificationAuditLogBtnClick(certification)">
+                      
+                        <ion-icon name="document-outline"></ion-icon>
+                      
+                    </ion-button>
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Remove">
+                  <th class="certifications-list-table-header" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                   
+                  </th>
+
+                  <td mat-cell *matCellDef="let certification" class="tms-table-cell ion-text-center small-status-cell">
+                    <ion-button *ngIf="!this.certificationManagementService.isReviewingCertificationChanges"
+                     [disabled]="!this.certificationManagementService.canEditCertification()" size="small" color="danger" fill="clear" title="Remove"
+                      (click)="this.onRemoveCertificationBtnClick(certification)">
+                      <ion-label>
+                        Remove
+                      </ion-label>
+                    </ion-button>
+
+                    
+                  </td>
+
+                </ng-container>
+
+                <!--EXPANDABLE ROW DEFINITION-->
+                <ng-container matColumnDef="expandedDetail">
+                  <td mat-cell *matCellDef="let certification"
+                    [attr.colspan]="certifications_matTable_displayedColumns.length" style="padding:0px !important;">
+                    <div class="expanded-element-detail"
+                      [@detailExpand]="certification == expandedElement ? 'expanded' : 'collapsed'">
+                      <!--EXPANDABLE ROW CONTENTS HERE-->
+                      <certification-details *ngIf="certification == expandedElement"
+                        [certificationInfo]="certification"
+                        (onCertificationArchived)="this.handleCertificationArchival()"
+                        (onCertificationUpdated)="this.handleCertificationUpdate($event)"></certification-details>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="certifications_matTable_displayedColumns"
+                  class="tms-table-row table-header-row"></tr>
+
+                <tr mat-row *matRowDef="let certification; columns: certifications_matTable_displayedColumns;"
+                  role="button" class="tms-table-row table-body-row inner-body-row expanded-element-row"
+                  [class.expanded-row]="expandedElement === certification" [class.deleted-row]="certification.IsDeleted"
+                  (click)="expandedElement = expandedElement === certification ? null : certification"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                  <div *ngIf="certifications_matTable_displayedColumns">
+                    <td [attr.colspan]="certifications_matTable_displayedColumns.length">
+                      <div>
+                        <span>
+                          There is no course data to review.
+                        </span>
+                      </div>
+                    </td>
+                  </div>
+                </tr>
+
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></tr>
+
+              </table>
+            </div>
+            <ion-row class="ion-align-items-center"
+              [hidden]="this.certificationsDataSource.data.length == 0 || !this.initialized || this.isSearching">
+              <ion-col>
+                <!--Paginator for the certifications table-->
+                <mat-paginator [length]="this.certificationsDataSource.data.length" [pageSize]="50"
+                  [pageSizeOptions]="[5, 10, 20, 50]" showFirstLastButtons></mat-paginator>
+              </ion-col>
+            </ion-row>
+
+
+          </ion-card-content>
+
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-content>
+</div>

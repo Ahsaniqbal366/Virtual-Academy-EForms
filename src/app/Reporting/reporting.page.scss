@@ -1,0 +1,48 @@
+
+
+.reporting-page-wrapper {
+  
+
+    
+
+    .header {
+      background-color: var(--ion-color-tms-dark-grey);
+      color: white;
+    }
+
+    .course-dt-header{
+      background-color: var(--ion-color-primary);
+      color:white;
+      padding-top:5px;
+      padding-bottom:5px;
+    }
+
+    .course-list {
+      overflow-y: scroll;
+      max-height: 75vh;
+      background-color: #f2f2f2;
+    }
+
+    .column-header{
+      border-top: 1px solid gray;
+      border-bottom: 1px solid gray;
+      box-shadow: 0 4px 10px -2px #bbb;
+    }
+
+    .date-select-table{
+      border-left:1px solid gray;
+      
+    }
+
+    .row-expand{
+      cursor:pointer;
+    }
+
+    
+}
+
+
+
+
+
+

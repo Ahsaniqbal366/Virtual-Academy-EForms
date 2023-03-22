@@ -1,0 +1,133 @@
+<div class="certification-details-wrapper">
+    <ion-card class="responsiveCard">
+        <ion-card-content>
+            <ion-row size="12" class="full-width-item">
+                <ion-col size="3">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Title</mat-label>
+                        <input [disabled]="!this.certificationManagementService.canEditCertification()" matInput
+                            [(ngModel)]="certificationInfo.Title">
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="2">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Type</mat-label>
+                        <mat-select [disabled]="!this.certificationManagementService.canEditCertification()"
+                            placeholder="Select..." [(ngModel)]="certificationInfo.TypeID">
+                            <mat-option *ngFor="let type of this.certificationManagementService.certificationTypes"
+                                [value]="type.CertificationTypeID">
+                                {{type.Name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="1">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Hours</mat-label>
+                        <input [disabled]="!this.certificationManagementService.canEditCertification()" matInput
+                            [(ngModel)]="certificationInfo.TrainingHours" type="number" min="0" maxlength="5">
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="2">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Date Certified</mat-label>
+                        <input [disabled]="!this.certificationManagementService.canEditCertification()" matInput
+                            [matDatepicker]="completionDatePicker" placeholder="MM/DD/YYYY" style="min-width: 80px;"
+                            min="0" [(ngModel)]="certificationInfo.CompletionDate">
+                        <mat-datepicker-toggle matSuffix [for]="completionDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #completionDatePicker></mat-datepicker>
+
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="2">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Expiration Date</mat-label>
+                        <input [disabled]="!this.certificationManagementService.canEditCertification()" matInput
+                            [matDatepicker]="expirationDatePicker" placeholder="MM/DD/YYYY" style="min-width: 80px;"
+                            [(ngModel)]="certificationInfo.ExpirationDate"
+                            (ngModelChange)="this.onExpirationDateChanged(certificationInfo)">
+                        <mat-datepicker-toggle matSuffix [for]="expirationDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #expirationDatePicker></mat-datepicker>
+                    </mat-form-field>
+                </ion-col>
+                <ion-col size="2">
+                    <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                        <mat-label>Alert Date</mat-label>
+                        <input [disabled]="!this.certificationManagementService.canEditCertification()" matInput
+                            [matDatepicker]="alertDatePicker" placeholder="MM/DD/YYYY" style="min-width: 80px;"
+                            [(ngModel)]="certificationInfo.AlertDate">
+                        <mat-datepicker-toggle matSuffix [for]="alertDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #alertDatePicker></mat-datepicker>
+                    </mat-form-field>
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col>
+                    <sls-file-upload-component [disabled]="!this.certificationManagementService.canEditCertification()"
+                        [inputData]="this.fileUploadInput"
+                        (output_onFileUploaded)="this.onCertificationUploaded($event);"
+                        (removeButtonClickEvent)="this.onClearCertificationUploadBtn()">
+                    </sls-file-upload-component>
+                </ion-col>
+            </ion-row>
+            <ion-row class="full-width-item ion-align-items-center">
+                <ion-col>
+                    <!-- Spacer -->
+                </ion-col>
+                <ion-col size="auto" *ngIf="certificationInfo.IsDeleted">
+                    <mat-label>Reason For Archive:</mat-label>
+                    <br />
+                    <ion-text>{{certificationInfo.ReasonForArchive || 'N/A'}}</ion-text>
+                </ion-col>
+                <ion-col size="auto" *ngIf="this.certificationManagementService.isManagerView">
+                    <ion-button [disabled]="!this.certificationManagementService.canEditCertification()" size="small"
+                        (click)="this.onViewAuditLogBtnClick()">
+                        Changelog
+                    </ion-button>
+                </ion-col>
+                <ion-col size="auto">
+                    
+                    <ion-button [disabled]="!this.certificationManagementService.canEditCertification()"
+                        *ngIf="certificationInfo.IsDeleted" size="small" color="danger"
+                        (click)="this.onUnarchiveBtnClick()">
+                        Unarchive
+                    </ion-button>
+                    <ion-button [disabled]="!this.certificationManagementService.canEditCertification()"
+                        *ngIf="!certificationInfo.IsDeleted" size="small" color="danger"
+                        (click)="this.onArchiveBtnClick()">
+                        Archive
+                    </ion-button>
+                </ion-col>
+                <ion-col size="auto">
+                    <ion-button [disabled]="!this.certificationManagementService.canEditCertification()" size="small"
+                        color="success" (click)="this.onSaveBtnClick()">
+                        Save
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-card-content>
+    </ion-card>
+    <div *ngIf="!this.initialized">
+        <ion-card>
+            <ion-card-header>
+                <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-row>
+                    <ion-col>
+                        <sls-skeleton-table [rows]="3" [columns]="4"></sls-skeleton-table>
+                    </ion-col>
+
+                </ion-row>
+            </ion-card-content>
+        </ion-card>
+    </div>
+    <ion-card class="responsiveCard" *ngIf="this.initialized">
+        <ion-card-header color="primary">
+            Prior/Expired Certifications
+        </ion-card-header>
+        <ion-card-content class="ion-no-padding">
+            <certification-history [certificationID]="certificationInfo.CertificationID"></certification-history>
+        </ion-card-content>
+    </ion-card>
+</div>

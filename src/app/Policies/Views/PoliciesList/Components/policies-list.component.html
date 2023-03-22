@@ -1,0 +1,4 @@
+<div class="ion-page">
+  <policies-list-admin-component *ngIf="this.policiesManagementService.isAdmin"></policies-list-admin-component>
+  <policies-list-user-component *ngIf="!this.policiesManagementService.isAdmin"></policies-list-user-component>
+</div>

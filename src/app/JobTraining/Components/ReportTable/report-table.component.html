@@ -1,0 +1,21 @@
+<div>
+    <div>
+        {{this.report.HeaderMessage}}
+    </div>
+    <table class="report-table-element" style="width: 100%;">
+        <thead>
+            <tr>
+                <th *ngFor="let cell of this.report.HeaderRow.Cells" [ngClass]="cell.CSSClass" [colSpan]="cell._ColSpan">
+                    {{cell.Text}}
+                </th>
+            </tr>
+        </thead>
+        <tbody *ngFor="let bodyRow of this.report.BodyRows">
+            <tr>
+                <td *ngFor="let cell of bodyRow.Cells" [ngClass]="cell.CSSClass" [colSpan]="cell._ColSpan">
+                    {{cell.Text}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

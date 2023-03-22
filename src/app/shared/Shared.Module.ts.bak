@@ -1,0 +1,65 @@
+// https://angular.io/guide/sharing-ngmodules
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AppHeaderComponent } from './Components/AppHeader/app-header.component';
+import { AppDatePickerComponent } from './Components/DatePicker/datepicker.component';
+import { IonicModule } from '@ionic/angular';
+import { RouterModule } from '@angular/router';
+import { HideHeaderDirective } from './Components/AutoHideHeader/auto-hide-header.directive';
+import { RankAndUserSelectComponent,UserSelectComponent } from './Components/UserSelect/userselect.component';
+import {CourseSelectModule} from './Components/CourseSelect/courseselect.module';
+import {SkeletonTableComponent} from './Components/SkeletonTable/skeleton-table.component'
+import { NgSelectModule } from '@ng-select/ng-select';
+
+import { AppFooterComponent } from './Components/AppFooter/app-footer.component';
+import { ExpandableListComponent } from './Components/ExpandableList/expandable-list';
+
+import {SharedAngularMaterialModule} from './Shared-Angular-Material.Module';
+@NgModule({
+    imports: [
+        CommonModule,
+        IonicModule,
+      
+        FormsModule,
+        ReactiveFormsModule,
+        RouterModule,
+        SharedAngularMaterialModule,
+        ReactiveFormsModule,
+        NgSelectModule
+        
+    ],
+    declarations: [
+        // Custom Shared/Components
+        AppHeaderComponent,
+        AppFooterComponent,
+        HideHeaderDirective,
+        AppDatePickerComponent,
+        RankAndUserSelectComponent,
+        UserSelectComponent,
+        SkeletonTableComponent,
+        ExpandableListComponent
+    ],
+    exports: [
+        CommonModule,
+        IonicModule,
+        
+        FormsModule,
+        ReactiveFormsModule,
+        RouterModule,
+        SharedAngularMaterialModule,
+        // Custom Shared/Components
+        AppHeaderComponent,
+        AppFooterComponent,
+        HideHeaderDirective,
+        AppDatePickerComponent,
+        RankAndUserSelectComponent,
+        UserSelectComponent,
+        CourseSelectModule,
+        SkeletonTableComponent,
+        ExpandableListComponent,
+        NgSelectModule
+    ]
+})
+export class SharedModule {
+}

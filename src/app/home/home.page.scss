@@ -1,0 +1,23 @@
+.welcome-card img {
+  max-height: 35vh;
+  overflow: hidden;
+}
+.toolbar-background {
+  background-color: black !important;
+}
+
+
+.icons{
+  height:55px;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  ion-icon{
+      font-size: 30px;
+      cursor: pointer;
+  }
+  ion-button{
+      height: 100%;
+      cursor: pointer;
+  }
+}

@@ -1,0 +1,33 @@
+.differing-item{
+    background-color:var(--ion-color-bootstrap-bg-success) !important;
+}
+
+.warning-badge {
+    position: absolute; 
+    font-size: 2px;
+    right: -16px;
+    top: -3px; 
+}
+
+.certification-cell-danger{
+    background-color:#FFDDDD !important;
+  }
+
+  .certification-cell-valid{
+    background-color:#DDFFDD !important;
+  }
+
+  .certification-cell-nearing{
+    background-color:#FFFFCC !important;
+  }
+
+  .certification-cell-moderate{
+    background-color:#E9B57D !important;
+  }
+
+/* Setting Overflow Visible */
+ion-button.custom-class::part(native) {
+    overflow: visible;
+}
+  
+  

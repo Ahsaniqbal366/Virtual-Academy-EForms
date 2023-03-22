@@ -1,0 +1,17 @@
+<ion-header role="banner">
+    <app-header [defaultHref]="'/home'" [headerText]="'Reports'" [hideBackButton]="this.hideHeaderBackButton">
+    </app-header>
+    <ion-row *ngIf="this.reportTypes.length > 0">
+        <ion-col size-lg="12">
+            <nav mat-tab-nav-bar color="primary">
+                <a mat-tab-link *ngFor="let report of reportTypes; index as i"
+                   (click)="initiateReport(i)"
+                   [active]="report.GUIData.IsSelected"> {{report.Name}} </a>
+                
+              </nav>
+        </ion-col>
+    </ion-row>
+</ion-header>
+<ion-content *ngIf="this.initialized" class="report-type-select-wrapper" fullscreen>
+    <router-outlet></router-outlet>
+</ion-content>

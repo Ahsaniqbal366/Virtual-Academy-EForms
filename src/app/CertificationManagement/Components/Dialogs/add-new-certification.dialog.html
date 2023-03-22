@@ -1,0 +1,148 @@
+<h2 mat-dialog-title style="margin: -18px -16px 4px -16px">
+  <ion-row class="full-width-item ion-align-items-center">
+    <ion-col>
+      {{this.headerText}}
+    </ion-col>
+    <ion-col size="auto">
+      <ion-button (click)="this.closeDialog();" fill="clear">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</h2>
+<mat-dialog-content class="" style="padding: 0;">
+  <form [formGroup]="addCertificationForm" *ngIf="this.initialized">
+    <ion-row>
+      <ion-col size="12" *ngIf="this.isNewCertification && this.certificationManagementService.isManagerView">
+
+
+        <ng-select [items]="this.users$ | async" bindLabel="FullName" bindValue="UserID" class="override-shorter-height"
+          placeholder="User" [formControl]="addCertificationForm.controls.User" appearance="outline"
+          typeToSearchText="Type to search for a user">
+
+        </ng-select>
+        <mat-error *ngIf="addCertificationForm.controls.User.invalid">
+          {{this.getFieldErrorMessage(addCertificationForm.controls.User)}}
+        </mat-error>
+
+
+      </ion-col>
+      <ion-col size="12" *ngIf="this.isNewCertification">
+        <ion-item lines="none" class="ion-no-padding">
+          <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+            <mat-label>Title</mat-label>
+            <input matInput formControlName="Title" maxlength="255" required>
+            <mat-error *ngIf="addCertificationForm.controls.Title.invalid">
+              {{this.getFieldErrorMessage(addCertificationForm.controls.Title)}}
+            </mat-error>
+          </mat-form-field>
+        </ion-item>
+
+      </ion-col>
+      <ion-col size="6" *ngIf="this.isNewCertification">
+        <ion-item lines="none" class="ion-no-padding">
+          <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+            <mat-label>Type</mat-label>
+            <mat-select placeholder="Select..." formControlName="Type">
+              <mat-option *ngFor="let type of this.certificationTypes" [value]="type.CertificationTypeID">
+                {{type.Name}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="addCertificationForm.controls.Type.invalid">
+              {{this.getFieldErrorMessage(addCertificationForm.controls.Type)}}
+            </mat-error>
+          </mat-form-field>
+        </ion-item>
+
+      </ion-col>
+      <ion-col size="6">
+        <ion-item lines="none" class="ion-no-padding">
+          <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+            <mat-label>Training Hours</mat-label>
+            <input type="number" matInput formControlName="TrainingHours" maxlength="5" min="0" required>
+            <mat-error *ngIf="addCertificationForm.controls.TrainingHours.invalid">
+              {{this.getFieldErrorMessage(addCertificationForm.controls.TrainingHours)}}
+            </mat-error>
+          </mat-form-field>
+        </ion-item>
+
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="ion-no-padding">
+          <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+            <mat-label>Completion Date</mat-label>
+            <input matInput [matDatepicker]="completionDatePicker" placeholder="MM/DD/YYYY"
+              formControlName="CompletionDate" required [max]="this.fieldDOBMaxValue" style="min-width: 80px;">
+            <mat-datepicker-toggle matSuffix [for]="completionDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #completionDatePicker></mat-datepicker>
+            <mat-error *ngIf="addCertificationForm.controls.CompletionDate.invalid">
+              {{this.getFieldErrorMessage(addCertificationForm.controls.CompletionDate)}}
+            </mat-error>
+          </mat-form-field>
+        </ion-item>
+
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="ion-no-padding">
+          <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+            <mat-label>Expiration Date</mat-label>
+            <input matInput [matDatepicker]="expirationDatePicker" placeholder="MM/DD/YYYY"
+              formControlName="ExpirationDate" style="min-width: 80px;">
+            <mat-datepicker-toggle matSuffix [for]="expirationDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #expirationDatePicker></mat-datepicker>
+            <mat-error *ngIf="addCertificationForm.controls.ExpirationDate.invalid">
+              {{this.getFieldErrorMessage(addCertificationForm.controls.ExpirationDate)}}
+            </mat-error>
+          </mat-form-field>
+        </ion-item>
+
+      </ion-col>
+      <ion-col [hidden]="!addCertificationForm.controls.ExpirationDate.value" size="4">
+        <ion-item lines="none" class="ion-no-padding">
+          <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+            <mat-label>Alert Date</mat-label>
+            <input matInput [matDatepicker]="alertDatePicker" placeholder="MM/DD/YYYY" formControlName="AlertDate"
+              style="min-width: 80px;">
+            <mat-datepicker-toggle matSuffix [for]="alertDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #alertDatePicker></mat-datepicker>
+            <mat-error *ngIf="addCertificationForm.controls.AlertDate.invalid">
+              {{this.getFieldErrorMessage(addCertificationForm.controls.AlertDate)}}
+            </mat-error>
+          </mat-form-field>
+        </ion-item>
+
+      </ion-col>
+      <ion-col size="12">
+        <ion-item lines="none">
+
+
+          <mat-checkbox class="" formControlName="AddToTrainingRecords" color="primary">
+            Add to Training Records (hrs.)
+          </mat-checkbox>
+
+        </ion-item>
+
+      </ion-col>
+    </ion-row>
+  </form>
+  <ion-row class="full-width-item">
+    <ion-col size="12" class="ion-no-padding">
+      <sls-file-upload-component [inputData]="this.fileUploadInput" (output_onFileUploaded)="this.onCertificationUploaded($event)"
+        (removeButtonClickEvent)="this.onClearCertificationUploadBtn()">
+      </sls-file-upload-component>
+    </ion-col>
+  </ion-row>
+</mat-dialog-content>
+<mat-dialog-actions style="margin: -8px -24px -24px -24px">
+  <ion-row class="full-width-item ion-align-items-center">
+    <ion-col>
+
+    </ion-col>
+
+    <ion-col size="auto">
+      <ion-button (click)="this.onSubmitBtnClick();" size="small" color="success">
+        Submit
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</mat-dialog-actions>

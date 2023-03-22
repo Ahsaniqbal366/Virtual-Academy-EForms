@@ -1,0 +1,23 @@
+
+
+
+  
+  /**
+   * [jt-header-info-divider] is a line drawn between small bits of data in the site header.
+   */
+  .jt-header-info-divider {
+    border-right: 1px solid #999;
+    padding-left: 6px;
+    padding-right: 3px;
+  
+    &:first-of-type {
+      padding-left: 0;
+    }
+    &:last-of-type {
+      padding-right: 0;
+      border-right: none;
+    }
+  }
+
+  
+  

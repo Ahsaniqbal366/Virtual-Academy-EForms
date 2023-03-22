@@ -1,0 +1,533 @@
+<div class="ion-page">
+  <ion-content color="secondary" >
+    <ion-row style="background-color:#e0e0e0; padding: 30px 0;">
+      <ion-col size="12">
+        <ion-item  color="secondary" lines="none">
+          <div>
+            <!-- Search bar for records.
+                ----
+                [debounce] only makes us wait for the (ionChange) to run.
+                (ionInput) & (ionClear) will run immediately to show our loading spinner.-->
+            <ion-searchbar class="ion-no-padding" debounce="300" [(ngModel)]="searchTextboxPendingInputValue"
+              (ionInput)="isSearchingPending = true;" (ionClear)="isSearchingPending = true;"
+              (ionChange)="setFilteredRecords(true);">
+            </ion-searchbar>
+          </div>
+
+          <ion-row class="full-width-item ion-align-items-center">
+            <ion-col style="padding-left: 0;">
+              <!--Spacer-->
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button color="primary" fill="solid" title="Refresh Policies" (click)="this.refreshGrid()">
+                <ion-icon name="refresh-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button class="button-small" fill="solid" color="primary" title="Export" (click)="onExportClick(true)">
+                Export
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-item>
+        <ion-card class="responsiveCard card-shadow-effect" style="margin-top: 0;">
+          <!--Skeleton Table to display when data is being loaded/searched-->
+          <div *ngIf="!initialized">
+            <ion-card-header>
+              <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content *ngIf="!initialized">
+              <ion-row>
+                <ion-col>
+                  <sls-skeleton-table [rows]="3" [columns]="9"></sls-skeleton-table>
+                </ion-col>
+              </ion-row>
+            </ion-card-content>
+          </div>
+
+          <!--No Data Available content when there are no records to display-->
+          <ion-card-content
+            *ngIf="policiesPendingDataSource.data.length == 0 && initialized"
+            class="ion-no-padding">
+            <ion-item color="bootstrap-bg-warning" lines="none">
+              <div *ngIf="!searchTextboxInputValue">
+                No Policies available.
+              </div>
+              <div *ngIf="searchTextboxInputValue">
+                No policy that match '{{searchTextboxInputValue}}'.
+              </div>
+            </ion-item>
+          </ion-card-content>
+
+          <!--Data View containing mat-table column definitions-->
+          <ion-card-content class="ion-no-padding">
+            <ion-item *ngIf="policiesPendingDataSource.data.length > 0 && searchTextboxPendingInputValue && !isSearchingPending" color="bootstrap-bg-warning" lines="none">
+              <div>
+                Searching for '{{searchTextboxPendingInputValue}}'.
+              </div>
+            </ion-item>
+            <div [hidden]="policiesPendingDataSource.data.length == 0 || !initialized">
+              <div class="table-heading" color="primary"> 
+                <h3> Needed Action </h3>
+              </div>
+              <table matSort mat-table [dataSource]="policiesPendingDataSource" class="tms-mat-table"
+                style="width:100%;" multiTemplateDataRows (matSortChange)="policiesSortChange($event)"> 
+                <ng-container matColumnDef="Policy Number">
+                  <th mat-sort-header="pending-type" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Policy Number
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+                    {{policy.policyNumber}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Title">
+                  <th mat-sort-header="pending-title" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Policy Title
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ">
+                    {{policy.friendlyName}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="EffectiveDate">
+                  <th mat-sort-header="pending-completion" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Effective Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+                    {{policy.effectiveDate | date:'MM/dd/yyyy'}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="ReviewDate">
+                  <th mat-sort-header="pending-expiration" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Review Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell"
+                    [class.policy-cell-danger]='policy.IsExpired'
+                    [class.policy-cell-valid]='policy.IsValid'
+                    [class.policy-cell-nearing]='policy.IsNearing'
+                    [class.policy-cell-moderate]='policy.IsModerate'>
+                    {{policy.reviewDate | date:'MM/dd/yyyy'}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Acknowledged/Assigned">
+                  <th mat-sort-header="acknowledged/assigned" mat-header-cell *matHeaderCellDef class="tms-table-cell" style="width:16%">
+                    Acknowledged/Assigned
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ">
+                    {{policy.acknowledgedNumber}}/{{policy.assignedNumber}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="View">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell ion-text-center ">
+                    View
+                  </th>
+                  <td mat-cell *matCellDef="let policy" id="{{policy.policyId}}" class="tms-table-cell  ion-text-center small-status-cell">
+                    <ion-button color="primary" fill="clear" title="View policy">
+                      <ion-icon name="eye-outline" *ngIf="expandedElement != policy"></ion-icon>
+                      <ion-icon name="chevron-up-outline" *ngIf="expandedElement == policy"></ion-icon>
+                    </ion-button>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Edit">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell">
+
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell  ion-text-center small-status-cell">
+                    <ion-button [disabled]="!policiesManagementService.canEditPolicies()" size="small" color="primary" fill="clear" title="View policy"
+                      (click)="onEditPoliciesBtnClick(policy)">
+                      <ion-label>
+                        Edit
+                      </ion-label>
+                    </ion-button>
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Renew">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell ion-text-center">
+                    <span *ngIf="policiesManagementService.isReviewingPoliciesChanges">
+                      Changelog
+                    </span>
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ion-text-center medium-status-cell">
+                    <!--Don't show the RENEW button if the policy is marked as archived. Instead, show them the option to unarchive-->
+                    <!-- <ion-button size="small" color="primary" fill="clear" title="Renew policy"
+                      (click)="onRenewPoliciesBtnClick($event,policy)" *ngIf="!showDeleted">
+                      <ion-label>
+                        Renew
+                      </ion-label>
+                    </ion-button> -->
+                    <!-- <ion-button size="small" color="primary" fill="clear" title="Unarchive policy"
+                      (click)="onUnarchivePoliciesBtnClick($event,policy)" *ngIf="showDeleted">
+                      <ion-label>
+                        Unarchive
+                      </ion-label>
+                    </ion-button> -->
+                    <ion-button *ngIf="policiesManagementService.isReviewingPoliciesChanges"
+                       size="small"  fill="clear" title="Changelog"
+                      (click)="onViewPoliciesAuditLogBtnClick(policy)">
+                      
+                        <ion-icon name="document-outline"></ion-icon>
+                      
+                    </ion-button>
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Remove">
+                  <th class="certifications-list-table-header" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                   
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ion-text-center small-status-cell">
+                    <ion-button *ngIf="!policiesManagementService.isReviewingPoliciesChanges"
+                     [disabled]="!policiesManagementService.canEditPolicies()" size="small" color="danger" fill="clear" title="Remove"
+                      (click)="onRemovePoliciesBtnClick(policy)">
+                      <ion-label>
+                        Remove
+                      </ion-label>
+                    </ion-button>
+
+                    
+                  </td>
+
+                </ng-container>
+
+                <!--EXPANDABLE ROW DEFINITION-->
+                <ng-container matColumnDef="expandedDetail">
+                  <td mat-cell *matCellDef="let policy"
+                    [attr.colspan]="policies_matTable_displayedColumns.length" style="padding:0px !important;">
+                    <div class="expanded-element-detail"
+                      [@detailExpand]="policy == expandedElement ? 'expanded' : 'collapsed'">
+                      <!--EXPANDABLE ROW CONTENTS HERE-->
+                      <policies-details *ngIf="policy == expandedElement"
+                        [policiesInfo]="policy"
+                        [policiesUserInfo]="policiesUserInfo"
+                        (onPoliciesArchived)="handlePoliciesArchival()"
+                        (onPoliciesUpdated)="handlePoliciesUpdate($event)"></policies-details>
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="policies_matTable_displayedColumns"
+                  class="tms-table-row table-header-row"></tr>
+                <tr mat-row *matRowDef="let policy; columns: policies_matTable_displayedColumns;"
+                  role="button" class="tms-table-row table-body-row inner-body-row expanded-element-row"
+                  [class.expanded-row]="expandedElement === policy" [class.deleted-row]="policy.IsDeleted"
+                  (click)="expandedElement = expandedElement === policy ? null : policy"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                  <div *ngIf="policies_matTable_displayedColumns">
+                    <td [attr.colspan]="policies_matTable_displayedColumns.length">
+                      <div>
+                        <span>
+                          There is no Policy data to review.
+                        </span>
+                      </div>
+                    </td>
+                  </div>
+                </tr>
+
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></tr>
+
+              </table>
+            </div>
+            <ion-row class="ion-align-items-center"
+              [hidden]="policiesPendingDataSource.data.length == 0 || !initialized || isSearching">
+              <ion-col>
+                <!--Paginator for the policys table-->
+                <mat-paginator #pendingPoliciesTablePaginator="matPaginator" [length]="policiesPendingDataSource.data.length" [pageSize]="10"
+                  [pageSizeOptions]="[5, 10, 20, 50]" showFirstLastButtons></mat-paginator>
+              </ion-col>
+            </ion-row>
+
+
+          </ion-card-content>
+
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-item  color="secondary" lines="none">
+          <div>
+            <!-- Search bar for records.
+                ----
+                [debounce] only makes us wait for the (ionChange) to run.
+                (ionInput) & (ionClear) will run immediately to show our loading spinner.-->
+            <ion-searchbar class="ion-no-padding" debounce="300" [(ngModel)]="searchTextboxInputValue"
+              (ionInput)="isSearching = true;" (ionClear)="isSearching = true;"
+              (ionChange)="setFilteredRecords(false);">
+            </ion-searchbar>
+          </div>
+
+          <ion-row class="full-width-item ion-align-items-center">
+            <ion-col style="padding-left: 0;">
+              <!--Spacer-->
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button [disabled]="!policiesManagementService.canEditPolicies()" color="success" title="Add new policy" (click)="onAddPoliciesBtnClick()">
+                <ion-icon name="add"></ion-icon>&nbsp;New Policies
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button class="button-small" color="primary" title="Export" (click)="onExportClick(false)">
+                Export
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto">
+              <!-- <ion-button class="button-small custom-class" color="primary" title="Review Changes" (click)="onReviewChangesBtnClick()">
+                {{policiesManagementService.isReviewingPoliciesChanges ? 'Exit' : 'View'}} Changes
+                <ion-badge *ngIf="unverifiedChangedExist" class="warning-badge" color="danger" >&#8203;</ion-badge>
+              </ion-button> -->
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button class="button-small" color="primary" title="Export" (click)="onArchivesClick(policiesDataSource.data)">
+                {{isViewingArchives ? 'Exit' : 'View'}} Archives
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-item>
+
+        <ion-card class="responsiveCard card-shadow-effect" style="margin-top: 0;">
+          <!--Skeleton Table to display when data is being loaded/searched-->
+          <div *ngIf="!initialized || isSearching">
+            <ion-card-header>
+              <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content *ngIf="!initialized || isSearching">
+              <ion-row>
+                <ion-col>
+                  <sls-skeleton-table [rows]="3" [columns]="9"></sls-skeleton-table>
+                </ion-col>
+              </ion-row>
+            </ion-card-content>
+          </div>
+
+          <!--No Data Available content when there are no records to display-->
+          <ion-card-content
+            *ngIf="policiesDataSource.data.length == 0 && initialized && !isSearching"
+            class="ion-no-padding">
+            <ion-item color="bootstrap-bg-warning" lines="none">
+              <div *ngIf="!searchTextboxInputValue">
+                No Policies available.
+              </div>
+              <div *ngIf="searchTextboxInputValue">
+                No policy that match '{{searchTextboxInputValue}}'.
+              </div>
+            </ion-item>
+          </ion-card-content>
+
+          <!--Data View containing mat-table column definitions-->
+          <ion-card-content class="ion-no-padding">
+            <ion-item *ngIf="policiesDataSource.data.length > 0 && searchTextboxInputValue && !isSearching" color="bootstrap-bg-warning" lines="none">
+              <div>
+                Searching for '{{searchTextboxInputValue}}'.
+              </div>
+            </ion-item>
+
+            <div [hidden]="policiesDataSource.data.length == 0 || !initialized || isSearching">
+              <div class="table-heading" color="primary"> 
+                <h3> {{showDeleted ? 'Archived' : 'Active'}} Policies </h3>
+              </div>
+              <table matSort mat-table [dataSource]="policiesDataSource" class="tms-mat-table"
+                style="width:100%;" multiTemplateDataRows (matSortChange)="policiesSortChange($event)">
+                <ng-container matColumnDef="Policy Number">
+                  <th mat-sort-header="type" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Policy Number
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+                    {{policy.policyNumber}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Title">
+                  <th mat-sort-header="title" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Policy Title
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ">
+                    {{policy.friendlyName}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="EffectiveDate">
+                  <th mat-sort-header="completion" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Effective Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell">
+                    {{policy.effectiveDate | date:'MM/dd/yyyy'}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="ReviewDate">
+                  <th mat-sort-header="expiration" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                    Review Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell tms-table-cell"
+                    [class.policy-cell-danger]='policy.IsExpired'
+                    [class.policy-cell-valid]='policy.IsValid'
+                    [class.policy-cell-nearing]='policy.IsNearing'
+                    [class.policy-cell-moderate]='policy.IsModerate'>
+                    {{policy.reviewDate | date:'MM/dd/yyyy'}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Acknowledged/Assigned">
+                  <th mat-sort-header="acknowledged/assigned" mat-header-cell *matHeaderCellDef class="tms-table-cell" style="width:16%">
+                    Acknowledged/Assigned
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ">
+                    {{policy.acknowledgedNumber}}/{{policy.assignedNumber}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="View">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell ion-text-center ">
+                    View
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" id="{{policy.policyId}}" class="tms-table-cell  ion-text-center small-status-cell">
+                    <ion-button color="primary" fill="clear" title="View policy">
+                      <ion-icon name="eye-outline" *ngIf="expandedElement != policy"></ion-icon>
+                      <ion-icon name="chevron-up-outline" *ngIf="expandedElement == policy"></ion-icon>
+                    </ion-button>
+
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Edit">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell">
+
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell  ion-text-center small-status-cell">
+                    <ion-button [disabled]="!policiesManagementService.canEditPolicies()" size="small" color="primary" fill="clear" title="View policy"
+                      (click)="onEditPoliciesBtnClick(policy)">
+                      <ion-label>
+                        Edit
+                      </ion-label>
+                    </ion-button>
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Renew">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell ion-text-center">
+                    <span *ngIf="policiesManagementService.isReviewingPoliciesChanges">
+                      Changelog
+                    </span>
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ion-text-center medium-status-cell">
+                    <!--Don't show the RENEW button if the policy is marked as archived. Instead, show them the option to unarchive-->
+                    <!-- <ion-button size="small" color="primary" fill="clear" title="Renew policy"
+                      (click)="onRenewPoliciesBtnClick($event,policy)" *ngIf="!showDeleted">
+                      <ion-label>
+                        Renew
+                      </ion-label>
+                    </ion-button> -->
+                    <ion-button size="small" color="primary" fill="clear" title="Unarchive policy"
+                      (click)="onUnarchivePoliciesBtnClick($event,policy)" *ngIf="showDeleted">
+                      <ion-label>
+                        Unarchive
+                      </ion-label>
+                    </ion-button>
+                    <ion-button *ngIf="policiesManagementService.isReviewingPoliciesChanges"
+                       size="small"  fill="clear" title="Changelog"
+                      (click)="onViewPoliciesAuditLogBtnClick(policy)">
+                      
+                        <ion-icon name="document-outline"></ion-icon>
+                      
+                    </ion-button>
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Remove">
+                  <th class="certifications-list-table-header" mat-header-cell *matHeaderCellDef class="tms-table-cell">
+                   
+                  </th>
+
+                  <td mat-cell *matCellDef="let policy" class="tms-table-cell ion-text-center small-status-cell">
+                    <ion-button *ngIf="!policiesManagementService.isReviewingPoliciesChanges"
+                     [disabled]="!policiesManagementService.canEditPolicies()" size="small" color="danger" fill="clear" title="Remove"
+                      (click)="onRemovePoliciesBtnClick(policy)">
+                      <ion-label>
+                        Remove
+                      </ion-label>
+                    </ion-button>
+
+                    
+                  </td>
+
+                </ng-container>
+
+                <!--EXPANDABLE ROW DEFINITION-->
+                <ng-container matColumnDef="expandedDetail">
+                  <td mat-cell *matCellDef="let policy"
+                    [attr.colspan]="policies_matTable_displayedColumns.length" style="padding:0px !important;">
+                    <div class="expanded-element-detail"
+                      [@detailExpand]="policy == expandedElement ? 'expanded' : 'collapsed'">
+                      <!--EXPANDABLE ROW CONTENTS HERE-->
+                      <policies-details *ngIf="policy == expandedElement"
+                      [isArchive]="isViewingArchives"
+                        [policiesInfo]="policy"
+                        [policiesUserInfo]="policiesUserInfo"
+                        (onPoliciesArchived)="handlePoliciesArchival()"
+                        (onPoliciesUpdated)="handlePoliciesUpdate($event)"></policies-details>
+                    </div>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="policies_matTable_displayedColumns"
+                  class="tms-table-row table-header-row"></tr>
+                <tr mat-row *matRowDef="let policy; columns: policies_matTable_displayedColumns;"
+                  role="button" class="tms-table-row table-body-row inner-body-row expanded-element-row"
+                  [class.expanded-row]="expandedElement === policy" [class.deleted-row]="policy.IsDeleted"
+                  (click)="expandedElement = expandedElement === policy ? null : policy"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                  <div *ngIf="policies_matTable_displayedColumns">
+                    <td [attr.colspan]="policies_matTable_displayedColumns.length">
+                      <div>
+                        <span>
+                          There is no policy data to review.
+                        </span>
+                      </div>
+                    </td>
+                  </div>
+                </tr>
+
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></tr>
+
+              </table>
+            </div>
+            <ion-row class="ion-align-items-center"
+              [hidden]="policiesDataSource.data.length == 0 || !initialized || isSearching">
+              <ion-col>
+                <!--Paginator for the policys table-->
+                <mat-paginator #policiesTablePaginator="matPaginator" [length]="policiesDataSource.data.length" [pageSize]="10"
+                  [pageSizeOptions]="[5, 10, 20, 50]" showFirstLastButtons></mat-paginator>
+              </ion-col>
+            </ion-row>
+
+
+          </ion-card-content>
+
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-content>
+</div>

@@ -1,0 +1,43 @@
+<ion-card-header>
+	<ion-label mat-dialog-title>{{this.dialogData.userData.Name}}</ion-label>
+</ion-card-header>
+<ion-card-content mat-dialog-content>
+	<!-- Profile Picture -->
+	<div>
+		<ion-avatar>
+			<ion-img
+				src="{{this.dialogData.userData.Photopath ? this.dialogData.userData.Photopath : 'assets/images/default-profile-pic-profile.png'}}"
+				class="profile-image-detail"></ion-img>
+		</ion-avatar>
+
+	</div>
+
+	<!-- Profile information -->
+	<ion-list>
+		<ion-item>
+			<ion-label position="stacked">Preferred Name:</ion-label>
+			<ion-text>{{this.dialogData.userData.PreferredName ? this.dialogData.userData.PreferredName : "N/A"}}
+			</ion-text>
+		</ion-item>
+		<ion-item>
+			<ion-label position="stacked">Email:</ion-label>
+			<ion-text>{{this.dialogData.userData.Email ? this.dialogData.userData.Email : "N/A"}}</ion-text>
+		</ion-item>
+		<ion-item *ngIf="!this.dialogData.userData.HideCellPhone">
+			<ion-label position="stacked">Phone:</ion-label>
+			<ion-text>{{this.dialogData.userData.Cell ? this.dialogData.userData.Cell : "N/A"}}</ion-text>
+		</ion-item>
+		<ion-item>
+			<ion-label position="stacked">Additional Info:</ion-label>
+			<ion-text *ngIf="this.dialogData.userData.AdditionalInfo"
+				[innerHTML]="this.dialogData.userData.AdditionalInfo"></ion-text>
+			<ion-text *ngIf="!this.dialogData.userData.AdditionalInfo">N/A</ion-text>
+		</ion-item>
+	</ion-list>
+
+	<ion-card-header mat-dialog-actions>
+		<ion-button type="button" class="ion-raised" (click)="this.closeDialog();" style="margin-right:10px;">
+			Close
+		</ion-button>
+	</ion-card-header>
+</ion-card-content>

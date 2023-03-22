@@ -1,0 +1,286 @@
+<ion-content  class="reporting-page-wrapper" color="secondary">
+  <ion-row class="header">
+
+    <ion-col>
+      <div class="ion-text-end">
+        <ion-button class="md-raised " md-theme="success" type="button" (click)="onBackBtnClick()" fill="solid">
+          Back
+        </ion-button>
+      </div>
+
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col class="ion-no-padding">
+      <report-parameters (onFiltersApplied)="this.applyFilters()"></report-parameters>
+    </ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-col class="ion-no-padding">
+      <ion-card>
+
+        <ion-card-content>
+
+
+          <ion-row class="full-width-item ion-align-items-center ion-no-padding">
+            <ion-col size="4">
+              <ion-searchbar class="ion-no-padding" debounce="300" [(ngModel)]="this.searchTextboxInputValue"
+                (ionInput)="this.isSearching = true;" (ionClear)="this.isSearching = true;"
+                (ionChange)="this.setFilteredRecords();">
+              </ion-searchbar>
+            </ion-col>
+            <ion-col>
+
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button class="button-small" color="primary" title="Export" (click)="this.onExportTableBtnClick()">
+                Export
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button class="button-small" color="primary" title="Print" (click)="this.onPrintTableBtnClick()">
+                Print
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <!--Skeleton Table to display when data is being loaded/searched-->
+              <div *ngIf="!this.initialized || this.isSearching">
+                <ion-card-header>
+                  <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+                </ion-card-header>
+                <ion-card-content *ngIf="!this.initialized || this.isSearching">
+                  <ion-row>
+                    <ion-col>
+                      <sls-skeleton-table [rows]="3" [columns]="9"></sls-skeleton-table>
+                    </ion-col>
+                  </ion-row>
+                </ion-card-content>
+              </div>
+              <table mat-table [dataSource]="this.reportTableDataSource" matSort class="tms-mat-table"
+                *ngIf="!this.isSearching && this.initialized" style="width:100%;"
+                (matSortChange)="this.reportSortChange($event)">
+
+                <ng-container matColumnDef="CourseName">
+                  <th mat-sort-header="CourseName" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    Course
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.CourseName}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="CourseType">
+                  <th mat-sort-header="CourseType" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    Type
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.CourseType =="General Order" ? this.reportingProvider.serverInfo.PolicyKeywords.One.Title.trim() : course.CourseType }}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="LearnerName">
+                  <th mat-sort-header="LearnerName" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    {{this.reportingProvider.serverInfo.UserKeywords.One.Title.trim()}}
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.LearnerName}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Rank">
+                  <th mat-sort-header="Rank" mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+                    {{this.reportingProvider.serverInfo.RankKeywords.One.Title.trim()}}
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.Rank}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="GroupName">
+                  <th mat-sort-header="GroupName" mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+                    District
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{this.reportingProvider.serverInfo.IsMultiManagerSite ? course.GroupName : "N/A"}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="PSID">
+                  <th mat-sort-header="PSID" mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+                    {{this.reportingProvider.serverInfo.PSIDKeywords.One.Title.trim()}}
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.AcadisID}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="EmployeeID">
+                  <th mat-sort-header="EmployeeID" mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+                    Employee ID
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.EmployeeID == "" ? "N/A" : course.EmployeeID}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="StartDate">
+                  <th mat-sort-header="StartDate" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    Start Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.StartDate}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="EndDate">
+                  <th mat-sort-header="EndDate" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    End Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.EndDate}}
+                  </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="CompletionDate">
+                  <th mat-sort-header="CompletionDate" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    Completion Date
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    <!--If the course type is general order/policy, display a hoverable icon that will show a disclaimer that completion dates are not tracked for policies just yet-->
+                    <span *ngIf="course.CourseType != 'General Order'">
+                      {{course.CompletionDate}}
+                    </span>
+                    <span *ngIf="course.CourseType == 'General Order'" matTooltip="Completion dates are not currently tracked for policies.">
+                      <ion-icon name="information-circle-outline" class="action-button" style="font-size:22px;cursor:pointer;">
+                      </ion-icon>
+                    </span>
+                    
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Completed">
+                  <th mat-sort-header="Completed" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    Completed
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell" >
+                    
+                      {{course.IsComplete}}
+                    
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Hours">
+                  <th mat-sort-header="Hours" mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="tms-table-cell">
+                    Hours
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.CourseHours}}
+                  </td>
+
+                </ng-container>
+
+                <ng-container matColumnDef="Grade">
+                  <th mat-sort-header="Grade" mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+                    Grade
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    {{course.Grade}}
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="GradePercentage">
+                  <th mat-sort-header="GradePercentage" mat-header-cell *matHeaderCellDef mat-sort-header class="tms-table-cell">
+                    Percentage
+                  </th>
+
+                  <td mat-cell *matCellDef="let course" class="tms-table-cell tms-table-cell">
+                    <span *ngIf="course.CourseType == 'Stock'">
+
+                      <span *ngIf="course.IsComplete && course.GradePercentage == 'N/A'" matTooltip="A percentage calculation does not exist for this course grade.">
+                          <ion-icon name="information-circle-outline" class="action-button" style="font-size:22px;cursor:pointer;">
+                          </ion-icon>
+                        
+                      </span>
+                      <span *ngIf="!course.IsComplete || course.GradePercentage != 'N/A'">
+                        {{course.GradePercentage}}
+                      </span>
+
+                    </span>
+                    <span *ngIf="course.CourseType != 'Stock'" matTooltip="Completion dates are not currently tracked for policies.">
+                      N/A
+                    </span>
+                    
+                  </td>
+
+                </ng-container>
+                <ng-container matColumnDef="Message">
+                  <th mat-header-cell *matHeaderCellDef class="tms-table-cell action-button-cell ion-text-center">
+                    Message
+                  </th>
+
+                  <td mat-cell *matCellDef="let course"
+                    class="tms-table-cell tms-table-cell action-button-cell ion-text-center"
+                    (click)="this.onMessageBtnClick(course)">
+                    <ion-icon name="mail-outline" class="action-button" style="font-size:22px;cursor:pointer;">
+                    </ion-icon>
+                  </td>
+
+                </ng-container>
+
+
+                <tr mat-header-row *matHeaderRowDef="reportTableProperties.displayedColumns"
+                  class="tms-table-row table-header-row"></tr>
+                <tr mat-row *matRowDef="let user; columns: reportTableProperties.displayedColumns;" role="button"
+                  class="tms-table-row table-body-row inner-body-row"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                  <td [attr.colspan]="reportTableProperties.displayedColumns.length">
+                    <div>
+                      <span>
+                        There is no data for these parameters.
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+
+              </table>
+
+              <mat-paginator [length]="this.totalRecordCount" [pageSize]="50" [pageSizeOptions]="[5, 10, 20, 50]"
+                showFirstLastButtons></mat-paginator>
+            </ion-col>
+
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+
+
+</ion-content>

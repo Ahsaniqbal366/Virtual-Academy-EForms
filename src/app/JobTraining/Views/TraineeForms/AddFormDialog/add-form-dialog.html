@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss(null, false)">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Start New Form
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+
+  <ion-list lines="full">
+    <ion-radio-group [(ngModel)]="this.selectedFormID">
+      <ion-list-header>
+        <ion-label>Available Forms</ion-label>
+      </ion-list-header>
+
+      <div *ngFor="let form of this.availableForms; index as i">
+        <ion-item>
+          <ion-label class="ion-align-self-start">
+            {{form.Name}}
+          </ion-label>
+          <ion-radio slot="end" [(value)]="form.FormID"></ion-radio>
+        </ion-item>
+      </div>
+
+    </ion-radio-group>
+  </ion-list>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-item>
+      <ion-label>Date</ion-label>
+      <app-datepicker-button slot="end" [disabled]="false" [inputDate]="this.selectedDate"
+        (outputDate)="this.selectedDate = $event">
+      </app-datepicker-button>
+    </ion-item>
+  </ion-toolbar>
+  <ion-toolbar>
+    <div slot="start" style="margin-top: 8px; margin-left: 20px; margin-bottom: 8px;">
+      <ion-label>
+        Phase:
+      </ion-label>
+      <ion-select class="form-control" style="display: inline-flex;" [(ngModel)]="this.selectedTraineePhaseID">
+        <ion-select-option *ngFor="let phaseOption of this.jobTrainingService.selectedProgram.Phases" [value]="phaseOption.PhaseID">
+          {{phaseOption.Name}}</ion-select-option>
+      </ion-select>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="onConfirmAddition()" color="success" fill="outline">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Submit
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

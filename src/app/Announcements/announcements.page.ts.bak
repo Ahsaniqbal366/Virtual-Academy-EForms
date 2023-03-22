@@ -1,0 +1,686 @@
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { LoadingService } from '../shared/Loading.Service';
+import { DNNEmbedService } from '../shared/DNN.Embed.Service';
+import { AnnouncementsProvider } from './Providers/announcements.service';
+import * as AnnouncementsModel from './Providers/announcements.model';
+import { APIResponseError } from '../shared/API.Response.Model';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ModalController, AlertController, ToastController, PopoverController } from '@ionic/angular';
+
+import { EditAnnouncementDialogPage } from './EditAnnouncementDialog/edit-announcement-dialog';
+import { isNullOrUndefined } from 'util';
+// tslint:disable-next-line: max-line-length
+import { AnnouncementCommentActionsPopoverMenuComponent } from './Components/AnnouncementComments/CommentActionsPopover/announcement-comment-actions.popover-menu.component';
+import { ActivatedRoute } from '@angular/router';
+
+// define component
+@Component({
+    selector: 'app-announcements-page',
+    templateUrl: 'announcements.page.html',
+    styleUrls: ['announcements.page.scss'],
+    /**
+     * Using [encapsulation: ViewEncapsulation.None] so that we can apply SCSS
+     * to the announcement content injected via [innerHTML] attribute.
+     * ----
+     * https://stackoverflow.com/questions/44210786/style-not-working-for-innerhtml-in-angular-2-typescript
+     */
+    encapsulation: ViewEncapsulation.None
+})
+
+// create class for export
+export class AnnouncementsPage implements OnInit {
+    // constructor -- define service provider
+    // The service provider will persist along routes
+    constructor(
+        private route: ActivatedRoute,
+        private alertController: AlertController,
+        private popoverController: PopoverController,
+        private toastController: ToastController,
+        private domSanitizer: DomSanitizer,
+        private modalController: ModalController,
+        private dnnEmbedService: DNNEmbedService,
+        private loadingService: LoadingService,
+        private announcementsProvider: AnnouncementsProvider
+    ) {
+    }
+
+    /*******************************************
+    * PUBLIC VARIABLES
+    *******************************************/
+    public initialized: boolean;
+
+    /**
+     * [hideHeaderBackButton] is set on _init. Used to hide the header's back button when the ionic app
+     * is embedded in the DNN site.
+     *
+     * We don't hide the back button on every page/view within this module, just the initial page.
+     */
+    public hideHeaderBackButton: boolean;
+
+    /**
+     * [filterType] drives the ngModel for the filter dropdownlist in the GUI.
+     * It's one of the needed input params for getting announcements.
+     */
+    public filterType: string;
+
+    // [canEditAnnouncement] is a temp variable that will be on the announcement model soon.
+    public canEditAnnouncement = true;
+
+    /**
+     * [failedToLoadAnnouncements] will get set on [_init] after we gather announcements.
+     * If the API call failed for whatever reason this flag will help show a message in the DOM.
+     * ----
+     * [announcementErrorMessage] will hold the w/e error message so the user can report or act on
+     *  the issue if possible.
+     */
+    public failedToLoadAnnouncements: boolean;
+    public announcementErrorMessage: string;
+
+    /**
+     * [hasAnnouncements] will get set on [_init] after we gather announcements.
+     * Controls visilbity of announcements repeated and a "no data message" in the DOM.
+     */
+    public hasAnnouncements: boolean;
+
+    public announcements: AnnouncementsModel.AnnouncementInfo[];
+
+    public serverInfo: AnnouncementsModel.AnnouncementServerInfo;
+
+    /*******************************************
+    * PRIVATE VARIABLES
+    *******************************************/
+    private _sectionID: number;
+
+    /*******************************************
+    * PUBLIC METHODS
+    *******************************************/
+    public async onFilterTypeChange() {
+        this.announcements = [];
+        this.initialized = false;
+        await this.loadingService.presentLoading('Loading announcements...');
+        this._getAnnouncements();
+    }
+
+    public onAddAnnouncementClick() {
+        // [isEditMode] as false because this the "add" button click event.
+        const isEditMode = false;
+        this._openEditAnnouncementDialog(isEditMode, null);
+    }
+
+    public onEditAnnouncementClick(announcement: AnnouncementsModel.AnnouncementInfo) {
+        // [isEditMode] as true because this the "edit" button click event.
+        const isEditMode = true;
+        this._openEditAnnouncementDialog(isEditMode, announcement);
+    }
+
+    public onReactionButtonClick(announcement: AnnouncementsModel.AnnouncementInfo, reactionTypeName: string) {
+        this._reactToAnnouncement(announcement, reactionTypeName);
+    }
+
+    public onAnnouncementsCommentsButtonClick(announcement: AnnouncementsModel.AnnouncementInfo) {
+        /**
+         * Flipflop the [GUIData.ShowCommentsContainer] flag for the given [announcement] to show
+         * or hide the comments content.
+         */
+        announcement.GUIData.ShowCommentsContainer = !announcement.GUIData.ShowCommentsContainer;
+        // If [ShowCommentsContainer] is true now, call API to get the comments.
+        if (announcement.GUIData.ShowCommentsContainer) {
+            this._getAnnouncementComments(announcement);
+        }
+    }
+
+    public onSubmitAnnouncementComment(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        this._submitAnnouncementComment(comment);
+    }
+
+    public onCancelAnnouncementComment(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        this._closeAnnouncementCommentEditMode(comment);
+    }
+
+    public onAnnouncementCommentPopoverMenuButtonClick(event: Event, comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        this._showAnnouncementCommentsActionButtonsPopoverMenu(event, comment);
+    }
+
+    public onReplyToAnnouncementCommentClick(
+        announcement: AnnouncementsModel.AnnouncementInfo,
+        parentComment: AnnouncementsModel.AnnouncementCommentInfo) {
+        this._startNewAnnouncementCommentReply(announcement, parentComment);
+    }
+
+    /*******************************************
+    * PRIVATE METHODS
+    *******************************************/
+    private _reactToAnnouncement(announcement: AnnouncementsModel.AnnouncementInfo, reactionTypeName: string) {
+        this.announcementsProvider.reactToAnnouncement(announcement.AnnouncementID, reactionTypeName).subscribe(
+            /**
+             * 03/08/2020 - [responseData] isn't going to be anything useful at this time for
+             * the [reactToAnnouncement] method.
+             */
+            (responseData: any) => {
+                // Decrement the old reaction count number, if any.
+                switch (announcement.UserReactionType) {
+                    case 'like':
+                        if (announcement.LikeReactionCount > 0) {
+                            announcement.LikeReactionCount--;
+                        }
+                        break;
+                    case 'neutral':
+                        if (announcement.NeutralReactionCount > 0) {
+                            announcement.NeutralReactionCount--;
+                        }
+                        break;
+                    case 'dislike':
+                        if (announcement.DislikeReactionCount > 0) {
+                            announcement.DislikeReactionCount--;
+                        }
+                        break;
+                }
+                /**
+                 * If [reactionTypeName] is the same as the existing [announcement.UserReactionType]
+                 * then the user is clearing their selected reaction. We don't increment any counters
+                 * in this case.
+                 */
+                if (reactionTypeName === announcement.UserReactionType) {
+                    /**
+                     * Clear [announcement.UserReactionType] string to show that no reaction type is
+                     * currently selected.
+                     */
+                    announcement.UserReactionType = '';
+
+                } else {
+                    /**
+                     * Update [announcement.UserReactionType] string to show the new type is selected in
+                     * the DOM.
+                     */
+                    announcement.UserReactionType = reactionTypeName;
+                    // Increment the newly selected reaction count number.
+                    switch (announcement.UserReactionType) {
+                        case 'like':
+                            announcement.LikeReactionCount++;
+                            break;
+                        case 'neutral':
+                            announcement.NeutralReactionCount++;
+                            break;
+                        case 'dislike':
+                            announcement.DislikeReactionCount++;
+                            break;
+                    }
+                }
+            },
+            (error: APIResponseError) => {
+                console.log('announcements-error: ', error);
+                // Failed reaction click. Prompt user.
+                this.alertController.create({
+                    message: 'Your reaction was not saved. Please try again later.',
+                    buttons: [{ text: 'OK', role: 'ok' }]
+                }).then(alertElement => {
+                    alertElement.present();
+                });
+            }
+        );
+    }
+
+    private _getAnnouncementComments(announcement: AnnouncementsModel.AnnouncementInfo) {
+        // Set [IsLoadingComments] to show a loading indicator in the GUI.
+        announcement.GUIData.IsLoadingComments = true;
+        // Reset the [FailedToLoadComments] warning indicator flag.
+        announcement.GUIData.FailedToLoadComments = false;
+        this.announcementsProvider.getAnnouncementComments(announcement.AnnouncementID).subscribe(
+            (responseData: AnnouncementsModel.AnnouncementCommentInfo[]) => {
+                // Cache the [responseData] comments array on [announcement] for displaying the DOM.
+                announcement.Comments = responseData;
+                /**
+                 * Use the returned [responseData] to sync the [announcement.CommentCount] value.
+                 * Exclude deleted comments from the count.
+                 */
+                let newCommentCount = 0;
+                announcement.Comments.forEach(loopedComment => {
+                    if (!loopedComment.IsDeleted) {
+                        newCommentCount++;
+                    }
+
+                    // Since we're already looping comments, take this chance to setup the [GUIData].
+                    loopedComment.GUIData = new AnnouncementsModel.AnnouncementCommentGUIData();
+                });
+                announcement.CommentCount = newCommentCount;
+                this._onAnnouncementCommentCountUpdated(announcement);
+
+                // Clear [IsLoadingComments] so the new content can be rendered.
+                announcement.GUIData.IsLoadingComments = false;
+
+                this._autoScrollToAnnouncementComments(announcement);
+            },
+            (error: APIResponseError) => {
+                console.log('announcements-error: ', error);
+                // Clear [IsLoadingComments] so the warning indicator can be rendered.
+                announcement.GUIData.IsLoadingComments = false;
+                // Set warning indicator flag & message.
+                announcement.GUIData.FailedToLoadComments = true;
+                announcement.GUIData.CommentsErrorMessage = error.errorCode + ' - ' + error.publicResponseMessage;
+
+                this._autoScrollToAnnouncementComments(announcement);
+            }
+        );
+    }
+
+    /**
+     * [_submitAnnouncementComment] assumes that the comment input has been validated.
+     */
+    private _submitAnnouncementComment(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        // Cache flag to show if this is a new comment or not. It's used in later logic.
+        const isNewComment = (comment.CommentID <= 0);
+
+        // Set [IsSaving] to show a loading indicator in the GUI.
+        comment.GUIData.IsSaving = true;
+
+        // User entered something in the textbox to submit.
+        this.announcementsProvider.submitAnnouncementComment(comment).subscribe(
+            (responseComment: AnnouncementsModel.AnnouncementCommentInfo) => {
+                /**
+                 * Check if [comment] is the [IsDefaultCommentInfo] record.
+                 * That will affect how we handle the API call success event.
+                 */
+                if (comment.GUIData.IsDefaultCommentInfo) {
+                    /**
+                     * New comment was created, place it on the [announcement.Comments] GUI & increment
+                     * the comments counter.
+                     */
+                    const matchedAnnouncement = this._getAnnouncementByIDFromCachedDataset(responseComment.AnnouncementID);
+                    if (!isNullOrUndefined(matchedAnnouncement)) {
+                        responseComment.GUIData = new AnnouncementsModel.AnnouncementCommentGUIData();
+                        matchedAnnouncement.Comments.push(responseComment);
+                        matchedAnnouncement.CommentCount++;
+                        this._onAnnouncementCommentCountUpdated(matchedAnnouncement);
+                    }
+
+                    // Clear the [comment] text model & other flags to reset the textarea in the GUI.
+                    comment.GUIData = new AnnouncementsModel.AnnouncementCommentGUIData();
+                    // Keep the [IsDefaultCommentInfo] flag in tact.
+                    comment.GUIData.IsDefaultCommentInfo = true;
+                    comment.Comment = '';
+
+                    this._showAnnouncementCommentSubmitSuccessToast(responseComment);
+                } else {
+                    // Use [responseComment] to overwrite [comment] data.
+                    this._overwriteAnnouncementCommentInfo(responseComment, comment);
+
+                    /**
+                     * Show a success message/toast. Change the shown text based on if this was
+                     * a new reply or an edit.
+                     */
+                    let successMessage = 'Comment updated.';
+                    if (isNewComment) {
+                        successMessage = 'Reply submitted.';
+                    }
+                    this._showAnnouncementCommentUpdateSuccessToast(successMessage);
+                }
+            },
+            (error: APIResponseError) => {
+                console.log('announcements-error: ', error);
+                // Always clear the saving state.
+                comment.GUIData.IsSaving = false;
+
+                // Alert user of error.
+                this.alertController.create({
+                    message: 'Comment failed to submit. Please try again.',
+                    buttons: [{ text: 'OK', role: 'ok' }]
+                }).then(alertElement => {
+                    alertElement.present();
+                });
+            }
+        );
+    }
+
+    private async _showAnnouncementCommentSubmitSuccessToast(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        const toast = await this.toastController.create({
+            message: 'Comment submitted.',
+            duration: 3000,
+            position: 'bottom',
+            buttons: [
+                {
+                    text: 'View',
+                    // '.toast-button-cancel' [cssClass] applied so the button color is white-ish.
+                    cssClass: 'toast-button-cancel',
+                    handler: () => {
+                        // View/ScrollTo" toast button clicked.
+                        // We are relying on a dynamic ID set in the HTML file.
+                        const commentItemElementIDAttribute = 'announcement-comment-item-wrapper-' + comment.CommentID;
+                        this._scrollToElement(commentItemElementIDAttribute);
+                        toast.dismiss();
+                    }
+                }, {
+                    text: 'Dismiss',
+                    role: 'cancel'
+                }
+            ]
+        });
+        toast.present();
+    }
+
+    private async _showAnnouncementCommentUpdateSuccessToast(successMessage: string) {
+        const toast = await this.toastController.create({
+            message: successMessage,
+            duration: 2000
+        });
+        toast.present();
+    }
+
+    private _startNewAnnouncementCommentReply(
+        announcement: AnnouncementsModel.AnnouncementInfo,
+        parentComment: AnnouncementsModel.AnnouncementCommentInfo) {
+        const parentCommentIndex = announcement.Comments.indexOf(parentComment);
+        if (parentCommentIndex > -1) {
+            const replyCommentInfo = new AnnouncementsModel.AnnouncementCommentInfo();
+            replyCommentInfo.CommentID = 0;
+            replyCommentInfo.AnnouncementID = announcement.AnnouncementID;
+            replyCommentInfo.ParentCommentID = parentComment.CommentID;
+            replyCommentInfo.Comment = '';
+            replyCommentInfo.CommentDateCreated = new Date();
+            replyCommentInfo.IsReply = true;
+            replyCommentInfo.GUIData = new AnnouncementsModel.AnnouncementCommentGUIData();
+            this._openAnnouncementCommentEditMode(replyCommentInfo);
+            /**
+             * Insert [replyCommentInfo] AFTER [parentCommentIndex].
+             * https://stackoverflow.com/questions/586182/how-to-insert-an-item-into-an-array-at-a-specific-index-javascript
+             */
+            announcement.Comments.splice((parentCommentIndex + 1), 0, replyCommentInfo);
+        }
+    }
+
+    private async _showAnnouncementCommentsActionButtonsPopoverMenu(event: Event, comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        event.stopImmediatePropagation();
+        const popover = await this.popoverController.create({
+            component: AnnouncementCommentActionsPopoverMenuComponent,
+            componentProps: {
+                comment
+            },
+            event,
+            translucent: true,
+        });
+
+        popover.onDidDismiss()
+            .then((result) => {
+                const selectedOption = result.data;
+
+                switch (selectedOption) {
+                    case 'editComment':
+                        this._openAnnouncementCommentEditMode(comment);
+                        break;
+                    case 'deleteComment':
+                        this._confirmAnnouncementCommentDelete(comment);
+                        break;
+                }
+            });
+
+        return await popover.present();
+    }
+
+    private _openAnnouncementCommentEditMode(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        comment.GUIData.ShowActionButtons = false;
+        comment.GUIData.IsEditing = true;
+    }
+
+    private _closeAnnouncementCommentEditMode(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        /**
+         * We have more than one case to handle here:
+         * Case 1: It was an existing announcement comment and the user cancelled.
+         * Case 2: It was a NEW announcement comment and the user cancelled.
+         */
+
+        const isNewComment = (comment.CommentID <= 0);
+
+        if (!isNewComment) {
+            /**
+             * Case 1: It was an existing announcement comment and the user cancelled.
+             * Just close the edit view in this case.
+             */
+            comment.GUIData.ShowActionButtons = true;
+            comment.GUIData.IsEditing = false;
+        } else {
+            /**
+             * Case 2: It was a NEW announcement comment and the user cancelled.
+             * Remove the comment from the announcement comments array.
+             */
+            const matchedAnnouncement = this._getAnnouncementByIDFromCachedDataset(comment.AnnouncementID);
+            const commentArrayIndex = matchedAnnouncement.Comments.indexOf(comment);
+            if (commentArrayIndex > -1) {
+                // Remove/splice 1 item from the [Comments] at the [commentArrayIndex] location.
+                matchedAnnouncement.Comments.splice(commentArrayIndex, 1);
+            }
+        }
+    }
+
+    private _confirmAnnouncementCommentDelete(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        // prepare the dialog
+        this.alertController.create({
+            header: 'Delete Comment',
+            message: 'Are you sure you want to delete this comment?',
+            buttons: [
+                {
+                    text: 'No',
+                    role: 'cancel'
+                },
+                {
+                    text: 'Yes',
+                    handler: () => {
+                        this._deleteAnnouncementComment(comment);
+                    }
+                }
+            ]
+        }).then(alertEl => {
+            alertEl.present();
+        });
+
+    }
+
+    private _deleteAnnouncementComment(comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        comment.GUIData.ShowActionButtons = false;
+        comment.GUIData.IsDeleting = true;
+        this.announcementsProvider.deleteAnnouncementComment(comment).subscribe(
+            (outputPackage: AnnouncementsModel.DeleteAnnouncementCommentOutputPackage) => {
+                if (outputPackage.DeletedSuccessfully) {
+                    this._onAnnouncementCommentDeleteSuccess(outputPackage.Comment, comment);
+                } else {
+                    this._onAnnouncementCommentDeleteFailed(outputPackage.DeleteErrorMessage, comment);
+                }
+            },
+            (error: APIResponseError) => {
+                console.log('announcements-error: ', error);
+                this._onAnnouncementCommentDeleteFailed(error.publicResponseMessage, comment);
+            }
+        );
+    }
+
+    private _onAnnouncementCommentDeleteSuccess(
+        newCommentInfo: AnnouncementsModel.AnnouncementCommentInfo,
+        oldCommentInfo: AnnouncementsModel.AnnouncementCommentInfo) {
+
+        // Overwrite [oldCommentInfo].
+        const overwrittenComment = this._overwriteAnnouncementCommentInfo(newCommentInfo, oldCommentInfo);
+
+        const matchedAnnouncement = this._getAnnouncementByIDFromCachedDataset(overwrittenComment.AnnouncementID);
+        if (!isNullOrUndefined(matchedAnnouncement)) {
+            matchedAnnouncement.CommentCount--;
+            this._onAnnouncementCommentCountUpdated(matchedAnnouncement);
+        }
+    }
+
+    private _onAnnouncementCommentDeleteFailed(errorMessage: string, comment: AnnouncementsModel.AnnouncementCommentInfo) {
+        this.alertController.create({
+            message: errorMessage,
+            buttons: [{ text: 'OK', role: 'ok' }]
+        }).then(alertElement => {
+            alertElement.present();
+        });
+
+        comment.GUIData.ShowActionButtons = true;
+        comment.GUIData.IsDeleting = false;
+    }
+
+    private _overwriteAnnouncementCommentInfo(
+        newCommentInfo: AnnouncementsModel.AnnouncementCommentInfo,
+        oldCommentInfo: AnnouncementsModel.AnnouncementCommentInfo) {
+        // Overwrite [oldCommentInfo].
+        const overwrittenComment = Object.assign(oldCommentInfo, newCommentInfo);
+
+        // Reset GUIData.
+        overwrittenComment.GUIData = new AnnouncementsModel.AnnouncementCommentGUIData();
+
+        return overwrittenComment;
+    }
+
+    private _autoScrollToAnnouncementComments(announcement: AnnouncementsModel.AnnouncementInfo) {
+        // We are relying on a dynamic ID set in the HTML file.
+        const commentsBlockElementIDAttribute = 'announcement-comments-wrapper-' + announcement.AnnouncementID;
+        this._scrollToElement(commentsBlockElementIDAttribute);
+    }
+
+    private _scrollToElement(elementIDAttribute: string) {
+        /**
+         * Autoscroll the screen to the given [HTMLElement].
+         * setTimeout is needed to let angular finish loading the element in the DOM before we scroll.
+         */
+        setTimeout(() => {
+            const element = document.getElementById(elementIDAttribute);
+            element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+        }, 0);
+    }
+
+    private _getAnnouncementByIDFromCachedDataset(announcementID: number): AnnouncementsModel.AnnouncementInfo {
+        let matchedAnnouncement: AnnouncementsModel.AnnouncementInfo;
+        this.announcements.forEach(loopedAnnouncement => {
+            if (loopedAnnouncement.AnnouncementID === announcementID) {
+                matchedAnnouncement = loopedAnnouncement;
+            }
+        });
+        return matchedAnnouncement;
+    }
+
+    private async _openEditAnnouncementDialog(isEditMode: boolean, announcementToEdit: AnnouncementsModel.AnnouncementInfo) {
+        const modal = await this.modalController.create({
+            backdropDismiss: false,
+            component: EditAnnouncementDialogPage,
+            componentProps: {
+                isEditMode,
+                announcementInput: announcementToEdit,
+                serverInfo: this.serverInfo
+            },
+            cssClass: 'large-modal-pwa'
+        });
+
+        return await modal.present();
+    }
+
+    private async _getAnnouncements() {
+        this.announcementsProvider.getAnnouncements(this.filterType, this._sectionID).subscribe(
+            (announcements: AnnouncementsModel.AnnouncementInfo[]) => {
+                this.announcements = announcements;
+                this.initialized = true;
+
+                this.failedToLoadAnnouncements = false;
+                if (this.announcements.length > 0) {
+                    this.hasAnnouncements = true;
+                } else {
+                    this.hasAnnouncements = false;
+                }
+
+                this._setupAnnouncementGUIData();
+
+                this.loadingService.dismissLoading();
+            },
+            (error: APIResponseError) => {
+                console.log('announcements-error: ', error);
+                this.initialized = true;
+                this.announcementErrorMessage = error.errorCode + ' - ' + error.publicResponseMessage;
+                this.failedToLoadAnnouncements = true;
+                this.loadingService.dismissLoading();
+            }
+        );
+    }
+
+    private _setupAnnouncementGUIData() {
+        this.announcements.forEach(loopedAnnouncement => {
+            // Set up [GUIData] on the [loopedAnnouncement] object.
+            loopedAnnouncement.GUIData = new AnnouncementsModel.AnnouncementGUIData();
+            /**
+             * Using [domSanitizer] to let the announcements CKEditor content
+             * maintain it's inline CSS styles.
+             * ---
+             * https://v8.angular.io/api/platform-browser/DomSanitizer#description
+             */
+            loopedAnnouncement.GUIData.SafeHTMLContent = this.domSanitizer.bypassSecurityTrustHtml(loopedAnnouncement.Description);
+
+            /**
+             * Set up [newCommentInfo] with the proper FK data and attach it to [loopedAnnouncement.GUIData].
+             * Not all flags and values on [AnnouncementCommentInfo] are relevant for this scenario so
+             * they won't get set.
+             */
+            const newCommentInfo = new AnnouncementsModel.AnnouncementCommentInfo();
+            newCommentInfo.CommentID = 0;
+            newCommentInfo.AnnouncementID = loopedAnnouncement.AnnouncementID;
+            newCommentInfo.ParentCommentID = 0;
+            newCommentInfo.Comment = '';
+            newCommentInfo.GUIData.IsDefaultCommentInfo = true;
+
+            loopedAnnouncement.GUIData.NewCommentInfo = newCommentInfo;
+
+            this._onAnnouncementCommentCountUpdated(loopedAnnouncement);
+        });
+    }
+
+    private _onAnnouncementCommentCountUpdated(announcement: AnnouncementsModel.AnnouncementInfo) {
+        announcement.GUIData.CommentsCountMessage = announcement.CommentCount + ' Comments';
+        if (announcement.CommentCount === 1) {
+            // If there is only 1 announcement show 'Comment' as a singular noun.
+            announcement.GUIData.CommentsCountMessage = announcement.CommentCount + ' Comment';
+        }
+    }
+
+    /*******************************************
+    * SELF INIT
+    *******************************************/
+    ionViewWillEnter() {
+        this.parseRouteParams();
+        this._init();
+    }
+
+    private parseRouteParams() {
+        const routeSectionID = this.route.snapshot.paramMap.get('sectionID');
+        this._sectionID = parseInt(routeSectionID, 10);
+        if (isNaN(this._sectionID)) {
+            this._sectionID = 0;
+        }
+    }
+
+    private async _init() {
+        this.filterType = 'Current';
+
+        await this.loadingService.presentLoading('Loading announcements...');
+
+        this.announcementsProvider.getServerInfo(this._sectionID).subscribe(
+            (serverInfo: AnnouncementsModel.AnnouncementServerInfo) => {
+                this.serverInfo = serverInfo;
+
+                // [_getAnnouncements] will dismiss the loader for us.
+                this._getAnnouncements();
+            },
+            (error: APIResponseError) => {
+                console.log('announcements-error: ', error);
+                this.initialized = true;
+                this.announcementErrorMessage = error.errorCode + ' - ' + error.publicResponseMessage;
+                this.failedToLoadAnnouncements = true;
+                this.loadingService.dismissLoading();
+            }
+        );
+    }
+
+    ngOnInit() {
+        this.hideHeaderBackButton = this.dnnEmbedService.getConfig().IsEmbedded;
+        /**
+         * The Ionic app can be embedded in an <iframe> on the DNN site. Check for that case now.
+         * We really only need to run [tryMessageDNNSite] on the main app/component ngInit.
+         * It will post a message out to the DNN site so the DNN site can will know ionic has loaded.
+         */
+        this.dnnEmbedService.tryMessageDNNSite('ionic-loaded');
+    }
+}

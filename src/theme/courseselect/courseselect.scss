@@ -1,0 +1,168 @@
+
+
+.courseCatalogView {
+
+    .video-name-label {
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color:black;
+    }
+
+    .sme-brief-bio-label {
+        color: #666;
+
+        p {
+            margin-bottom: 2px;
+        }
+    }
+
+    .custom-tab-item {
+        display: inline-block;
+        text-align: center;
+        padding: 12px 24px;
+        
+        font-size: 14px;
+        color: white;
+        background-color: #778188;
+        cursor:pointer;
+        margin:3px;
+    }
+
+    .custom-tab-item.selected {
+        
+        background-color: var(--ion-color-primary);
+        color:white;
+    }
+
+
+    .major-header, .major-header-blue {
+        background-color: var(--ion-color-secondary);
+        color: #fff;
+        padding: 4px 16px;
+        min-height: 42px;
+    }
+
+
+    .major-header-blue {
+        background-color: var(--ion-color-primary);
+    }
+
+    .course-catalog-image-wrapper {
+        /*The following position, display, & width styles are to keep the preview play button
+          looking good when hovered.
+        */
+        position: relative;
+        display: inline-block;
+        width: auto;
+
+        img {
+            width: 150px;
+            min-height: 100px;
+            height: auto;
+            max-height: 110px;
+            background-color: #000;
+        }
+    }
+
+    .advertisedCourseItem .md-button {
+        padding: 0 !important;
+    }
+
+    .advertisedCourseItem md-card {
+        md-card-contents {
+            padding: 16px;
+        }
+
+        margin: 1px;
+        text-align: center;
+        align-items: center;
+    }
+
+    .course-catalog-image-wrapper.detail-view {
+        img {
+            width: 250px;
+            height: auto;
+            max-height: none;
+            max-width: 100%;
+        }
+    }
+
+    .course-catalog-image-wrapper.advertised-view {
+        img {
+            width: 100%;
+            min-height: 66%;
+            height: auto;
+            max-height: none;
+            max-width: 100%;
+            background-color: #000;
+            margin-bottom: 16px;
+        }
+    }
+    /*The video play button lays on top of the catalog image*/
+    .promo-video-play-button {
+        position: absolute;
+        padding: 0 8px;
+        top: 2px;
+        left: 2px;
+        border-radius: 2px;
+        border: 1px solid #000;
+        color: #fff;
+        background: rgba(0,0,0,.3);
+
+        .material-icons {
+            color: #fff;
+        }
+    }
+    /*When the user hovers the catalog image we will make the play button take up the full size of the image and change color.*/
+    .course-catalog-image-wrapper:hover {
+        .promo-video-play-button {
+            top: 0;
+            left: 0;
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--ion-color-primary);
+            background: var(--ion-color-primary);
+            opacity: .7;
+
+            .material-icons {
+                font-size: 72px;
+            }
+        }
+    }
+
+    .catalog-table-item-wrapper {
+        min-height: 182px;
+    }
+
+    .catalog-table-item-header {
+
+        border-bottom:1px solid #5b6770 !important;
+    }
+
+    
+}
+
+.course-description-popover-wrapper {
+    //Apply a max-height and scroll to the course description popovers
+    .popover-content {
+        max-height: 250px;
+        overflow-y: auto;
+        padding:10px;
+    }
+}
+
+.course-detail-wrapper {
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.course-image {
+    width: 150px;
+    min-height: 100px;
+    height: auto;
+    max-height: 110px;
+    background-color: #000;
+}

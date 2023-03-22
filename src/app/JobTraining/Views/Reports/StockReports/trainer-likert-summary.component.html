@@ -1,0 +1,85 @@
+<div class="reports-wrapper">
+  <ion-toolbar color="tms-dark-grey" style="padding: 0 8px;">
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        Report: Trainer Scoring Summary
+      </ion-col>
+      <ion-col size="auto">
+        <ion-button color="white" (click)="this.onCloseReportClick();">
+          Close
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+  <div *ngIf="this.initialized">
+    <ion-row>
+      <ion-col>
+        <ion-header color="white">
+          <ion-item lines="none">
+            Users
+          </ion-item>
+        </ion-header>
+        <jt-user-selector-component [roles]="this.jobTrainingService.selectedProgram.NonTraineeRoles"
+          [users]="this.users" [preSelectedUserID]="this.selectedUserID"
+          (onUserSelected)="this.setSelectedUser($event);">
+        </jt-user-selector-component>
+      </ion-col>
+      <ion-col>
+        <ion-header>
+          <ion-item lines="none">
+            Options
+          </ion-item>
+        </ion-header>
+        <ion-item>
+          <ion-label>Warning % Threshold</ion-label>
+          <ion-input type="number" [(ngModel)]="this.warningPercentageThreshold" class="form-control"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-checkbox color="primary" [(ngModel)]="this.filterOutEmptyForms"></ion-checkbox>
+          &nbsp;
+          <ion-label>Filter out Empty Forms</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-checkbox color="primary" [(ngModel)]="this.filterOutIncompleteForms"></ion-checkbox>
+          &nbsp;
+          <ion-label>Filter out Incomplete Forms</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>From Date</ion-label>
+          <!-- Form [Date] filter control. From Date, or the min date to include.-->
+          <app-datepicker-button slot="end" [inputDate]="this.filterFromDate"
+            (outputDate)="this.updateFilterFromDate($event)">
+          </app-datepicker-button>
+        </ion-item>
+        <ion-item>
+          <ion-label>To Date</ion-label>
+          <!-- Form [Date] filter control. To Date, or the max date to include.-->
+          <app-datepicker-button slot="end" [inputDate]="this.filterToDate"
+            (outputDate)="this.updateFilterToDate($event)">
+          </app-datepicker-button>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-toolbar color="tms-dark-grey" style="padding: 0 8px;">
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+          <span *ngIf="!this.hasReport">
+            No report ran yet.
+          </span>
+        </ion-col>
+        <ion-col size="auto">
+          <ion-button (click)="this.onGoClick();">
+            Generate
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+
+    <ion-card *ngIf="this.hasReport" color="white">
+      <ion-card-content>
+        <report-table-component [report]="this.report"></report-table-component>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</div>

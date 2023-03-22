@@ -1,0 +1,78 @@
+<div class="course-select-table" ng-cloak >
+
+        <ion-row class="course-assignment-table-column-header-row ">
+
+            <ion-col class="course-assignment-table-column-header-cell ">
+                <!--Role/Role selection header-->
+                <ion-grid>
+                    <ion-row>
+                        <ion-col>
+                            <ion-label class="">
+                                {{headerText}}
+                            </ion-label>
+
+
+                        </ion-col>
+                        <ion-col>
+
+                            <ion-row class="" style="float:right;">
+
+                                <ion-label style="margin-right:10px;">Select All</ion-label>
+
+                                <ion-checkbox item-right secondary (ionChange)="this.onSelectAllCoursesChange();"
+                                    [(ngModel)]="this.selectAllCoursesFlag"></ion-checkbox>
+
+                            </ion-row>
+
+                        </ion-col>
+                    </ion-row>
+
+                </ion-grid>
+            </ion-col>
+
+
+
+        </ion-row>
+        <ion-row class="" >
+            <ion-col>
+                <ion-select multiple placeholder="Filter by category" class="form-control" [(ngModel)]="this.selectedCategories"
+                    (ionChange)="this.onCategorySelectionChanged()">
+                    <ion-select-option *ngFor="let category of this.courseCategories"
+                        [value]="category.CategoryID.toString()">
+                        {{category.CategoryName}}
+                    </ion-select-option>
+
+                </ion-select>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+
+            <!--Course selection column-->
+            <ion-col class="course-assignment-table-column">
+
+                <!--Course repeater search textbox-->
+                <div>
+                    <input type="text" class="form-control" placeholder="Search" style="width:100%"
+                        [(ngModel)]="this.courseSearchFilterText" (ngModelChange)="onCourseFilterTextChange();" />
+                </div>
+                <!--Course repeater-->
+                <div class="course-list-wrapper">
+                    <ion-item *ngFor="let course of this.courses" title="{{course.CourseName}}"
+                        class="course-assignment-course-item" ngClass="{'is-selected': course.GUIData.IsSelected}"
+                        [hidden]="course.GUIData.IsHiddenBySearch || course.GUIData.IsHiddenByCategory">
+                        
+                        <p>
+                            {{course.CourseName}}
+                        </p>
+                        <ion-checkbox slot="end" [(ngModel)]="course.GUIData.IsSelected"
+                            (ngModelChange)="onCourseRowClicked();"></ion-checkbox>
+                    </ion-item>
+                </div>
+                <div *ngIf="this.courseSearchFilterIsActive" class="search-filter-warning bg-danger">
+                    <em>{{this.courseSearchFilterWarningMessage}}</em>
+                </div>
+            </ion-col>
+
+        </ion-row>
+
+</div>

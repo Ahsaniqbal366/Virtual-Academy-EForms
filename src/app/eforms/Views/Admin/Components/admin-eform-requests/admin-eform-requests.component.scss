@@ -1,0 +1,30 @@
+@import "src/app/eforms/Styles.scss";
+
+.mat-mdc-menu-trigger.custom-table-dropdown {
+    border-radius: 4px;
+    border: none;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+
+    &.new {
+        background: #F3FFEE;
+        color: #78C55B;
+
+    }
+
+    &.inprogress {
+        background: #EEF7FF;
+        color: #1F87E5;
+    }
+
+    &.archive {
+        background: #F7F7FA;
+        color: #555555;
+    }
+
+    &.close {
+        background: #FFEBEB;
+        color: #E81D1D;
+    }
+}

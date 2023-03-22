@@ -1,0 +1,52 @@
+<div class="catalog-table-item-wrapper courseCatalogView" ng-click="onCourseClick($event)">
+    <ion-row layout="row" class="catalog-table-item-header">
+        <!--Not all CourseCatalog tools that use this shared directive will allow the user to edit the course.
+        Futher, even if edit access is available, not all courses will be editable.-->
+        <ion-col style="width: 24px;" [hidden]="!course.CanEditCourse">
+            <i class="icon icon-edit course-edit-button"   title="Edit course" style="font-size: 24px;"
+                ng-click="onEditCourseClick($event);"></i>
+        </ion-col>
+        <!--Course name label could be truncated w/ elipsis if it is longer than the
+        container-->
+        <ion-col size="10"  class="md-subhead video-name-label" title="{{course.CourseName}}">
+            {{course.CourseName}}
+        </ion-col>
+        <ion-col size="2" >
+            <ion-checkbox aria-label="checkbox" title="Select course for enrollment" class="course-card-checkbox ion-float-right"
+            ng-change="onCheckboxChange();" ng-show="config.hasCheckbox" [(ngModel)]="course.GUIData.IsSelected"
+            style="margin-bottom: 0px;"></ion-checkbox>
+        </ion-col>
+        
+
+    </ion-row>
+    
+
+    <div ng-if="course.HasWarning" class="bg-danger" style="margin-bottom: 8px; padding: 0 16px;">
+        {{course.WarningMessage}}
+    </div>
+
+    <ion-row layout="row" class="catalog-table-item-content">
+        <ion-col size="3" >
+            <course-card-contents-image [course]="course" [config]="config">
+            </course-card-contents-image>
+            <!--Play button for preview/promo video. Hidden if no video is avaiable.-->
+            <course-card-contents-preview-button [course]="course" [config]="config"></course-card-contents-preview-button>
+        </ion-col>
+        <ion-col size="9">
+            <course-card-contents-sme [course]="course" [config]="config">
+            </course-card-contents-sme>
+
+            <!--Most of the [layout] markup below is to position the "Description"
+            at the bottom right hand side of the parent md-card. It works!-->
+            <div style="width: 100%;"  class="ion-float-right">
+               
+
+                <course-card-contents-description [course]="course" [config]="config">
+                </course-card-contents-description>
+
+            </div>
+        </ion-col>
+
+        
+    </ion-row>
+</div>

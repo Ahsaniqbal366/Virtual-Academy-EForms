@@ -1,0 +1,10 @@
+<!-- [disabled] indicated read-only mode. handle separately
+    Input / Edit mode -->
+<ion-input *ngIf="!this.disabled" color="{{this.hasError ? 'danger' : ''}}" class="form-control" placeholder="MM/DD/YYYY"
+    [(ngModel)]="this.selectedDate" (ngModelChange)="this.onDateInput()">
+    <ion-button (click)="openDatePicker()">
+        <ion-icon name="calendar"></ion-icon>
+    </ion-button>
+</ion-input>
+<!-- Read-Only Mode -->
+<span *ngIf="this.disabled">{{this.selectedDate}}</span>

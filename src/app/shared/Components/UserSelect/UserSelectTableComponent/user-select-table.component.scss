@@ -1,0 +1,102 @@
+.user-select-table, .user-select-dialog {
+
+    .layout-row {
+        margin: 0;
+    }
+
+    .course-assignment-table-column-header-row {
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+        box-shadow: 0 4px 10px -2px #bbb;
+    }
+
+    .course-assignment-table-column-header-cell {
+        border-left: 1px solid gray;
+    }
+
+    .course-assignment-table-column {
+        border-left: 1px solid gray;
+        border-bottom:1px solid gray
+    }
+
+    .course-assignment-rank-item, .course-assignment-course-item {
+        p, md-checkbox {
+            margin: 0;
+        }
+
+        
+
+        &.is-selected {
+            background-color: var(--ion-color-primary);
+            color: #fff;
+        }
+    }
+
+    .course-assignment-course-item .md-button {
+        border: none !important;
+    }
+
+    .rank-list-wrapper, .course-list-wrapper, .section-list-wrapper {
+        max-height: 75vh;
+        height:75vh;
+        overflow-y: auto;
+    }
+
+    .course-name-header {
+        background-color: gray;
+        color: #fff;
+        margin: 0 -8px;
+        margin-bottom: 8px;
+
+        .status-icon {
+            padding: 8px;
+            color: #fff;
+            /*override the default cursor:pointer style that is set on the skin for material-icons*/
+            cursor: inherit !important;
+        }
+
+        .course-name-label {
+            padding: 8px;
+            padding-left: 0;
+        }
+    }
+
+    .course-name-header.is-complete {
+        .status-icon {
+            background-color: var(--ion-color-bootstrap-bg-success);
+        }
+    }
+
+    .course-name-header.has-warning {
+        .status-icon {
+            background-color: var(--ion-color-bootstrap-bg-warning);
+        }
+    }
+
+    .course-name-header.has-error {
+        .status-icon {
+            background-color: var(--ion-color-bootstrap-bg-warning);
+        }
+    }
+
+    .section-list-info-icon {
+        font-size: 24px;
+        padding-bottom: 10px;
+    }
+
+    .course-photo {
+        height: 30px;
+        width: 30px;
+        margin-right: 8px;
+    }
+
+    .enrollment-setting-question-icon {
+        font-size: 24px;
+        padding-bottom: 10px;
+    }
+
+    .search-filter-warning {
+        margin: 0 -8px;
+        padding: 8px;
+    }
+}

@@ -1,0 +1,38 @@
+<ion-header class="program-detail-wrapper">
+    <!-- the <ion-header> must be present from the start for the [appHideHeader] can function -->
+    <div *ngIf="this.initialized">
+
+        <!--Wrapping the <app-header> in <ion-header> to keep both toolbars in the header-->
+        <app-header [defaultHref]="'/jobtraining'" headerText="{{this.jobTrainingService.selectedProgram.Name}}"
+            [hideBackButton]="false"></app-header>
+
+        <archived-program-header-component></archived-program-header-component>
+
+    </div>
+
+</ion-header>
+<div *ngIf="this.initialized" class="program-detail-wrapper">
+
+    <!-- Extra buttons for admin level accounts. -->
+    <div *ngIf="this.jobTrainingService.selectedProgram.IsAdminUser">                
+        <ion-button size="small" routerLink="./trainees" [routerLinkActive]="'button-outline'">
+            Trainees
+        </ion-button>
+        <ion-button size="small" routerLink="./users" [routerLinkActive]="'button-outline'">
+            Users
+        </ion-button>
+		<ion-button size="small" routerLink="./todo" [routerLinkActive]="'button-outline'">
+            To Do
+        </ion-button>
+        <ion-button size="small" routerLink="./reports" [routerLinkActive]="'button-outline'">
+            Reports
+        </ion-button>
+        <!-- <ion-button size="small" routerLink="./forms" [routerLinkActive]="'button-outline'">
+            Forms
+        </ion-button>
+         -->
+    </div>
+
+    <router-outlet></router-outlet>
+
+</div>

@@ -1,0 +1,222 @@
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { IonicLoadingService } from '../shared/Ionic.Loading.Service';
+import { DNNEmbedService } from '../shared/DNN.Embed.Service';
+import { ActiveCoursesProvider } from './Providers/active-courses';
+import * as ActiveCoursesModel from './Providers/active-courses.model';
+import { APIResponseError } from '../shared/API.Response.Model';
+import { DomSanitizer } from '@angular/platform-browser';
+import { PopoverController, ModalController } from '@ionic/angular';
+import { ActiveCoursesPopoverDescriptionComponent } from './PopoverDescription/active-courses.popover-description.component';
+import { CoursePreviewDialogPage } from './PreviewDialog/preview-dialog';
+import { isNullOrUndefined } from 'is-what';
+
+// define component
+@Component({
+    selector: 'app-active-courses-page',
+    templateUrl: 'active-courses.page.html',
+    styleUrls: ['active-courses.page.scss']
+})
+
+// create class for export
+export class ActiveCoursesPage implements OnInit {
+    // constructor -- define service provider
+    // The service provider will persist along routes
+    constructor(
+        private domSanitizer: DomSanitizer,
+        private dnnEmbedService: DNNEmbedService,
+        private loadingService: IonicLoadingService,
+        private activeCoursesProvider: ActiveCoursesProvider,
+        private popoverController: PopoverController,
+        private modalController: ModalController
+    ) {
+    }
+
+    /*******************************************
+    * PUBLIC VARIABLES
+    *******************************************/
+    public initialized: boolean;
+
+    /**
+     * [hideHeaderBackButton] is set on _init. Used to hide the header's back button when the ionic app
+     * is embedded in the DNN site.
+     *
+     * We don't hide the back button on every page/view within this module, just the initial page.
+     */
+    public hideHeaderBackButton: boolean;
+
+    /**
+     * [failedToLoadActiveCourses] will get set on [_init] after we gather active courses.
+     * If the API call failed for whatever reason this flag will help show a message in the DOM.
+     * ----
+     * [activeCoursesErrorMessage] will hold the w/e error message so the user can report or act on
+     *  the issue if possible.
+     */
+    public failedToLoadActiveCourses: boolean;
+    public activeCoursesErrorMessage: string;
+
+    /**
+     * [hasActiveCourses] will get set on [_init] after we gather active courses.
+     * Controls visilbity of active courses repeated and a "no data message" in the DOM.
+     */
+    public hasActiveCourses: boolean;
+
+    /**
+     * [activeCourses] holds the full, unfiltered list of active courses for this user
+     */
+    public activeCourses: ActiveCoursesModel.ActiveCourseInfo[];
+
+    /**
+     * [catalogCategories] holds the full list of catalog categories for this user
+     */
+    public catalogCategories: ActiveCoursesModel.CourseCategoryInfo[];
+
+    /**
+     * [selectedCategoryID] holds the ID of the selected category. -1 if 'All Courses'
+     */
+    public selectedCategoryID: number;
+
+    /**
+     * [filteredActiveCourses] holds the filtered by [selectedCategoryID] courses to be displayed
+     */
+    public filteredActiveCourses: ActiveCoursesModel.ActiveCourseInfo[];
+    /*******************************************
+    * PUBLIC METHODS
+    *******************************************/
+    onCategoryChanged(event: Event, category: ActiveCoursesModel.CourseCategoryInfo) {
+        // Here's we'll filter the courses using each courses [CourseCategoryIDs] compared to the selected [CategoryID]
+        if (this.selectedCategoryID !== -1) {
+            this.filteredActiveCourses = this.activeCourses.filter((course) => {
+                return (course.CourseCategoryIDs.indexOf(this.selectedCategoryID) !== -1);
+            });
+        } else {
+            this.filteredActiveCourses = this.activeCourses;
+        }
+
+        // The (ionChange) of the radio-group passes in a null for [category]
+        if (!isNullOrUndefined(category)) {
+            // Flag this [category] as [isSelected] and others as not
+            this.catalogCategories.forEach((loopedCategory) => {
+                loopedCategory.GUIData.isSelected = false;
+            });
+
+            category.GUIData.isSelected = true;
+
+        }
+    }
+
+    async onPopoverDescriptionButtonClick(event: Event, description: string) {
+        event.stopImmediatePropagation();
+
+        const popover = await this.popoverController.create({
+            component: ActiveCoursesPopoverDescriptionComponent,
+            componentProps: {
+                description
+            },
+            event
+        });
+
+        return await popover.present();
+    }
+
+    onPreviewClick(event: Event, videoURL: string, courseName: string) {
+        this._openPreviewDialog(videoURL, courseName);
+    }
+
+    /*******************************************
+    * PRIVATE METHODS
+    *******************************************/
+    private _getActiveCourses() {
+        this.loadingService.presentLoading('Loading active courses...');
+
+        this.activeCoursesProvider.getActiveCourses().subscribe(
+            (data: any) => {
+                this._initAPIData(data);
+                this.initialized = true;
+                this.loadingService.dismissLoading();
+            },
+            (error: APIResponseError) => {
+                console.log('active courses-error: ', error);
+                this.initialized = true;
+                this.activeCoursesErrorMessage = error.errorCode + ' - ' + error.publicResponseMessage;
+                this.failedToLoadActiveCourses = true;
+                this.loadingService.dismissLoading();
+            }
+        );
+    }
+
+    _initAPIData(data: any) {
+        this.activeCourses = data.CatalogCourses;
+        this.filteredActiveCourses = data.CatalogCourses;
+        this.catalogCategories = data.CatalogCategories;
+        // Add default option
+        this.catalogCategories.unshift({
+            CategoryName: 'All Courses',
+            CategoryID: -1,
+            HasCourses: this.activeCourses.length !== 0
+        } as ActiveCoursesModel.CourseCategoryInfo);
+
+        this.failedToLoadActiveCourses = false;
+        if (this.activeCourses.length > 0) {
+            this.hasActiveCourses = true;
+        } else {
+            this.hasActiveCourses = false;
+        }
+
+        this._setupActiveCourseGUIData();
+        this._setupCategoryGUIData();
+
+        this.selectedCategoryID = -1;
+        this.catalogCategories[0].GUIData.isSelected = true;
+    }
+
+    private _setupActiveCourseGUIData() {
+        this.activeCourses.forEach(loopedActiveCourse => {
+            // Set up [GUIData] on the [loopedActiveCourse] object.
+            loopedActiveCourse.GUIData = new ActiveCoursesModel.ActiveCourseGUIData();
+        });
+    }
+
+    private _setupCategoryGUIData() {
+        this.catalogCategories.forEach(loopedCategory => {
+            // Set up [GUIData] on the [loopedCategory] object.
+            loopedCategory.GUIData = new ActiveCoursesModel.CategoryGUIData();
+        });
+    }
+
+    /** Adds a new [TraineeFormRecord] and routes to it immediately */
+    async _openPreviewDialog(videoURL: string, courseName: string) {
+        const modal = await this.modalController.create({
+            component: CoursePreviewDialogPage,
+            componentProps: {
+                videoURL,
+                courseName
+            },
+            cssClass: 'video-preview-dialog'
+        });
+
+        return await modal.present();
+    }
+
+    /*******************************************
+    * SELF INIT
+    *******************************************/
+    ionViewWillEnter() {
+        this._init();
+    }
+
+    private _init() {
+        this._getActiveCourses();
+    }
+
+    ngOnInit() {
+        this.hideHeaderBackButton = this.dnnEmbedService.getConfig().IsEmbedded;
+        /**
+         * The Ionic app can be embedded in an <iframe> on the DNN site. Check for that case now.
+         * We really only need to run [tryMessageDNNSite] on the main app/component ngInit.
+         * It will post a message out to the DNN site so the DNN site can will know ionic has loaded.
+         */
+        this.dnnEmbedService.tryMessageDNNSite('ionic-loaded');
+    }
+
+
+}

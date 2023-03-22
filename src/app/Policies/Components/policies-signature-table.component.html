@@ -1,0 +1,123 @@
+<div *ngIf="!this.initialized">
+
+      <ion-row>
+        <ion-col>
+          <sls-skeleton-table [rows]="1" [columns]="4"></sls-skeleton-table>
+        </ion-col>
+
+      </ion-row>
+</div>
+<div class="policies-assignment-wrapper" *ngIf="this.initialized">
+  <table mat-table [dataSource]="policiesAssignmentTableDataSource" class="jt-mat-table" style="width:100%;">
+
+    <ng-container matColumnDef="IDNumber">
+      <th mat-header-cell *matHeaderCellDef class="jt-table-cell">
+        ID Number
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="jt-table-cell jt-table-cell">
+        {{policy.userId}}
+      </td>
+
+    </ng-container>
+    <ng-container matColumnDef="Username">
+      <th mat-header-cell *matHeaderCellDef class="jt-table-cell">
+        Username
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="jt-table-cell jt-table-cell">
+        {{policy.assigneeName}}
+      </td>
+
+    </ng-container>
+    <ng-container matColumnDef="Status">
+      <th mat-header-cell *matHeaderCellDef class="jt-table-cell">
+        Status
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="jt-table-cell jt-table-cell">
+          <ion-icon name="close-circle-outline" color="danger" *ngIf="!policy.isAcknowledged"></ion-icon>
+          <ion-icon name="checkmark-circle-outline" color="success" *ngIf="policy.isAcknowledged"></ion-icon>
+          <ng-template [ngIf]="initFrom == 'admin'">
+            <ion-button size="small" color="primary" fill="clear" title="Reset" *ngIf="(!policy.isAcknowledged && policy.needsAssessmentReset) && !this.assessmentReseted" (click)="this.resetBtnClick(policy.userId, policy.assigneeName)">
+              Reset 
+            </ion-button>
+          </ng-template>
+      </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="DateAcknowledged">
+      <th mat-header-cell *matHeaderCellDef class="jt-table-cell">
+        Acknowledged Date
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="jt-table-cell jt-table-cell">
+        {{policy.dateAcknowledged==null?
+          "N/A"
+          :policy.dateAcknowledged | date:'MM/dd/yyyy'}}
+      </td>
+
+    </ng-container>
+
+    <ng-container matColumnDef="Reminder" *ngIf="initFrom == 'admin'">
+      <th mat-header-cell *matHeaderCellDef class="jt-table-cell ion-text-center ">
+        Send Reminders
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="jt-table-cell  ion-text-center small-status-cell">
+        <ng-container *ngIf="!policy.isAcknowledged; else acknowledgeOulet">
+          <ion-button size="small" color="primary" fill="clear" title="Reminder" (click)="this.reminderButtonClick(policy)" [disabled]="">
+            <!-- <ion-icon name="send"></ion-icon>  Send --> Send
+          </ion-button>
+        </ng-container>
+        <ng-template #acknowledgeOulet>
+          <span style="color: #6bc04b;"> Acknowledged </span>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="DeleteSignature" *ngIf="initFrom == 'admin'">
+      <th mat-header-cell *matHeaderCellDef class="jt-table-cell ion-text-center ">
+        Action
+      </th>
+
+      <td mat-cell *matCellDef="let policy" class="jt-table-cell  ion-text-center small-status-cell">
+        <ion-button size="small" color="danger" fill="clear" title="Delete Signature" (click)="this.deleteSignature(policy.id)">
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </td>
+
+    </ng-container>
+    
+    <tr mat-header-row *matHeaderRowDef="policiesAssignmentTable_matTable_displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: policiesAssignmentTable_matTable_displayedColumns;"></tr>
+    <!-- Row shown when there is no matching data. -->
+    <tr class="mat-row" *matNoDataRow>
+      <td [attr.colspan]="policiesAssignmentTable_matTable_displayedColumns.length">
+        <div>
+          <span>
+            There is no policy data to review.
+          </span>
+        </div>
+      </td>
+    </tr>
+
+
+
+  </table>
+
+</div>
+
+<ion-row class="ion-align-items-center"
+  [hidden]="policiesAssignmentTableDataSource.data.length == 0 || !initialized">
+  <ion-col>
+    <!--Paginator for the policys table-->
+    <mat-paginator  
+      #signaturePaginator
+      [length]="policiesAssignmentTableDataSource.data.length"
+      [pageSize]="PaginatorOptions.pageSize"  
+      [pageSizeOptions]="PaginatorOptions.pageSizeOptions"
+      [showFirstLastButtons]="PaginatorOptions.showFirstLastButtons">
+    </mat-paginator>
+  </ion-col>
+</ion-row>

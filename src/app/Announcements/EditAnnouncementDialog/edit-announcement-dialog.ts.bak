@@ -1,0 +1,135 @@
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ModalController, AlertController, IonInput } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { LoadingService } from 'src/app/shared/Loading.Service';
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import * as AnnouncementsModel from '../Providers/announcements.model';
+import { isNullOrUndefined } from 'util';
+
+// define component
+@Component({
+  selector: 'edit-announcement-dialog',
+  templateUrl: 'edit-announcement-dialog.html',
+  styleUrls: ['../announcements.page.scss']
+})
+
+export class EditAnnouncementDialogPage implements OnInit {
+  @ViewChild('announcementTitleTextbox', { static: true }) announcementTitleTextboxElement: IonInput;
+
+  // Data passed in
+  @Input() isEditMode: boolean;
+  @Input() announcementInput: AnnouncementsModel.AnnouncementInfo;
+  @Input() serverInfo: AnnouncementsModel.AnnouncementServerInfo;
+
+  public announcementFormData = {
+    Title: '',
+    PublishDate: '',
+    ExpireDate: '',
+    AllowComments: false,
+    AllowReactions: false,
+    NotifyUsers: false,
+    Description: '',
+    DistrictsToSendTo: ['0'],
+    GroupsToSendTo: ['0'],
+    TagsToSendTo: ['0']
+  };
+
+  public ckeditorInstance = ClassicEditor;
+  public ckeditorConfig = {
+    placeholder: 'Add content here...',
+    // toolbar:
+    // [
+    //   'bold', 'italic', 'underline',
+    //   '|',
+    //   'link',
+    //   // '|',
+    //   'fontFamily', 'fontSize'
+    // ]
+  };
+
+  // define service provider and route provider when component is constructed
+  constructor(
+    private modalCtrl: ModalController,
+    private datePipe: DatePipe) {
+  }
+
+  /**
+   * ASYNC: Close this modal, return "new data"* and [confirmed] flag to
+   * flag to indicate that the user submitted the dialog, as opposed to cancelled it.
+   *
+   * "new data"* might not be returned if the user cancelled the action.
+   */
+  public async dismiss(confirmed) {
+    // using the injected ModalController this page
+    // can "dismiss" itself and optionally pass back data
+    await this.modalCtrl.dismiss({
+      dismissed: true,
+      confirmed
+    });
+  }
+
+  /**
+   * [onConfirm] - The click event for the submit button.
+   */
+  public onConfirm() {
+    // Show that the user confirmed submitting the dialog.
+    const confirmed = true;
+    this.dismiss(confirmed);
+  }
+
+  /** PRIVATE METHODS */
+  private _formatAnnouncementInput() {
+    if (!this.isEditMode) {
+      // This is not edit mode, so let's make a new announcement object instance.
+      // JLP 3/20/17 Set new announcements publish/expire as current date and date 2 weeks from now.
+      const currentDate = new Date();
+      const twoWeeksFromCurrentDate = new Date(currentDate);
+      twoWeeksFromCurrentDate.setDate(twoWeeksFromCurrentDate.getDate() + 14);
+      this.announcementFormData.PublishDate = this._formatDateForForm(currentDate);
+      this.announcementFormData.ExpireDate = this._formatDateForForm(twoWeeksFromCurrentDate);
+
+      // Defaulting some settings to true for NEW announcements.
+      this.announcementFormData.AllowComments = true;
+      this.announcementFormData.AllowReactions = true;
+      this.announcementFormData.NotifyUsers = true;
+    } else {
+      /**
+       * This is edit mode, so we need to copy the [announcement] input to detact the object instance
+       * from the dialog's ng-models.
+       */
+      this.announcementFormData.Title = this.announcementInput.Title;
+      this.announcementFormData.PublishDate = this._formatDateForForm(this.announcementInput.PublishDate);
+      this.announcementFormData.ExpireDate = this._formatDateForForm(this.announcementInput.ExpireDate);
+      this.announcementFormData.AllowComments = this.announcementInput.AllowComments;
+      this.announcementFormData.AllowReactions = this.announcementInput.AllowReactions;
+      this.announcementFormData.Description = this.announcementInput.Description;
+    }
+
+  }
+
+  private _formatDateForForm(date: Date): string {
+    let formattedDate: string;
+    if (!isNullOrUndefined(date)) {
+      formattedDate = this.datePipe.transform(date, 'MM/dd/yyyy HH:mm');
+    } else {
+      formattedDate = '';
+    }
+    return formattedDate;
+  }
+
+  /** SELF INIT */
+
+  ngOnInit() {
+    this._formatAnnouncementInput();
+    if (!this.isEditMode) {
+      /**
+       * !isEditMode means this is a new announcement.
+       * Autofocus the first control on the dialog: [#announcementTitleTextbox] element.
+       */
+      setTimeout(() => {
+        this.announcementTitleTextboxElement.setFocus();
+      }, 0);
+    }
+  }
+}

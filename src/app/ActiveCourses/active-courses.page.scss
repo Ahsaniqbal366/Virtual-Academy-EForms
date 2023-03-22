@@ -1,0 +1,108 @@
+/* Page wrapper is present on the header and content */
+.activeCourses-page-wrapper {
+  /* Applied to the selected category to give a blue bottom border */
+  .selected-category-item {
+    border-bottom: 3px solid var(--ion-color-primary);
+  }
+
+  /* Width 0 hides the radio button dot from view but keeps all functionality, 
+  vs {display: none;} which seemed to remove functionality */
+  .radio-category-item-wrapper {
+    .category-radio {
+      width: 0px;
+    }
+  }
+
+  /* The column element for the course, 1 per course for responsiveness */
+  .activeCourse-card-wrapper {
+    position: relative;
+    padding-bottom: 8px;
+
+    /* Separates the Header and Content of the card */
+    .card-divider {
+      border-bottom: 1px solid var(--ion-color-secondary);
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    /* 
+      Used around the img tag to provide ionic's support, sized auto to remain square and full 
+      Manually setting the thumbnail, image, and icon to 100px x 100 to keep it all clean looking.
+
+      To account for variable aspect ratio in course images, this will need to change
+      */
+    .activeCourse-Thumbnail {
+      width: 100px;
+      height: 100px;
+
+      /* The img tag, needs a black BG to keep transparent images looking good.*/
+      .course-image {
+        position: absolute;
+
+        width: 100px;
+        height: 100px;
+
+        background-color: #000;
+      }
+
+      /* The play button overlay for thumbnails with previews */
+      .preview-button {
+        width: 100px;
+        height: 100px;
+
+        .preview-button-icon {
+          position: absolute;
+
+          width: 100px;
+          height: 100px;
+
+          opacity: 0.75;
+        }
+      }
+    }
+
+    /* The SME info, Description, and Duration */
+    .course-info-wrapper {
+      height: 100%;
+    }
+
+    /* The list of info, all except description */
+    .course-info-list {
+      padding-top: 0px;
+      padding-left: 16px;
+    }
+
+    /* The description button is separate to be pulled to the bottom right */
+    .course-description-button {
+      bottom: 0;
+      right: 0;
+    }
+
+    /* The active course card */
+    .activeCourse-card {
+      /* Padding the content differently to match the original better */
+      ion-card-content {
+        padding-top: 0px;
+        padding-bottom: 16px;
+      }
+
+      /* Center and bold the title. The Bold is a new style not matching the original and may be rejected */
+      .activeCourse-title {
+        text-align: center;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+/* Wraps the video element in the preview dialog */
+.preview-video-wrapper {
+  /* The video tag, centered in the dialog and brought to full width */
+  .preview-video {
+    width: 100%;
+    height: auto;
+    transform: translateY(-50%);
+    top: 50%;
+    position: absolute;
+  }
+}

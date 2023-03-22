@@ -1,0 +1,78 @@
+import { Component, OnInit, Input, Injectable } from '@angular/core';
+import { PopoverController, AlertController } from '@ionic/angular';
+import * as InventoryModel from 'src/app/Inventory/Providers/Model';
+import { InventoryProvider } from 'src/app/Inventory/Providers/Service';
+import { LoadingService } from 'src/app/shared/Loading.Service';
+import { ToastService } from 'src/app/shared/Toast.Service';
+import { Observable, Subscriber } from 'rxjs';
+import { SafeUrl } from '@angular/platform-browser';
+
+@Component({
+    selector: 'category-edit-popover',
+    templateUrl: './category-edit-popover.html',
+    styleUrls: ['../../page.scss']
+})
+
+export class CategoryEditPopover implements OnInit {
+    // Data passed in
+    @Input() Data: any;
+    public hasAcknowledged: boolean;
+    // define service provider and route provider when component is constructed
+    constructor(
+        public inventoryProvider: InventoryProvider,
+        private popoverController: PopoverController
+    ) { }
+
+    ngOnInit() { }
+
+    dismissPopover(selectedOption: string) {
+        this.popoverController.dismiss(selectedOption);
+    }
+
+    async dismiss(passBackData, confirmed) {
+        // using the injected ModalController this page
+        // can "dismiss" itself and optionally pass back data
+        await this.popoverController.dismiss({
+            dismissed: true,
+            passBackData,
+            confirmed
+        });
+    }
+}
+
+export class FileDisplayDialogPageInputInfo {
+    public friendlyName: string;
+    public acknowledgementText: string;
+    public fileType: string;
+    public filePath: string;
+    public safeFilePath: SafeUrl;
+}
+
+@Injectable()
+export class CategoryEditPopoverFactory {
+    // define service provider and route provider when component is constructed
+    constructor(
+        private alertController: AlertController,
+        private toastService: ToastService,
+        private loadingService: LoadingService,
+        private inventoryProvider: InventoryProvider,
+        private popoverController: PopoverController
+    ) { }
+
+    public async openPopover(Data: any): Promise<object> {
+        return await new Promise(async (resolve, reject) => {
+            this.popoverController.create({
+                component: CategoryEditPopover,
+                componentProps: {
+                    Data
+                },
+                event,
+                translucent: true,
+                cssClass: 'category-edit-popover'
+            }).then((popover: HTMLIonPopoverElement) => {
+                popover.present();
+                resolve(popover.onDidDismiss());
+            });
+        });
+    }
+}

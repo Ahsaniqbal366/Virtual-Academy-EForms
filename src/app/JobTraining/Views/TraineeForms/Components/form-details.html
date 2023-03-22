@@ -1,0 +1,34 @@
+<div class="form-details-wrapper">
+    <ion-header>
+        <!-- the <ion-header> must be present from the start for the [appHideHeader] can function -->
+        <div *ngIf="this.initialized">
+            <ion-toolbar color="white">
+                <ion-row class="ion-align-items-center" style="padding: 0 16px;">
+                    <ion-col>
+                        <u style="font-size: 20px; padding-right: 4px;">{{this.selectedForm.Name}}</u>
+                        <span>for {{this.traineeFormsService.traineeUserInfo.DisplayName}}</span>
+                    </ion-col>
+                    <ion-col size="auto">
+                        <ion-button *ngIf="this.selectedForm.TraineeFormRecordInfo.Permissions.CanSave" color="success"
+                            fill="outline" (click)="this.onSaveFormClick()">
+                            <ion-icon name="save" slot="start"></ion-icon>Save
+                        </ion-button>
+                        <ion-button fill="outline" (click)="this.exportFormToPDF();" 
+                            *ngIf="this.selectedForm.CanBeExported && this.jobTrainingService.selectedProgram.Permissions.CanExportForms">
+                            Export
+                        </ion-button>
+                        <ion-button fill="outline" (click)="this.onCloseFormClick();">
+                            Close
+                        </ion-button>
+                    </ion-col>
+                </ion-row>
+            </ion-toolbar>
+        </div>
+    </ion-header>
+
+    
+
+    <div *ngIf="this.initialized" class="form-details-content">
+        <form-display-component [isPreviewMode]="false" [formInfo]="this.selectedForm"></form-display-component>        
+    </div>
+</div>

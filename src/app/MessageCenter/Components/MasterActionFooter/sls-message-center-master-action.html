@@ -1,0 +1,58 @@
+<ion-toolbar *ngIf="this.messageCenterProvider.subView != 'compose' && this.messageCenterProvider.messageID <= 0">
+    <ion-progress-bar [type]="'indeterminate'" *ngIf="this.messageCenterProvider.isLoading"></ion-progress-bar>
+    <ion-button disabled="{{this.messageCenterProvider.masterActions.selectDisabled || this.messageCenterProvider.isLoading}}" fill="outline"
+        [class]="this.messageCenterProvider.masterActions.selectDisabled === true ? 'transparent-ripple' : ''"
+        [ngSwitch]="this.messageCenterProvider.subView">
+        <ion-select disabled="{{this.messageCenterProvider.masterActions.selectDisabled}}" [style.font-weight]="'bold'"
+            [style.max-width]="'100%'" class="custom-options custom-placeholder" placeholder="Select an Action:"
+            [(ngModel)]="this.messageCenterProvider.masterActions.selectedAction"
+            (ionChange)="this.onMasterActionChange($event)">
+            <ion-select-option value="archive" *ngSwitchCase="'inbox'">Archive
+                {{this.messageCenterProvider.masterActions.numberOfSelected}}
+            </ion-select-option>
+            <ion-select-option value="mark read" *ngIf="this.messageCenterProvider.subView != 'sent'">
+                Mark
+                {{this.messageCenterProvider.masterActions.numberOfSelected}} as Read
+            </ion-select-option>
+            <ion-select-option value="mark unread" *ngIf="this.messageCenterProvider.subView != 'sent'">
+                Mark
+                {{this.messageCenterProvider.masterActions.numberOfSelected}} as
+                Unread</ion-select-option>
+            <ion-select-option value="deleteActive" *ngSwitchCase="'inbox'">
+                Trash
+                {{this.messageCenterProvider.masterActions.numberOfSelected}}
+            </ion-select-option>
+            <ion-select-option value="deleteArchive" *ngSwitchCase="'archive'">
+                Trash
+                {{this.messageCenterProvider.masterActions.numberOfSelected}}
+            </ion-select-option>
+            <ion-select-option value="eradicateDeleted" *ngSwitchCase="'trash'">
+                Delete
+                {{this.messageCenterProvider.masterActions.numberOfSelected}}
+            </ion-select-option>
+            <ion-select-option value="eradicateSent" *ngSwitchCase="'sent'">
+                Delete
+                {{this.messageCenterProvider.masterActions.numberOfSelected}}
+            </ion-select-option>
+            <ion-select-option value="restoreDeleted" *ngSwitchCase="'trash'">
+                Restore
+                {{this.messageCenterProvider.masterActions.numberOfSelected}}
+            </ion-select-option>
+            <ion-select-option value="restoreArchived" *ngSwitchCase="'archive'">
+                Restore
+                {{this.messageCenterProvider.masterActions.numberOfSelected}}
+            </ion-select-option>
+        </ion-select>
+    </ion-button>
+</ion-toolbar>
+<ion-toolbar *ngIf="this.messageCenterProvider.subView === 'compose'">
+    <ion-progress-bar [type]="'indeterminate'" *ngIf="this.messageCenterProvider.isLoading"></ion-progress-bar>
+    <ion-buttons>
+        <ion-button [disabled]="this.messageCenterProvider.isLoading" slot="start" (click)="this.presentSignatureEditor()">
+            Signature Editor
+        </ion-button>
+        <ion-button [disabled]="this.messageCenterProvider.isLoading" slot="end" (click)="this.messageCenterProvider.onSendButtonClick()">
+            Send
+        </ion-button>
+    </ion-buttons>
+</ion-toolbar>

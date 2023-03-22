@@ -1,0 +1,37 @@
+<h1 mat-dialog-title>Need Help?</h1>
+<div mat-dialog-content>
+  <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px">
+    <ion-item>
+      <ion-label position="stacked">Name</ion-label>
+      <ion-input [(ngModel)]="name" name="name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input [(ngModel)]="email" name="email"></ion-input>
+    </ion-item>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px">
+    <ion-item>
+      <ion-label position="stacked">Phone</ion-label>
+      <ion-input [(ngModel)]="phone" name="phone"></ion-input>  
+    </ion-item>
+    <ion-item>
+            <ion-label position="stacked">Question</ion-label>
+            <ion-input [(ngModel)]="question" name="question"></ion-input>
+    </ion-item>
+</div>
+    
+    <ion-item style="width:100%">
+            <ion-label position="stacked">Description</ion-label>
+            <ion-textarea style="width:100%" matInput [(ngModel)]="description" name="description"></ion-textarea>
+            
+    </ion-item>
+  
+</div>
+<div mat-dialog-actions>
+    <p style="margin-right:20px;">
+  Call Techsupport at 855-227-9119</p>
+  <ion-button (click)="startZopim()">Chat</ion-button>
+  <ion-button (click)="closeDialog()">Cancel</ion-button>
+  <ion-button cdkFocusInitial (click)="submitTicket()">Submit</ion-button>
+</div>

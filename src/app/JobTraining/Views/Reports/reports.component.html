@@ -1,0 +1,11 @@
+<ion-header>
+    <div *ngIf="this.initialized">
+        <app-header [defaultHref]="this.defaultBackHref" headerText="{{this.jobTrainingService.selectedProgram.Name}}"
+            [hideBackButton]="false">
+        </app-header>
+        <archived-program-header-component></archived-program-header-component>    
+    </div>
+</ion-header>
+<ng-container *ngIf="this.initialized">
+    <router-outlet></router-outlet>
+</ng-container>

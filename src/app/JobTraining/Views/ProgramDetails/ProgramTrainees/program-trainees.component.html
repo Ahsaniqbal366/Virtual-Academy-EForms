@@ -1,0 +1,141 @@
+<ion-list lines="full" class="jt-table program-trainees-list ion-no-padding" *ngIf="this.initialized">
+    <ion-item color="primary" class="jt-table-row table-header-row ion-no-padding">
+        <ion-row class="full-width-item">
+            <ion-col class="jt-table-cell index-cell ion-text-center">
+                <ion-label>#</ion-label>
+            </ion-col>
+            <ion-col class="jt-table-cell">
+                <ion-label>Trainee</ion-label>
+            </ion-col>
+            <ion-col class="jt-table-cell">
+                <ion-label>Phase</ion-label>
+            </ion-col>
+            <ion-col class="jt-table-cell">
+                <ion-label>Summary</ion-label>
+            </ion-col>
+            <!-- 
+                JTC 03/31/2020 - Removing this table cell until the summary data really exists.
+                Hopefully later this week.
+                <ion-col class="jt-table-cell status-cell">
+                <ion-label>Status</ion-label>
+                </ion-col> -->
+            <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center">
+                <!-- Popover or other actions column -->
+                <!-- Header cell holds the "+ Trainee" button.
+                    - Have to be [IsAdminUser] to add trainees to the program.
+                    - Otherwise this is just a placeholder cell for the popover or other actions column. -->
+                <ion-button color="success" title="Add Trainee"
+                    *ngIf="this.jobTrainingService.selectedProgram.IsAdminUser"
+                    (click)="this.onAddTraineeButtonClick();">
+                    <ion-icon name="person-add"></ion-icon>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+    </ion-item>
+    <div *ngFor="let shift of this.jobTrainingService.selectedProgram.ShiftInfo; index as shiftIndex;">
+        <ion-item button (click)="this.onShiftClick(shift);" [ngClass]="{'shift-row-expanded' : shift.Expanded}"
+            class="jt-table-row table-body-row ion-no-padding">
+            <ion-row class="full-width-item">
+                <ion-col class="jt-table-cell index-cell ion-text-center">
+                    {{shiftIndex + 1}}
+                </ion-col>
+                <ion-col class="jt-table-cell">
+                    {{shift.Name}}
+                </ion-col>
+                <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center">
+                    <ion-button fill="clear">
+                        <ion-icon *ngIf="shift.Expanded" name="chevron-up"></ion-icon>
+                        <ion-icon *ngIf="!shift.Expanded" name="chevron-down">
+                        </ion-icon>
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-item>
+        <div class="jt-table-nested-rows-wrapper" *ngIf="shift.Expanded">
+            <ion-item button *ngFor="let trainee of shift.Trainees" (click)="onRowClick($event, trainee)"
+                class="jt-table-row table-body-row inner-body-row ion-no-padding">
+                <ion-row class="full-width-item">
+                    <ion-col class="jt-table-cell index-spacer-cell jt-spacer-cell">
+                        <!-- Spacer cell -->
+                    </ion-col>
+                    <!-- Various 'cell' components will go here, taking summary info from later pages 
+                        displaying it here. They will have siza-* attributes to render them when there's 
+                        available screen space -->
+                    <ion-col class="jt-table-cell jt-table-cell-raised">
+                        <ion-row>
+                            <img class="jt-table-profile-photo" [src]="trainee.ProfilePhotoPath" />
+                            &nbsp;
+                            <div>
+                                <ion-label>
+                                    <u>{{trainee.DisplayName}}</u>
+                                </ion-label>
+                                <ion-label>
+                                    <b>ID:</b> {{trainee.AcadisID}}
+                                </ion-label>
+                            </div>
+                        </ion-row>
+                        <!-- Status cell shows a breif message like "Action Required" or "Signature Required"-->
+                        <!-- <app-status-cell [statusMessage]="trainee.Summary.Status"
+                            [statusTheme]="trainee.Summary.StatusTheme">
+                        </app-status-cell> -->
+                    </ion-col>
+                    <ion-col class="jt-table-cell">
+                        <ion-label>
+                            {{trainee.PhaseName}}
+                        </ion-label>
+                    </ion-col>
+                    <ion-col class="jt-table-cell">
+                        <div *ngFor="let formattedData of trainee.Summary.FormattedData">
+                            <!-- Example output of the summary layout HTML below.
+                                -----------
+                                Hours: 24
+                                -----------
+                                -->
+                            <ion-label>
+                                {{formattedData.DataName}}:&nbsp;{{formattedData.DataValue}}
+                            </ion-label>
+                        </div>
+                    </ion-col>
+                    <!-- 
+                        JTC 03/31/2020 - Removing this table cell until the summary data really exists.
+                        Hopefully later this week.
+                    <ion-col class="jt-table-cell status-cell">
+                        <ion-label>
+                        Needs Review
+                        </ion-label>
+                    </ion-col>           
+                    -->
+                    <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center">
+                        <!-- Popover menu button for actions like, remove user, change shift, etc.
+                            - Only available IF [IsAdminUser].-->
+                        <ion-button class="block-parent-event" fill="clear"
+                            *ngIf="this.jobTrainingService.selectedProgram.IsAdminUser"
+                            (click)="this.onPopoverMenuButtonClick($event, trainee, shift);">
+                            <ion-icon name="menu"></ion-icon>
+                        </ion-button>
+                        <!-- View trainee icon button. 
+                            - Shown as the only available action for non-adminu users. -->
+                        <ion-button fill="clear" *ngIf="!this.jobTrainingService.selectedProgram.IsAdminUser">
+                            <ion-icon name="eye"></ion-icon>
+                        </ion-button>
+                    </ion-col>
+                </ion-row>
+            </ion-item>
+            <!-- No trainees message -->
+            <ion-item class="jt-table-row table-body-row inner-body-row ion-no-padding"
+                *ngIf="(shift.Trainees.length === 0)">
+                <ion-row class="full-width-item">
+                    <ion-col class="jt-table-cell index-spacer-cell jt-spacer-cell">
+                        <!-- Spacer cell -->
+                    </ion-col>
+                    <ion-col class="jt-table-cell">
+                        <em>
+                            No trainees to show.
+                        </em>
+                    </ion-col>
+                </ion-row>
+            </ion-item>
+        </div>
+
+    </div>
+</ion-list>

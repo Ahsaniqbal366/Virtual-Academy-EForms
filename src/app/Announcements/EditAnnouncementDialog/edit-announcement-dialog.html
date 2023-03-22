@@ -1,0 +1,164 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="this.dismiss(false);">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <span *ngIf="!this.isEditMode">
+        Add New Announcement
+      </span>
+      <span *ngIf="this.isEditMode">
+        Edit Announcement
+      </span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-row>
+    <!-- Announcement [Title] textbox. -->
+    <ion-col size="12">
+      <ion-item lines="none">
+        <ion-label position="fixed">Title</ion-label>
+        <ion-input #announcementTitleTextbox spellcheck="true" class="form-control" placeholder="Add a title here..."
+          [(ngModel)]="this.announcementFormData.Title"></ion-input>
+      </ion-item>
+    </ion-col>
+
+    <ion-col size-xs="12" size-sm="8" size-md="6">
+      <!-- Announcement [PublishDate] textbox. -->
+      <ion-item lines="none" style="padding: 8px 0;">
+        <ion-label position="fixed">Publish</ion-label>
+        <ion-input class="form-control" placeholder="MM/DD/YYYY" [(ngModel)]="this.announcementFormData.PublishDate">
+        </ion-input>
+      </ion-item>
+      <!-- Announcement [ExpireDate] textbox. -->
+      <ion-item lines="none" style="padding: 8px 0;">
+        <ion-label position="fixed">Expires</ion-label>
+        <ion-input class="form-control" placeholder="MM/DD/YYYY" [(ngModel)]="this.announcementFormData.ExpireDate"></ion-input>
+      </ion-item>
+    </ion-col>
+    <!-- Announcement "settings" checkboxes. -->
+    <ion-col size-xs="12" size-sm="4" size-md="6">
+      <!-- Announcement "settings" checkboxes. 
+        1. Notify Users
+        This option is not available in "edit mode". -->
+      <ion-item *ngIf="!this.isEditMode">
+        <ion-label>Notify Recipients</ion-label>
+        <ion-checkbox color="primary" [(ngModel)]="this.announcementFormData.NotifyUsers"></ion-checkbox>
+      </ion-item>
+      <!-- Announcement "settings" checkboxes. 
+        2. Allow Comments-->
+      <ion-item>
+        <ion-label>Allow Comments</ion-label>
+        <ion-checkbox color="primary" [(ngModel)]="this.announcementFormData.AllowComments"></ion-checkbox>
+      </ion-item>
+      <!-- Announcement "settings" checkboxes. 
+        3. Allow Reactions-->
+      <ion-item>
+        <ion-label>Allow Reactions</ion-label>
+        <ion-checkbox color="primary" [(ngModel)]="this.announcementFormData.AllowReactions"></ion-checkbox>
+      </ion-item>
+    </ion-col>
+    <!-- Announcement "selective announcements" selectors. 
+      "Selective announcements" is not available in "edit mode".-->
+    <ion-col size="12" *ngIf="!this.isEditMode && this.serverInfo.SelectiveAnnouncements.SelectiveAnnouncementsEnabled">
+      <ion-item-group>
+        <ion-item-divider>
+          <ion-label>Configure Recipients</ion-label>
+        </ion-item-divider>
+        <ion-row>
+          <!-- Announcement "selective announcements" selector. 
+            1. "District" -->
+          <ion-col size-xs="12" size-sm="12" size-md="6" size-lg
+            *ngIf="this.serverInfo.SelectiveAnnouncements.CanSelectDistricts">
+            <ion-item lines="none">
+              <ion-label position="fixed">Districts</ion-label>
+              <ion-select multiple placeholder="Select one more districts" [(ngModel)]="this.announcementFormData.DistrictsToSendTo"
+                class="form-control" style="max-width: none; width: 100%;">
+                <ion-select-option value="0">
+                  All
+                </ion-select-option>
+                <ion-select-option *ngFor="let district of this.serverInfo.SelectiveAnnouncements.Districts" 
+                  value="district.ID">
+                  {{district.Name}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <!-- Announcement "selective announcements" selector. 
+            2. "Ranks" -->
+          <ion-col size-xs="12" size-sm="12" size-md="6" size-lg
+            *ngIf="this.serverInfo.SelectiveAnnouncements.CanSelectRoles">
+            <ion-item lines="none">
+              <ion-label position="fixed">Groups</ion-label>
+              <ion-select multiple placeholder="Select one more groups" [(ngModel)]="this.announcementFormData.GroupsToSendTo"
+                class="form-control" style="max-width: none; width: 100%;">
+                <ion-select-option value="0">
+                  All
+                </ion-select-option>
+                <ion-select-option *ngFor="let role of this.serverInfo.SelectiveAnnouncements.Roles" 
+                  value="role.ID">
+                  {{role.Name}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <!-- Announcement "selective announcements" selector. 
+            3. "Tags" -->
+          <ion-col size-xs="12" size-sm="12" size-md="6" size-lg
+            *ngIf="this.serverInfo.SelectiveAnnouncements.CanSelectTags">
+            <ion-item lines="none">
+              <ion-label position="fixed">{{this.serverInfo.SelectiveAnnouncements.TagKeyword.Many.Title}}</ion-label>
+              <ion-select multiple
+                placeholder="Select one more {{this.serverInfo.SelectiveAnnouncements.TagKeyword.Many.Lower}}"
+                [(ngModel)]="this.announcementFormData.TagsToSendTo" class="form-control" style="max-width: none; width: 100%;">
+                <ion-select-option value="0">
+                  All
+                </ion-select-option>                
+                <ion-select-option *ngFor="let tag of this.serverInfo.SelectiveAnnouncements.Tags" 
+                  value="tag.ID">
+                  {{tag.Name}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-item-group>
+    </ion-col>
+    <!-- Announcement [Description]/content rich text editor. 
+      Placed at the bottom of the form because it is going to grow vertically as user adds content.
+      This change in size would force other fields out of view and might cause usability issues. -->
+    <ion-col size="12">
+      <ion-item-divider style="margin-bottom: 8px;">
+        <ion-label>Content</ion-label>
+      </ion-item-divider>
+      <ckeditor [editor]="this.ckeditorInstance" [config]="this.ckeditorConfig"
+        [(ngModel)]="this.announcementFormData.Description"></ckeditor>
+    </ion-col>
+  </ion-row>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="this.dismiss(false);" fill="outline">
+        Cancel
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="this.onConfirm();" color="success" fill="outline" *ngIf="!this.isEditMode">
+        Save
+      </ion-button>
+      <ion-button (click)="this.onConfirm();" color="success" fill="outline" *ngIf="!this.isEditMode">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Save & New
+      </ion-button>
+      <ion-button (click)="this.onConfirm();" color="success" fill="outline" *ngIf="this.isEditMode">
+        Update
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

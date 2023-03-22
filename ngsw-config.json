@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/ionic/app/index.html",
+  "appData": {
+    "PromptUser": true,
+    "PromptTitle": "Upgrade to the latest version of TMS?",
+    "PromptBody": "Please reload the page to upgrade the TMS",
+    "VersionNumber": "1.0.0",
+    "VersionName": "mystery turtle",
+    "ReleaseDate": "08/07/2020"
+  },
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/ionic/app/index.html",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    }, {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/**",
+          "/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
+        ]
+      }
+    }
+  ]
+}

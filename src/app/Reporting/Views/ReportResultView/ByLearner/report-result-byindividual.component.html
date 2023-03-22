@@ -1,0 +1,72 @@
+<ion-content *ngIf="!this.initialized">
+
+  <ion-card>
+    <ion-card-header>
+      <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-row>
+        <ion-col>
+          <sls-skeleton-table [rows]="3" [columns]="5"></sls-skeleton-table>
+        </ion-col>
+
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ion-content *ngIf="this.initialized" class="reporting-page-wrapper" color="secondary">
+  
+  <ion-row>
+    <ion-col>
+      <report-parameters (onFiltersApplied)="this.applyFilters()"></report-parameters>
+    </ion-col>
+  </ion-row>
+
+  <ion-row *ngFor="let dtInstance of this.dtInstances" style="overflow-y:auto;">
+    <ion-col class="ion-no-padding">
+      <ion-card>
+        <ion-card-content>
+          <ion-row>
+            <ion-col>
+
+            </ion-col>
+            <ion-col>
+              <ion-button class="button-small ion-float-right" color="primary" title="Print" (click)="this.printCollatedSummary()">
+                Print Summary
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-toolbar>
+                <ion-title size="small" class="header" style="padding:5px;text-align:center;">Courses</ion-title>
+              </ion-toolbar>
+              <table datatable [dtOptions]="dtInstance.StockCourseData.dtOptions" class="row-border hover"
+                style="width:100%"></table>
+              <ion-toolbar>
+                <ion-title size="small" class="header" style="padding:5px;text-align:center;">Roll Calls</ion-title>
+              </ion-toolbar>
+              <table datatable [dtOptions]="dtInstance.RollCallCourseData.dtOptions" class="row-border hover"
+                style="width:100%"></table>
+              <ion-toolbar>
+                <ion-title size="small" class="header" style="padding:5px;text-align:center;">{{this.reportingProvider.serverInfo.PolicyKeywords.Many.Title.trim()}}</ion-title>
+              </ion-toolbar>
+              <table datatable [dtOptions]="dtInstance.GeneralOrderCourseData.dtOptions" class="row-border hover"
+                style="width:100%"></table>
+              <ion-toolbar>
+                  <ion-title size="small" class="header" style="padding:5px;text-align:center;">External Training</ion-title>
+                </ion-toolbar>
+                <table datatable [dtOptions]="dtInstance.ExternalTrainingCourseData.dtOptions" class="row-border hover"
+                  style="width:100%"></table>
+            </ion-col>
+
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+
+
+</ion-content>

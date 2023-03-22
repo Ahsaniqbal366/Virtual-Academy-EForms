@@ -1,0 +1,147 @@
+<div class="ion-page">
+  <ion-content color="secondary">
+    <div *ngIf="this.initialized">
+      <ion-card>
+        <ion-card-header>
+          Course Details
+        </ion-card-header>
+        <ion-card-content>
+          <form [formGroup]="addCourseForm" *ngIf="this.initialized">
+            <ion-row>
+
+              <ion-col size="3">
+                <div class="custom-mat-form-field">
+                  <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                    <mat-label>Course Name</mat-label>
+                    <input matInput formControlName="Name" maxlength="255" required>
+                    <mat-error *ngIf="addCourseForm.controls.Name.invalid">
+                      {{this.getFieldErrorMessage(addCourseForm.controls.Name)}}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+              </ion-col>
+              <ion-col size="2">
+                <div class="custom-mat-form-field">
+                <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                  <mat-label>Credit Type</mat-label>
+                  <mat-select placeholder="Select..." class="standard-input" formControlName="CreditType" required>
+                    <mat-option *ngFor="let type of this.externalTrainingService.externalTrainingTypes"
+                      [value]="type.ExternalCreditTypeID">
+                      {{type.Name}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="addCourseForm.controls.CreditType.invalid">
+                    {{this.getFieldErrorMessage(addCourseForm.controls.CreditType)}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              </ion-col>
+              <ion-col size="1">
+                <div class="custom-mat-form-field">
+                <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                  <mat-label>Hours</mat-label>
+                  <input matInput formControlName="Hours" maxlength="255">
+
+                </mat-form-field>
+                </div>
+              </ion-col>
+              <ion-col size="2">
+                <div class="custom-mat-form-field">
+                <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                  <mat-label>Instructor</mat-label>
+                  <input matInput formControlName="SME" maxlength="255">
+
+                </mat-form-field>
+                </div>
+              </ion-col>
+              <ion-col size="2">
+                <div class="custom-mat-form-field">
+                  <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                    <mat-label>Start Date</mat-label>
+                    <input matInput [matDatepicker]="startDatePicker" placeholder="MM/DD/YYYY" formControlName="StartDate" required
+                      style="min-width: 80px;">
+                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #startDatePicker></mat-datepicker>
+                    
+                  </mat-form-field>
+                </div>
+
+              </ion-col>
+              <ion-col size="2">
+                <div class="custom-mat-form-field">
+                  <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                    <mat-label>End Date</mat-label>
+                    <input matInput [matDatepicker]="endDatePicker" placeholder="MM/DD/YYYY" formControlName="EndDate" required
+                      style="min-width: 80px;">
+                    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #endDatePicker></mat-datepicker>
+                    
+                  </mat-form-field>
+                </div>
+
+              </ion-col>
+
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <div class="custom-mat-form-field">
+                <mat-form-field class="full-width-item" floatLabel="always" appearance="outline">
+                  <mat-label>Additional Info</mat-label>
+                  <textarea matInput rows="3" cols="40" formControlName="AdditionalDetails"></textarea>
+
+                </mat-form-field>
+                </div>
+              </ion-col>
+              <ion-col>
+                <sls-file-upload-component [inputData]="this.fileUploadInput"
+                  (output_onFileUploaded)="this.onAdditionalDetailsUploaded($event);"
+                  (removeButtonClickEvent)="this.onClearAdditionalDetailsUploadBtn()">
+                </sls-file-upload-component>
+              </ion-col>
+              <ion-col>
+                
+                  <mat-slide-toggle style="float:right; padding-top:30px;" class="example-margin" color="primary" 
+                  [(ngModel)]="this.externalTrainingInfo.IsStateApproved" [ngModelOptions]="{standalone: true}">
+                    State Approved?
+                  </mat-slide-toggle>
+                
+
+              </ion-col>
+            </ion-row>
+          </form>
+        </ion-card-content>
+      </ion-card>
+      <ion-card>
+        <ion-card-header>
+          Select course roster:
+        </ion-card-header>
+        <ion-card-content>
+          <ion-row>
+            <ion-col>
+              <user-selector-table (onUsersSelected)="this.onUserSelectionChanged($event)"></user-selector-table>
+            </ion-col>
+          </ion-row>
+          <ion-row class="full-width-item ion-align-items-center">
+            <ion-col>
+        
+            </ion-col>
+        
+            <ion-col size="auto">
+              <button mat-stroked-button class=" gray-border-button" (click)="this.onBackBtnClick();" size="small" color="success">
+                Back
+              </button>
+            </ion-col>
+            <ion-col size="auto">
+              
+              <button mat-stroked-button class=" gray-border-button" (click)="this.onSubmitBtnClick();" size="small" color="success">
+                Submit
+              </button>
+            </ion-col>
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+  </ion-content>
+</div>

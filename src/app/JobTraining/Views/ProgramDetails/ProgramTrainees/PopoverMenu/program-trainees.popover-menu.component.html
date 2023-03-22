@@ -1,0 +1,29 @@
+<ion-content>
+    <ion-list>
+        <ion-item color="secondary">
+            {{this.traineeUserInfo.DisplayName}}
+        </ion-item>
+        <ion-item button
+            (click)="this.dismissPopover('selectTrainee');">
+            View Forms
+        </ion-item>
+        <!-- A trainee user cannot change their shift or another trainee's shift. -->
+        <ion-item *ngIf="!this.jobTrainingService.selectedProgram.IsTraineeUser">
+            <ion-label>Change Shift</ion-label>
+            <ion-select placeholder="Shift"
+                [(ngModel)]="this.traineeUserInfo.ShiftID"
+                (ionChange)="this.dismissPopover('changeShift')">
+                <ion-select-option *ngFor="let shiftOption of this.jobTrainingService.selectedProgram.ShiftInfo"
+                    [value]="shiftOption.ShiftID">{{shiftOption.Name}}</ion-select-option>
+            </ion-select>
+        </ion-item>        
+        <!-- A trainee user cannot remove themself or another trainee from a program. -->
+        <ion-item button *ngIf="!this.jobTrainingService.selectedProgram.IsTraineeUser"
+            (click)="this.dismissPopover('removeTrainee');">
+            Remove
+        </ion-item>
+        <ion-item button (click)="this.dismissPopover('close');">
+            Close
+        </ion-item>
+    </ion-list>
+</ion-content>

@@ -1,0 +1,3 @@
+<ion-item *ngIf="this.jobTrainingService.selectedProgram.IsArchived" color="bootstrap-bg-warning">
+    This program was archived on {{(this.jobTrainingService.selectedProgram.ArchivedOnDate | date:'MM/dd/yyyy')}}.
+  </ion-item>

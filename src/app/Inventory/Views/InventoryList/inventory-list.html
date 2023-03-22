@@ -1,0 +1,127 @@
+<ion-header>
+    <app-header [defaultHref]="'/home'" [headerText]="'Inventory'" [hideBackButton]="this.hideHeaderBackButton">
+    </app-header>
+</ion-header>
+<div *ngIf="this.initialized" class="inventory-page-wrapper">
+
+
+    <ion-row>
+        <ion-col size="3" class="inventory-item-tree">
+
+            <ul>
+                <ng-container
+                    *ngTemplateOutlet="categoryTreeTemplate; context:{ list: this.inventoryProvider.inventoryInfo }">
+                </ng-container>
+            </ul>
+
+            <ng-template #categoryTreeTemplate let-list="list">
+                <li *ngFor="let category of list" (click)="onCategoryClick($event, category)">
+                    <ion-row class="item-category">
+
+                        <div float-left>
+                            <ion-icon [name]="category.GUIData.IsOpen ? 'caret-down-outline' :'caret-forward-outline'"
+                                (click)="onCategoryOpenClick($event, category)"></ion-icon>
+
+
+                            <label [ngClass]="{'selected-item' : category.GUIData.IsSelected}">
+                                <ion-icon name="folder-outline"></ion-icon> {{ category.Name }}
+                            </label>
+
+                        </div>
+
+                        <div float-right class="">
+                            <ion-button fill="clear" expand="full" size="small" color="primary" class="ion-no-margin"
+                                (click)="displayCategoryOptions(category)">
+                                <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+                            </ion-button>
+
+                        </div>
+
+
+                    </ion-row>
+                    <div *ngIf="category.GUIData.IsOpen">
+                        <ul>
+                            <li *ngFor="let categoryItem of category.CategoryItems"
+                                (click)="onCategoryItemClick($event, categoryItem)">
+                                <ion-icon name="document-outline"></ion-icon>
+                                <label
+                                    [ngClass]="{'selected-item' : categoryItem.GUIData.IsSelected}">{{categoryItem.Name}}</label>
+                            </li>
+                        </ul>
+                        <ul *ngIf="category.ChildItems.length > 0">
+                            <ng-container
+                                *ngTemplateOutlet="categoryTreeTemplate; context:{ list: category.ChildItems }">
+                            </ng-container>
+                        </ul>
+                    </div>
+                </li>
+            </ng-template>
+
+        </ion-col>
+        <ion-col size="9" class="inventory-item-view">
+            <div *ngIf="this.selectedItem.InventoryItemID">
+                <div class="header">
+                    <h2>
+                        {{this.selectedItem.Name}}
+                    </h2>
+
+                </div>
+
+                <div class="inventory-item-field-table">
+
+
+                    <ion-grid>
+                        <ion-row style="margin-bottom:5px;">
+                            <ion-toolbar>
+                                <ion-buttons slot="start">
+                                    <ion-button color="success" fill="outline" class="ion-no-margin"
+                                        (click)="onAddFieldClick()">
+                                        <ion-icon name="add-outline" small></ion-icon> <label>Add New Field</label>
+                                    </ion-button>
+
+                                    <ion-button color="success" fill="outline" class="ion-no-margin"
+                                        (click)="onAssignItemClick()">
+                                        <ion-icon name="person-add-outline" small></ion-icon> <label>Assign Item</label>
+                                    </ion-button>
+                                </ion-buttons>
+                            </ion-toolbar>
+
+
+                        </ion-row>
+                        <ion-row class="table-header-row">
+                            <ion-col size="5" class="table-header-cell">
+                                Field
+                            </ion-col>
+                            <ion-col size="5" class="table-header-cell">
+                                Value
+                            </ion-col>
+                            <ion-col size="1" class="table-header-cell">
+                                Edit
+                            </ion-col>
+                            <ion-col size="1" class="table-header-cell">
+                                Delete
+                            </ion-col>
+                        </ion-row>
+                        <ion-row class="table-row" *ngFor="let field of this.selectedItem.FieldInfo">
+                            <ion-col size="5" class="table-cell">
+                                {{field.FieldName}}
+                            </ion-col>
+                            <ion-col size="5" class="table-cell">
+                                {{field.Value}}
+                            </ion-col>
+                            <ion-col size="1" class="table-cell" style="text-align: center;">
+                                <ion-icon name="create-outline" (click)="onEditFieldClick(field)"></ion-icon>
+                            </ion-col>
+                            <ion-col size="1" class="table-cell" style="text-align: center;">
+                                <ion-icon name="close-outline"></ion-icon>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </div>
+            </div>
+
+        </ion-col>
+
+    </ion-row>
+
+</div>

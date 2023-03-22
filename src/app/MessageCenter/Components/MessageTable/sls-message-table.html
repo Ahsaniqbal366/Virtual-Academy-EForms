@@ -1,0 +1,270 @@
+<!-- Against a medium colored ion-content, under the tabs -->
+<ion-searchbar [(ngModel)]="this.filter.searchText">
+</ion-searchbar>
+<!-- This card keeps the table inline with the searchbar -->
+<ion-card style="border-radius: 0;">
+    <!-- Colored header prrevents any white strip at the top -->
+    <ion-card-header style="padding-top: 4px; padding-bottom: 0;" color="primary">
+    </ion-card-header>
+    <!-- ion-list here includes the header and keeps everything in style -->
+    <ion-list class="ion-no-padding">
+        <!-- ion-list-header with table styling by .sls-table-item -->
+        <ion-list-header color="primary" class="ion-no-padding sls-table-item">
+            <!-- ion-row with table styling by .sls-table-header-row -->
+            <ion-row class="ion-no-padding full-width-item ion-align-items-center ion-text-center sls-table-header-row">
+                <!-- ion-col with .sls-table-cell for each cell -->
+                <ion-col size-md="10" size-sm="9" size-xs="9" class="ion-hide-md-up sls-table-cell center-any-object">
+                    <!-- header cells will ion-items with  click events for sorting by setting this.filter.sortBy -->
+                    <ion-item color="transparent" class="full-width-item">
+                        <ion-label>
+                            Messages
+                        </ion-label>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xl="1.5" size-lg="1.75" size-md="1.75"
+                    class="ion-hide-md-down sls-table-cell center-any-object">
+                    <!-- header cells will ion-items with  click events for sorting by setting this.filter.sortBy -->
+                    <ion-item color="transparent" class="full-width-item" button
+                        (click)="this.onTableHeaderCellClickSortBy('DisplayName')">
+                        <ion-label>
+                            {{this.messageCenterProvider.subView === 'sent' ? 'To' : 'From'}}
+                            <ion-icon *ngIf="this.filter.sortBy === 'DisplayName'"
+                                [name]="this.filter.sortAscending ? 'caret-down' : 'caret-up'"></ion-icon>
+                        </ion-label>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xl="5.5" size-lg="4.3" size-md="4"
+                    class="ion-hide-md-down sls-table-cell ion-no-margin center-any-object">
+                    <ion-item class="full-width-item" button (click)="this.onTableHeaderCellClickSortBy('MsgSubject')"
+                        color="transparent">
+                        <ion-label>
+                            Subject
+                            <ion-icon *ngIf="this.filter.sortBy === 'MsgSubject'"
+                                [name]="this.filter.sortAscending ? 'caret-down' : 'caret-up'"></ion-icon>
+                        </ion-label>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xl="2" size-lg="2.2" size-md="2.35"
+                    class="ion-hide-md-down sls-table-cell ion-no-margin center-any-object">
+                    <ion-item class="full-width-item" button (click)="this.onTableHeaderCellClickSortBy('DateCreated')"
+                        color="transparent">
+                        <ion-label>
+                            {{this.messageCenterProvider.subView === 'sent' ? 'Sent' : 'Recieved'}}
+                            <ion-icon *ngIf="this.filter.sortBy === 'DateCreated'"
+                                [name]="this.filter.sortAscending ? 'caret-down' : 'caret-up'"></ion-icon>
+                        </ion-label>
+                    </ion-item>
+                </ion-col>
+                <div *ngIf="this.messageCenterProvider.subView === 'sent'; then sentSubView else otherSubView"></div>
+                <ng-template #sentSubView>
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.275" *ngIf="this.messageCenterProvider.serverInfo.showReadReciepts === true"
+                        class="ion-hide-md-down sls-table-cell ion-no-margin center-any-object">
+                        <ion-item button (click)="this.onTableHeaderCellClickSortBy('IsReadReceipt')"
+                            color="transparent">
+                            <ion-label>
+                                Read
+                                <ion-icon *ngIf="this.filter.sortBy === 'IsReadReceipt'"
+                                    [name]="this.filter.sortAscending ? 'caret-down' : 'caret-up'"></ion-icon>
+                            </ion-label>
+                        </ion-item>
+                    </ion-col>
+                </ng-template>
+                <ng-template #otherSubView>
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.275"
+                        class="ion-hide-md-down sls-table-cell ion-no-margin center-any-object">
+                        {{this.messageCenterProvider.subView === 'inbox' ? 'Archive' : 'Restore'}}
+                    </ion-col>
+                </ng-template>
+                <ion-col
+                    [attr.size-xl]="this.messageCenterProvider.serverInfo.showReadReciepts === false && this.messageCenterProvider.subView === 'sent' ? '2' : '1'"
+                    [attr.size-lg]="this.messageCenterProvider.serverInfo.showReadReciepts === false && this.messageCenterProvider.subView === 'sent'? '2.5' : '1.25'"
+                    [attr.size-md]="this.messageCenterProvider.serverInfo.showReadReciepts === false && this.messageCenterProvider.subView === 'sent'? '2.4' : '1.125'"
+                    class="ion-hide-md-down sls-table-cell ion-no-margin center-any-object">
+                    Delete
+                </ion-col>
+                <ion-col size-xl="1" size-lg="1.25" size-md="1.5" size-sm="3" size-xs="3"
+                    class="sls-table-cell ion-no-margin center-any-object">
+                    <ion-item class="full-width-item center-any-object ion-no-padding" color="primary" lines="none">
+                        <ion-label style="font-size: 0.9rem; margin-right: 5px;">
+                            <ion-text>Select All</ion-text>
+                        </ion-label>
+                        <ion-checkbox [(ngModel)]="allSelected"
+                            [indeterminate]="this.messageCenterProvider.masterActions.someSelected"
+                            (click)="onCheckMaster($event)" color="success">
+                        </ion-checkbox>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+        </ion-list-header>
+        <!-- END of table Header -->
+        <!-- Active filter alert row -->
+        <ion-item *ngIf="this.filter.searchText.length" color="bootstrap-bg-warning">
+            <ion-buttons>
+                <ion-button color="danger" fill="outline" (click)="this.onClearSearchTextClick()">
+                    <b>Clear Search</b>
+                </ion-button>
+            </ion-buttons>
+            <ion-text style="padding-left: 10px;">Showing {{this.filter.start}} - {{this.filter.endOfMessages === true ? this.messageCenterProvider.renderedMessages.length : this.filter.numberToRender}} of {{this.messageCenterProvider.filteredAndSortedMessages.length}} messages that match of {{this.messageCenterProvider.cachedMessages.length}} total. </ion-text>
+        </ion-item>
+
+        <ion-infinite-scroll *ngIf="this.filter.start != 0" position="top" (ionInfinite)="this.onInfiniteScrollUpTriggered($event)">
+            <ion-infinite-scroll-content></ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+
+        <ion-row class="center-any-object">
+            <ion-button fill="outline" *ngIf="this.filter.start != 0" (click)="this.onInfiniteScrollUpTriggered($event)">
+            Load More Messages
+            </ion-button>
+        </ion-row>
+
+        <!-- Looped ion-item for the list of messages, filtered with messageTablefilter -->
+        <ion-item color="{{even ? 'mc-light' : 'white'}}" class="full-width-item ion-no-padding sls-table-item" *ngFor="let loopedCachedMessage of this.messageCenterProvider.cachedMessages
+             | messageTablefilter:{text:this.filter.searchText, size: this.filter.numberToRender, sortBy: this.filter.sortBy, sortAscending: this.filter.sortAscending, start: this.filter.start}; 
+             let i = index; even as even;" (click)="this.onMessageClick($event, loopedCachedMessage)" button>
+            <ion-row class="full-width-item ion-align-items-center sls-body-row ion-no-padding hide-overflow"
+                [style.font-weight]="this.messageCenterProvider.subView != 'sent' && loopedCachedMessage.IsReadReceipt === false ? 'bold': null">
+                <ion-col size-md="10" size-sm="9" size-xs="9" class="ion-hide-md-up sls-table-cell">
+                    <ion-label class="vert-center">
+                        <ion-icon [hidden]="!loopedCachedMessage.HasAttachement" name="document-attach-outline"></ion-icon>
+                        {{loopedCachedMessage.MsgSubject}}
+                        <p style="font-size: 0.8rem;"> <ion-text [innerHtml]="loopedCachedMessage.DisplayName"></ion-text> |
+                            {{loopedCachedMessage.DateCreated | date:'short'}}</p>
+                    </ion-label>
+                </ion-col>
+                <ion-col size-xl="1.5" size-lg="1.75" size-md="1.75" class="ion-hide-md-down sls-table-cell">
+                    <ion-label class="vert-center" [innerHtml]="loopedCachedMessage.DisplayName">  
+                    </ion-label>
+                </ion-col>
+                <ion-col size-xl="5.5" size-lg="4.3" size-md="4" class="ion-hide-md-down sls-table-cell">
+                    <ion-label class="vert-center">
+                        <ion-icon [hidden]="!loopedCachedMessage.HasAttachement" name="document-attach-outline"></ion-icon>
+                        {{loopedCachedMessage.MsgSubject}}
+                    </ion-label>
+                </ion-col>
+                <ion-col size-xl="2" size-lg="2.2" size-md="2.35"
+                    class="ion-hide-md-down sls-table-cell center-any-object">
+                    {{loopedCachedMessage.DateCreated | date:'short'}}
+                </ion-col>
+                <div *ngIf="this.messageCenterProvider.subView === 'sent'; then sentView else otherView"></div>
+                <ng-template #sentView>
+                    <div *ngIf="this.messageCenterProvider.serverInfo.showReadReciepts === true; then readRecieptView">
+                    </div>
+                    <ng-template #readRecieptView>
+                        <ion-col size-xl="1" size-lg="1.25" size-md="1.275"
+                            class="ion-hide-md-down sls-table-cell center-any-object">
+                            <ion-icon style="zoom:2.0;"
+                                [attr.name]="loopedCachedMessage.IsReadReceipt === true ? 'checkmark-circle-outline' : 'close-circle-outline'">
+                            </ion-icon>
+                        </ion-col>
+                    </ng-template>
+                    <ion-col
+                        [attr.size-xl]="this.messageCenterProvider.serverInfo.showReadReciepts === true ? '1' : '2'"
+                        [attr.size-lg]="this.messageCenterProvider.serverInfo.showReadReciepts === true ? '1.25' : '2.5'"
+                        [attr.size-md]="this.messageCenterProvider.serverInfo.showReadReciepts === true ? '1.125' : '2.4'"
+                        [ngSwitch]="this.messageCenterProvider.subView"
+                        class="ion-hide-md-down sls-table-cell center-any-object">
+                        <!-- Sent -->
+                        <ion-buttons *ngSwitchCase="'sent'">
+                            <ion-button color="danger" fill="outline"
+                                (click)="this.messageCenterProvider.onEradicateMessageClick($event, loopedCachedMessage, 'S')">
+                                <b>Delete</b>
+                            </ion-button>
+                        </ion-buttons>
+                    </ion-col>
+                </ng-template>
+                <ng-template #otherView>
+                    <!-- Inbox -->
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.275"
+                        *ngIf="this.messageCenterProvider.subView === 'inbox'"
+                        class="ion-hide-md-down sls-table-cell center-any-object">
+                        <ion-button color="primary" fill="outline"
+                            (click)="this.messageCenterProvider.onMoveMessageClick($event, loopedCachedMessage, 'A', true, 'active')">
+                            <b>Archive</b>
+                        </ion-button>
+                    </ion-col>
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.125"
+                        *ngIf="this.messageCenterProvider.subView === 'inbox'"
+                        class="ion-hide-md-down sls-table-cell center-any-object">
+                        <ion-button color="danger" fill="outline"
+                            (click)="this.messageCenterProvider.onMoveMessageClick($event, loopedCachedMessage, 'D', true, 'active')">
+                            <b>Delete</b>
+                        </ion-button>
+                    </ion-col>
+
+                    <!-- Trash -->
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.275"
+                        *ngIf="this.messageCenterProvider.subView === 'trash'"
+                        class="ion-hide-md-down sls-table-cell center-any-object">
+                        <ion-button color="success" fill="outline"
+                            (click)="this.messageCenterProvider.onMoveMessageClick($event, loopedCachedMessage, 'D', false, 'deleted')">
+                            <b>Restore</b>
+                        </ion-button>
+                    </ion-col>
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.125"
+                        *ngIf="this.messageCenterProvider.subView === 'trash'"
+                        class="ion-hide-md-down sls-table-cell center-any-object">
+                        <ion-button color="danger" fill="outline"
+                            (click)="this.messageCenterProvider.onEradicateMessageClick($event, loopedCachedMessage, 'E')">
+                            <b>Delete</b>
+                        </ion-button>
+                    </ion-col>
+
+                    <!-- Archive -->
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.275"
+                        *ngIf="this.messageCenterProvider.subView === 'archive'"
+                        class="ion-hide-md-down sls-table-cell center-any-object">
+                        <ion-button color="success" fill="outline"
+                            (click)="this.messageCenterProvider.onMoveMessageClick($event, loopedCachedMessage, 'A', false, 'archive')">
+                            <b>Restore</b>
+                        </ion-button>
+                    </ion-col>
+                    <ion-col size-xl="1" size-lg="1.25" size-md="1.125"
+                        *ngIf="this.messageCenterProvider.subView === 'archive'"
+                        class="ion-hide-md-down sls-table-cell center-any-object">
+                        <ion-button color="danger" fill="outline"
+                            (click)="this.messageCenterProvider.onMoveMessageClick($event, loopedCachedMessage, 'D', true, 'archive')">
+                            <b>Delete</b>
+                        </ion-button>
+                    </ion-col>
+                </ng-template>
+                <ion-col size-xl="1" size-lg="1.25" size-md="1.5" size-sm="3" size-xs="3"
+                    class="sls-table-cell ion-no-padding ion-no-margin center-any-object">
+                    <ion-item (click)="this.onCheckMessageClick($event)" class="transparent-ripple full-width-item"
+                        color="transparent" lines="none">
+                        <ion-checkbox class="transparent-ripple" [(ngModel)]="loopedCachedMessage.GUIData.isChecked"
+                            color="success" (ngModelChange)="this.onCheckMessageChange()">
+                        </ion-checkbox>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+        </ion-item>
+        <ion-item *ngIf="!this.messageCenterProvider.cachedMessages.length" color="light">
+            <ion-row>
+                <ion-text>
+                    No Messages.
+                </ion-text>
+            </ion-row>
+        </ion-item>
+        <ion-item *ngIf="this.filter.searchText && !this.messageCenterProvider.renderedMessages.length" color="light">
+            <ion-row>
+                <ion-text>
+                    No messages that match your search.
+                </ion-text>
+            </ion-row>
+        </ion-item>
+    </ion-list>
+</ion-card>
+<ion-text style="padding-left: 10px;" *ngIf="this.filter.searchText">
+    Showing {{this.filter.start}} - {{this.filter.endOfMessages === true ? this.messageCenterProvider.renderedMessages.length : this.filter.numberToRender}} of {{this.messageCenterProvider.filteredAndSortedMessages.length}} messages that match of {{this.messageCenterProvider.cachedMessages.length}} total.
+</ion-text>
+<ion-text style="padding-left: 10px;" *ngIf="!this.filter.searchText">
+    Showing {{this.filter.start}} - {{this.filter.endOfMessages === true ? this.messageCenterProvider.renderedMessages.length : this.filter.numberToRender}} of {{this.messageCenterProvider.cachedMessages.length}} Messages.
+</ion-text>
+<ion-row class="center-any-object">
+    <ion-button fill="outline" [hidden]="this.filter.endOfMessages" (click)="this.onInfiniteScrollDownTriggered($event)">
+    Load More Messages
+    </ion-button>
+</ion-row>
+<ion-infinite-scroll (ionInfinite)="this.onInfiniteScrollDownTriggered($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+</ion-infinite-scroll>

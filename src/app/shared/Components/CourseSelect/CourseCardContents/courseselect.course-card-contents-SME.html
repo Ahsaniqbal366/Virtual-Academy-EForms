@@ -1,0 +1,19 @@
+﻿<div class="md-body-1">
+    <div *ngIf="course.HasSMEDetails">
+        <div>
+            {{course.SME.Name}}
+        </div>
+        <div class="sme-brief-bio-label">
+            {{course.SME.Title}}
+        </div>
+        <div class="sme-brief-bio-label">
+            {{course.SME.Company}}
+        </div>
+    </div>
+    <div ng-show="course.HasDuration">
+        {{course.FormattedDurationText}}
+    </div>
+    <div ng-show="config.isCourseAssembly && course.HasCreditHours">
+        {{course.FormattedCreditHoursText}}
+    </div>
+</div>

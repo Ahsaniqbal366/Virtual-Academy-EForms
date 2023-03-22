@@ -1,0 +1,97 @@
+.announcements-page-wrapper {
+  .announcement-card-wrapper {
+    position: relative;
+    padding-bottom: 8px;
+
+    .announcement-creator-profile-pic {
+      border-radius: 50%;
+      height: 75px;
+      width: 75px;
+      /**
+     * Positioning the profile pic on the top-left of the .announcement-card,
+     * overlapping the borders a bit.
+     */
+      position: absolute;
+      top: -4px;
+      left: 4px;
+      z-index: 2;
+    }
+
+    .announcement-card {
+      // [#f1f1f1] & [#213357] colors taken directly from the TMS website announcement styles.
+      background-color: #f1f1f1;
+      color: #213357;
+
+      .announcement-title {
+        font-weight: bold;
+      }
+
+      .announcement-subtitle {
+        font-style: italic;
+      }
+
+      .announcement-header-profile-spacer {
+        width: 56px;
+      }
+
+      .announcement-content {
+        border-top: 1px solid var(--ion-color-secondary-shade);
+        padding-top: 16px;
+
+        p {
+          font-size: 18px;
+        }
+        img {
+          width: auto;
+          height: auto;
+          max-width: 100%;
+        }
+        video {
+          width: auto;
+          height: auto;
+          max-width: 100%;
+        }
+      }
+
+      .announcement-reaction-icon {
+        font-size: 24px;
+      }
+      .announcement-comments-wrapper {
+        padding: 8px;
+        background-color: #fff;
+      }
+
+      .announcement-comment-header-counter {
+        font-size: 16px;
+      }
+
+      .announcement-commentor-profile-pic {
+        border-radius: 50%;
+        height: 50px;
+        width: 50px;
+      }
+
+      // [.announcement-comment-item-wrapper] wraps a single announcement comment.
+      .announcement-comment-item-wrapper {
+        // Every other item needs a different color bg, like gray, white, gray, white...
+        &:nth-child(odd) {
+          // [#f1f1f1] color taken directly from the TMS website announcement styles.
+          background-color: #f1f1f1;
+        }
+
+        &.announcement-reply-comment {
+          // Indent reply comments to show they are nested below a parent.
+          padding-left: 40px;
+        }
+
+        .announcement-comment-text {
+          /**
+           * We use a [pre-wrap] css because that will preserve any spaces or line-breaks the user
+           * entered.
+           */
+          white-space: pre-wrap;
+        }
+      }
+    }
+  }
+}

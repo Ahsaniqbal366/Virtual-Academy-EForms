@@ -1,0 +1,31 @@
+<ion-header class="toolbar-background">
+  <ion-toolbar color="black" class="white-text">
+    <ion-buttons slot="start">
+      <ion-menu-button menuToggle></ion-menu-button>
+    </ion-buttons> 
+    <ion-title>
+      <img src="assets/images/VA-logo-horizontal.png">
+    </ion-title>
+    <ion-buttons slot="end" class="icons">
+      <ion-button (click)="signOut()">
+        <div>
+          <ion-icon name="walk"></ion-icon><br>
+          <label position="stacked">Log out</label>
+        </div>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+ 
+</ion-header>
+
+<ion-content>
+  <ion-card class="welcome-card">
+    <ion-card-header>      
+      <ion-card-title>Welcome to Virtual Academy!</ion-card-title>
+      <ion-card-subtitle>Sign in to get started.</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+<app-footer></app-footer>

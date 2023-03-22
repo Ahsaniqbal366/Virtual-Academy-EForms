@@ -1,0 +1,34 @@
+.mat-form-field-wrapper {
+    // Remove excessive bottom padding on <.mat-form-field-wrapper> elements.
+    padding-bottom: 0;
+  }
+  
+  .mat-form-field-appearance-outline {
+    // Keep "outline" mat-form-fields much shorter than the default.
+    .mat-form-field-infix {
+      padding: 8px 0;
+    }
+  
+    // Darken up the labels on "outline" form fields.
+    mat-label{
+        color: #444444;
+    }
+  }
+  // As the material is updated and mat -> mat-mdc- prefix changed
+
+  .mat-mdc-form-field-wrapper {
+    // Remove excessive bottom padding on <.mat-form-field-wrapper> elements.
+    padding-bottom: 0;
+  }
+  
+  .mat-mdc-form-field-appearance-outline {
+    // Keep "outline" mat-form-fields much shorter than the default.
+    .mat-mdc-form-field-infix {
+      padding: 8px 0;
+    }
+  
+    // Darken up the labels on "outline" form fields.
+    mat-mdc-label{
+        color: #444444;
+    }
+  }

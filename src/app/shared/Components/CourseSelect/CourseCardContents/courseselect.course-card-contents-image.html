@@ -1,0 +1,12 @@
+﻿<!--
+* We're using a seemingly usless wrapper div around the [.course-catalog-image-wrapper]
+element, but it's purpose is to keep the [.promo-video-play-button]
+element looking good on the image/button hover event.
+
+* Without this empty wrapper div the play button can appear as too
+large in some cases.-->
+<div>
+    <div class="course-catalog-image-wrappeer">
+        <img class="course-image" src="{{course.CourseCatalogImagePath}}" />
+    </div>
+</div>

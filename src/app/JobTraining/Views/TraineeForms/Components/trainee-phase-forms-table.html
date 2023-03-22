@@ -1,0 +1,202 @@
+<div class="trainee-forms-wrapper" *ngIf="this.initialized">
+  <ion-item *ngIf="!this.hasPhasesWithForms" lines="none">
+    <ion-row>
+      <ion-col>
+        <em>
+          No forms to show.
+        </em>
+      </ion-col>
+    </ion-row>
+  </ion-item>
+
+  <ion-list class="jt-table ion-no-padding" lines="full" *ngIf="this.hasPhasesWithForms">
+    <ion-header>
+      <!-- Search bar - shown when a form is open. 
+        Otherwise a search bar is shown on the parent view. 
+        -----
+        We are using [hidden] on the search bar so the connected 
+        search bar in the parent control can affect this (ionChange).
+        If we use *ngIf this searchbar can't listen for changes
+        from the parent quite as easily.
+        ----
+        [debounce] only makes us wait for the (ionChange) to run.
+        (ionInput) & (ionClear) will run immediately to show our loading spinner.-->
+      <ion-searchbar class="ion-no-padding" [hidden]="!this.traineeFormsService.hasFormOpenInInlineMode" debounce="300"
+        [(ngModel)]="this.traineeFormsService.searchTextboxInputValue"
+        (ionInput)="this.traineeFormsService.isSearching = true;"
+        (ionClear)="this.traineeFormsService.isSearching = true;" (ionChange)="this.setFilteredPhasesAndForms();">
+      </ion-searchbar>
+
+      <div *ngIf="this.traineeFormsService.isSearching" style="text-align: center;">
+        <ion-spinner></ion-spinner>
+      </div>
+
+      <ion-item color="primary" class="jt-table-row table-header-row ion-no-padding">
+        <ion-row class="full-width-item">
+          <ion-col class="jt-table-cell index-cell ion-text-center">
+            <ion-label>#</ion-label>
+          </ion-col>
+          <ion-col class="jt-table-cell">
+            <ion-label>Phase</ion-label>
+          </ion-col>
+          <!-- <ion-col class="jt-table-cell">
+          <ion-label>Date</ion-label>
+        </ion-col> -->
+          <ion-col class="jt-table-cell summary-cell" *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+            <ion-label>Summary</ion-label>
+          </ion-col>
+          <ion-col class="jt-table-cell status-cell" *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+            <ion-label>Status</ion-label>
+          </ion-col>
+          <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center"
+            *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+            <!-- Action/menu button -->
+          </ion-col>
+        </ion-row>
+      </ion-item>
+    </ion-header>
+    <div class="phase-list-wrapper">
+      <div *ngFor="let phase of this.filteredPhases; index as index;">
+        <div *ngIf="!phase.GUIData.IsHidden">
+          <ion-item button class="jt-table-row table-body-row ion-no-padding"
+            [ngClass]="{'phase-row-expanded' : phase.GUIData.Expanded}" (click)="onPhaseClick(phase)">
+            <ion-row class="full-width-item">
+              <ion-col class="jt-table-cell index-cell ion-text-center">
+                {{index + 1}}
+              </ion-col>
+              <ion-col class="jt-table-cell">
+                {{phase.Name}}
+              </ion-col>
+              <ion-col class="jt-table-cell" *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                <div *ngFor="let formattedData of phase.Summary.FormattedData">
+                  <!-- Example output of the summary layout HTML below.
+                  -----------
+                  Hours: 24
+                  -----------
+                -->
+                  <ion-label>
+                    {{formattedData.DataName}}:&nbsp;{{formattedData.DataValue}}
+                  </ion-label>
+                </div>
+              </ion-col>
+              <ion-col class="jt-table-cell status-cell ion-no-padding"
+                *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                <!-- Status cell shows a brief message like "Action Required" or "Signature Required"-->
+                <app-status-cell [statusMessage]="phase.Summary.Status.Text"
+                  [statusHoverMessage]="phase.Summary.Status.HoverText" [statusTheme]="phase.Summary.Status.Theme">
+                </app-status-cell>
+              </ion-col>
+              <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center"
+                *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                <ion-button fill="clear">
+                  <ion-icon *ngIf="phase.GUIData.Expanded" name="caret-dropup"></ion-icon>
+                  <ion-icon *ngIf="!phase.GUIData.Expanded" name="caret-dropdown"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-item>
+          <div *ngIf="phase.GUIData.Expanded" class="jt-table-nested-rows-wrapper">
+            <!-- Using <ng-container> here so that the nested content can be repeated w/ 
+              *ngFor without actually generating a parent element for each [phase.FormGroups].
+              It's to help with the even/odd css coloring of the nested table rows. -->
+            <ng-container *ngFor="let group of phase.FormGroups">
+              <ion-item button class="jt-table-row table-body-row inner-body-row ion-no-padding"
+                [ngClass]="{'form-group-row-expanded' : group.GUIData.Expanded}" (click)="this.onFormGroupClick(group);"
+                *ngIf="!group.GroupIsSingle">
+                <ion-row class="full-width-item">
+                  <ion-col class="jt-table-cell index-spacer-cell jt-spacer-cell">
+                    <!-- Spacer cell -->
+                  </ion-col>
+                  <ion-col class="jt-table-cell jt-table-cell-raised">
+                    {{group.GroupName}}
+                    <br>
+                    {{(group.GroupedFormsDate | date:'MM/dd/yyyy')}}
+                  </ion-col>
+                  <ion-col class="jt-table-cell" *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                    <ion-row>
+                      <ion-col *ngFor="let formattedData of group.Summary.FormattedData">
+                        <ion-label>
+                          <b>{{formattedData.DataName}}</b>:&nbsp;{{formattedData.DataValue}}
+                        </ion-label>
+                      </ion-col>
+                    </ion-row>
+                  </ion-col>
+                  <ion-col class="jt-table-cell status-cell ion-no-padding"
+                    *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                    <app-status-cell [statusMessage]="group.Summary.Status.Text"
+                      [statusTheme]="group.Summary.Status.Theme">
+                    </app-status-cell>
+                  </ion-col>
+                  <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center block-parent-event"
+                    *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                    <ion-button fill="clear">
+                      <ion-icon *ngIf="group.GUIData.Expanded" name="chevron-up"></ion-icon>
+                      <ion-icon *ngIf="!group.GUIData.Expanded" name="chevron-down"></ion-icon>
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </ion-item>
+              <ng-container *ngIf="group.GUIData.Expanded || group.GroupIsSingle">
+                <ion-item button class="jt-table-row table-body-row inner-body-row ion-no-padding"
+                  *ngFor="let form of group.TraineeFormRecords" (click)="this.onFormRowClick($event, form);"                  
+                  [ngClass]="{'jt-table-row-selected' : (form.RecordID === this.traineeFormsService.selectedTraineeFormRecordID)}">
+                  <ion-row class="full-width-item">
+                    <ion-col class="jt-table-cell index-spacer-cell jt-spacer-cell"
+                      [ngClass]="{'index-spacer-cell-double-wide': !group.GroupIsSingle}">
+                      <!-- Spacer cell -->
+                    </ion-col>
+                    <ion-col class="jt-table-cell jt-table-cell-raised">
+                      {{form.BasicFormInfo.Name}}
+                      <br>
+                      {{(form.Date | date:'MM/dd/yyyy')}}
+                    </ion-col>
+                    <ion-col class="jt-table-cell" *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                      <ion-row>
+                        <ion-col class="summary-inner-cell" *ngFor="let formattedData of form.Summary.FormattedData"
+                          size-xs="12" size-sm="12" size-md="auto">
+                          <ion-label>
+                            <b>{{formattedData.DataName}}</b>:&nbsp;{{formattedData.DataValue}}
+                          </ion-label>
+                        </ion-col>
+                        <ion-col class="summary-inner-cell" size-xs="12" size-sm="12" size-md="auto">
+                          <ion-label>
+                            <b>Owner:</b>&nbsp;{{form.FormOwners}}
+                          </ion-label>
+                        </ion-col>
+                      </ion-row>
+
+                    </ion-col>
+                    <ion-col class="jt-table-cell status-cell ion-no-padding"
+                      *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode">
+                      <app-status-cell [statusMessage]="form.Summary.Status.Text"
+                        [statusTheme]="form.Summary.Status.Theme">
+                      </app-status-cell>
+                    </ion-col>
+                    <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center block-parent-event"
+                      *ngIf="!this.traineeFormsService.hasFormOpenInInlineMode"
+                      (click)="this.onPopoverMenuButtonClick($event, form);">
+                      <ion-button [disabled]="!form.Permissions.CanEdit"
+                        [ngClass]="{'visibility-hidden' : !form.Permissions.CanEdit}"
+                        class="block-parent-event ion-float-right" fill="clear">
+                        <ion-icon name="menu" slot="icon-only"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-item>
+              </ng-container>
+            </ng-container>
+            <ion-item class="jt-table-row" *ngIf="!phase.GUIData.HasForms">
+              <ion-row>
+                <ion-col>
+                  <em>
+                    No forms to show.
+                  </em>
+                </ion-col>
+              </ion-row>
+            </ion-item>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ion-list>
+</div>

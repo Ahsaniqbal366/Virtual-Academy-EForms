@@ -1,0 +1,42 @@
+
+<ion-content *ngIf="!this.initialized">
+  <ion-list>
+    <ion-item>
+      <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+      <ion-label>
+        <h3>
+          <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+        </h3>
+        <p>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </p>
+        <p>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-content *ngIf="this.initialized" class="reporting-page-wrapper">
+  <ion-row class="header">
+   
+    <ion-col>
+      <div class="ion-text-start">
+        <ion-button class="md-raised " md-theme="success" type="button" (click)="onBackBtnClick()" fill="solid">
+          Back
+        </ion-button>
+      </div>
+
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <table datatable [dtOptions]="dtOptions" class="row-border hover" style="width:100%">
+
+
+      </table>
+    </ion-col>
+  </ion-row>
+
+</ion-content>

@@ -1,0 +1,22 @@
+<!-- The header has to be available if the ionic app is embedded in the DNN site so 
+  the user will have access to the "Back" icon buttons.
+  ----
+  However we don't want to show the 'dark' color or the ionic app menu buttons. -->
+<ion-toolbar [color]="this.headerColor">
+  <ion-buttons slot="start" [hidden]="this.hideBackButton">
+    <!-- This back button has [routerDirection="back"] attibute
+      to force navgation backwards in the ionic sense. -->
+    <ion-button [routerLink]="this.defaultHref" routerDirection="back" (click)="this.onBackButtonClick();">
+      <ion-icon name="arrow-back"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+  <ion-title>
+    {{this.headerText}}
+  </ion-title>
+  <ion-buttons slot="end">
+    <ion-menu-button *ngIf="!this.isDNNEmbeddedHeader"></ion-menu-button>
+    <ion-button *ngIf="this.isDNNEmbeddedHeader" (click)="this.onFullScreenButtonClick();">
+      <ion-icon name="expand"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>

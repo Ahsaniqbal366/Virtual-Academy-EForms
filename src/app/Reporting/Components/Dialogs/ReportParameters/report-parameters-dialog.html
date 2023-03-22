@@ -1,0 +1,125 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="this.dismiss(false);">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <span>
+        Additional Parameters
+      </span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content >
+  <ion-row>
+    <ion-col  class="ion-no-padding">
+        <div class="date-select-table" style="height:100%">
+            <ion-row class=" ">
+
+                <ion-col class=" ">
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col>
+                                <ion-label>Completion Status</ion-label>
+                                <ion-radio-group [(ngModel)]="this.reportingProvider.selectedCompletionStatus">
+
+
+                                    <ion-item>
+                                        <ion-label>All</ion-label>
+                                        <ion-radio value="a"></ion-radio>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label>Complete</ion-label>
+                                        <ion-radio value="c"></ion-radio>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label>Incomplete</ion-label>
+                                        <ion-radio value="i"></ion-radio>
+                                    </ion-item>
+
+
+                                </ion-radio-group>
+                            </ion-col>
+                        </ion-row>
+                        <ion-item-divider></ion-item-divider>
+                        <ion-row>
+                            <ion-col>
+                                <ion-label>Course Start Date</ion-label>
+                                <mat-form-field floatLabel="always" appearance="outline" style="width:100%;">
+
+                                    <mat-label>
+                                        Start
+                                    </mat-label>
+                                    <input matInput [matDatepicker]="startDatePicker" class="form-control"
+                                        [(ngModel)]="this.reportingProvider.courseStartRange">
+                                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #startDatePicker></mat-datepicker>
+                                </mat-form-field>
+
+
+
+                            </ion-col>
+
+                        </ion-row>
+                        <ion-row>
+                            <ion-col>
+                                <mat-form-field floatLabel="always" appearance="outline" style="width:100%;">
+
+                                    <mat-label>
+                                        End
+                                    </mat-label>
+                                    <input matInput [matDatepicker]="endDatePicker" class="form-control"
+                                        [(ngModel)]="this.reportingProvider.courseEndRange">
+                                    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #endDatePicker></mat-datepicker>
+                                </mat-form-field>
+                            </ion-col>
+                        </ion-row>
+                        <ion-item-divider></ion-item-divider>
+                        <ion-row>
+                            <ion-col>
+                                <ion-label>Completion Date</ion-label>
+                                <mat-form-field floatLabel="always" appearance="outline" style="width:100%;">
+
+                                    <mat-label>
+                                        Start
+                                    </mat-label>
+                                    <input matInput [matDatepicker]="completionStartDatePicker" class="form-control"
+                                        [(ngModel)]="this.reportingProvider.courseCompletionStartRange">
+                                    <mat-datepicker-toggle matSuffix [for]="completionStartDatePicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #completionStartDatePicker></mat-datepicker>
+                                </mat-form-field>
+
+
+
+                            </ion-col>
+
+                        </ion-row>
+                        <ion-row>
+                            <ion-col>
+                                <mat-form-field floatLabel="always" appearance="outline" style="width:100%;">
+
+                                    <mat-label>
+                                        End
+                                    </mat-label>
+                                    <input matInput [matDatepicker]="completionEndDatePicker" class="form-control"
+                                        [(ngModel)]="this.reportingProvider.courseCompletionEndRange">
+                                    <mat-datepicker-toggle matSuffix [for]="completionEndDatePicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #completionEndDatePicker></mat-datepicker>
+                                </mat-form-field>
+                            </ion-col>
+                        </ion-row>
+
+                    </ion-grid>
+                </ion-col>
+            </ion-row>
+        </div>
+    </ion-col>
+</ion-row>
+
+</ion-content>

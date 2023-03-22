@@ -1,0 +1,33 @@
+<ion-header>
+    <app-header [defaultHref]="'/home'" [headerText]="this.profilesProvider.headerText" [hideBackButton]="this.hideHeaderBackButton">
+    </app-header>
+</ion-header>
+
+<!-- Loading State: Skeleton Elements -->
+<ion-content *ngIf="!this.initialized">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
+<!-- Initialized State: Potentially in Error -->
+<ion-content [ngSwitch]="this.profilesProvider.subView" *ngIf="this.initialized" class="report-type-select-wrapper">
+    <sls-profiles-my-profile *ngSwitchCase="'myProfile'"></sls-profiles-my-profile>
+    <sls-profiles-main-roster *ngSwitchCase="'mainRoster'"></sls-profiles-main-roster>
+    <sls-profiles-main-roster *ngSwitchCase="'classroomRoster'"></sls-profiles-main-roster>
+    <div *ngSwitchDefault>
+        Page {{this.profilesProvider.subView}} Not Found
+    </div>
+</ion-content>

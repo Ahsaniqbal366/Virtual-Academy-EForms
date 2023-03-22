@@ -1,0 +1,133 @@
+<h2 mat-dialog-title
+  style="background-color: #1a43a9; color:white;" class="policy-modal-title ion-no-padding">
+  <ion-row style="padding-left: 10px;">
+    <ion-col>
+      {{ this.policiesInfo.friendlyName }} & {{ this.policiesInfo.policyNumber }}
+    </ion-col>
+    <ion-col size="auto">
+      <ion-button (click)="closeDialog();" fill="clear">
+        <ion-icon name="close" slot="icon-only" color="white"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</h2>
+<mat-dialog-content>
+  <!-- <ckeditor [data]="this.policiesInfo.description" [editor]="Editor"  disabled="true" ></ckeditor> -->
+  <ion-card class="responsiveCard card-shadow-effect" style="margin: 0 0 1em 0;">
+    <div class="table-heading" color="primary" style="text-align: left;">
+      <span style="font-weight: bold; letter-spacing: 1px;"> Detail </span>
+    </div>
+    <ion-card-content>
+      <ion-row>
+        <ion-col>
+          <div [innerHTML]="policiesInfo.description"></div>
+        </ion-col>
+      </ion-row>
+      <br />
+      <ngx-doc-viewer *ngIf="this.typeURL == 'PDF'" [url]="this.pdfURL" viewer="google"
+        style="width:100%;height:93vh;padding: 25px 0;" (loaded)="contentLoaded()">
+        <div>Loading</div>
+      </ngx-doc-viewer>
+      <img *ngIf="this.typeURL != 'PDF'" class="images" [src]="this.pdfURL" />
+    </ion-card-content>
+  </ion-card>
+
+  <ng-template [ngIf]="isAssessment">
+    <ng-container
+      *ngIf="policiesAssesment && policiesAssesment.policyAssessmentQuestions.length as length; else loadingOutlet">
+      <p style="margin: 2em 0 0 0; font-weight: bold;" *ngIf="!policyAssessmentStatusId">Please complete the assessment before signing the acknowledgement below.</p>
+      <ion-card class="responsiveCard card-shadow-effect" style="margin: 1em 0 1em 0;">
+        <div class="table-heading" color="primary" style="text-align: left;">
+          <span style="font-weight: bold; letter-spacing: 1px;"> Assessment Question: <span
+              class="badge badge-light">{{questionPreviewIndex+1}} / {{length}} </span></span>
+        </div>
+        <form [formGroup]="AssesmentFormGroup">
+          <ion-card-content>
+            <ion-row *ngIf="input">
+              <ion-col>
+                <h4>{{input.questionBody}}</h4>
+                <mat-radio-group [disabled]="policyAssessmentStatusId"
+                  formControlName="q-{{input.policyAssessmentQuestionId}}" class="tp-radio-group assesment-radio-group"
+                  style="display: grid;">
+                  <mat-radio-button color="primary" class="tp-radio-button assesment-radio-button"
+                    *ngFor="let option of input.policyAssessmentAnswers; let i = index"
+                    [checked]="option.policyAssessmentAnswerId == option?.userSelected"
+                    [value]="option.policyAssessmentAnswerId"
+                    [disabled]="policyAssessmentStatusId"
+                    (change)="radioChange($event, option, input.policyAssessmentAnswers)">
+                    {{option.answerBody}}
+                    <!-- id="q-{{input.policyAssessmentQuestionId}}-option-{{option.policyAssessmentAnswerId}}" -->
+                  </mat-radio-button>
+                </mat-radio-group>
+                <div>
+                  <ion-button *ngIf="(questionPreviewIndex < (length - 1))" style="float: right" mat-button
+                    class="button-medium" color="primary" title="Next"
+                    (click)="nextValidator(input.policyAssessmentQuestionId, input.policyAssessmentAnswers)">
+                    Next
+                  </ion-button>
+
+                  <!--policyAssessmentStatusId false indicate that policy submitable -->
+                  <ion-button [disabled]="assessmentStatus"
+                    *ngIf="questionPreviewIndex == (length - 1) && this.policyAssessmentStatusId == false"
+                    id="submitClose" class="button-medium button-solid" style="float: right" color="success"
+                    (click)="submitAssessment(input.policyAssessmentQuestionId, input.policyAssessmentAnswers)">
+                    Submit
+                  </ion-button>
+
+                  <ion-button *ngIf="questionPreviewIndex >= 1" style="float: right" mat-button title="Back"
+                    (click)="navigateBack()" class="button-medium" color="secondary">
+                    Previous
+                  </ion-button>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+          <!-- <h2>Assesment-[{{i+1}}/{{this.policiesAssesmentNumber}}]</h2> -->
+        </form>
+      </ion-card>
+    </ng-container>
+    <ng-template #loadingOutlet>
+      <ng-container *ngTemplateOutlet="loadingSkeleton"></ng-container>
+    </ng-template>
+  </ng-template>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+  <ion-row *ngIf="policiesDetail" style="align-items: center; width: 100%;">
+    <ion-col size="10">
+      <mat-checkbox [checked]="policiesDetail.hasAcknowledged" color="primary" (change)="toggleEditable($event)"
+        [disabled]="policiesDetail.hasAcknowledged"></mat-checkbox>
+      <mat-label style="margin-left: 18px;">Click here to indicate that you have read and understood the attached
+        materials</mat-label>
+    </ion-col>
+    <ion-col size="2">
+      <ng-container *ngIf="isAssessment; else enabledAcknowledged">
+        <ion-button *ngIf="(!policiesDetail.hasAcknowledged)" id="submitClose" class="button-medium button-solid"
+          [disabled]="!assessmentStatus" style="float: right" color="success" (click)="acknowledgeAssessment()">
+          Done
+        </ion-button>
+      </ng-container>
+
+      <ng-template #enabledAcknowledged>
+        <ion-button *ngIf="(!policiesDetail.hasAcknowledged)" id="submitClose" class="button-medium button-solid"
+          style="float: right" color="success" (click)="acknowledgeAssessment()">
+          Done
+        </ion-button>
+      </ng-template>
+    </ion-col>
+  </ion-row>
+</mat-dialog-actions>
+
+
+<ng-template #loadingSkeleton>
+  <ion-card-header>
+    <ion-skeleton-text animated style="width:100%; height:30px"></ion-skeleton-text>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-row>
+      <ion-col>
+        <sls-skeleton-table [rows]="3" [columns]="6"></sls-skeleton-table>
+      </ion-col>
+    </ion-row>
+  </ion-card-content>
+</ng-template>

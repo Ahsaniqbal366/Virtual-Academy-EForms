@@ -1,0 +1,45 @@
+<ion-header class="toolbar-background">
+    <ion-toolbar color="black" class="white-text">
+      
+      <ion-title>
+        <img src="assets/images/VA-logo-horizontal.png">
+      </ion-title>
+      
+        <form (ngSubmit)="onSignin(form)" #form="ngForm" slot="end" class="toolbar-background login-form">
+          <input type="text"
+              id="username" 
+              name="username" 
+              placeholder="Username"
+              class="center-vertical rounded-input"
+              autocomplete="username"
+              ngModel/>
+          <input type="password"
+              id="password" 
+              name="password" 
+              placeholder="Password"
+              class="center-vertical rounded-input"
+              autocomplete="current-password"
+              (keyup.enter)="onSignin(form)"
+              ngModel/>
+
+    
+          <ion-button type="submit" color="tms-gold"
+              [disabled]="!form.valid">
+              Sign In
+          </ion-button>
+          <ion-button type="button" (click)="showTechsupportModal()" color="tms-gold" class="techsupportbutton">
+            <ion-icon name="chatbubbles" slot="icon-only"></ion-icon>
+          </ion-button>
+      </form>
+    </ion-toolbar>
+    
+  </ion-header>
+  
+  <ion-content>
+    <ion-card >
+      <ion-card-content>
+        Sign in in the form above to navigate to the home page
+      </ion-card-content>
+    </ion-card>
+  </ion-content>
+  

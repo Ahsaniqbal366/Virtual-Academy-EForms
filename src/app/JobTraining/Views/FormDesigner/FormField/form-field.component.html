@@ -1,0 +1,170 @@
+<div>
+  <ion-item-divider>
+    <ion-row class="full-width-item ion-align-items-center">
+      <ion-col>
+        Edit field #{{this.fieldInfo.SortOrder}} for <u>{{this.categoryInfo.Name}}</u> category
+      </ion-col>
+      <ion-col size="auto">
+        <ion-button fill="outline" (click)="this.onCloseClick();">
+          Close
+        </ion-button>
+        <ion-button color="success" fill="outline" (click)="this.onSubmitClick();">
+          Save Changes
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-item-divider>
+  <div>
+    <ion-item>
+      <ion-row class="full-width-item ion-align-items-center">
+        <ion-col class="ion-no-padding">
+          <span *ngIf="!this.fieldInfo.IsDeleted">
+            Field is enabled.
+          </span>
+          <ion-label color="danger" *ngIf="this.fieldInfo.IsDeleted">
+            Field has been disabled.
+          </ion-label>
+        </ion-col>
+        <ion-col size="auto">
+          <ion-button *ngIf="!this.fieldInfo.IsDeleted" color="danger" fill="outline"
+            (click)="this.onDisableFieldClick();">
+            Disable Field
+          </ion-button>
+          <ion-button *ngIf="this.fieldInfo.IsDeleted" color="success" fill="outline"
+            (click)="this.onEnableFieldClick();">
+            Enable Field
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        Field Type: {{this.fieldInfo.FieldType.FriendlyName}}
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-row class="full-width-item">
+        <ion-col size="auto" style="padding-left: 0;">
+          <ion-label>
+            Field Text:
+          </ion-label>
+        </ion-col>
+        <ion-col>
+          <textarea style="width: 100%;" class="form-control" placeholder="Field text..."
+            [disabled]="this.fieldInfo.IsDeleted" [(ngModel)]="this.fieldInfo.Text"></textarea>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+    <ion-item [hidden]="this.fieldInfo.IsDeleted">
+      <ion-checkbox color="primary" [(ngModel)]="this.fieldInfo.IsOptional">
+      </ion-checkbox>
+      &nbsp;
+      <ion-label>
+        Optional
+      </ion-label>
+    </ion-item>
+    <ion-item [hidden]="this.fieldInfo.IsDeleted">
+      <ion-checkbox color="primary" [(ngModel)]="this.fieldInfo.CanHaveFeedback">
+      </ion-checkbox>
+      &nbsp;
+      <ion-label>
+        Can Have Feedback
+      </ion-label>
+    </ion-item>
+    <!-- Some fields can optionally show signature info. We hide this control if the fieldType is 
+      already a signature. -->
+    <ion-item [hidden]="this.fieldInfo.IsDeleted" *ngIf="this.fieldInfo.FieldType.Type !== 'Signature'">
+      <ion-checkbox color="primary" [(ngModel)]="this.fieldInfo.ShowSignatureInfo">
+      </ion-checkbox>
+      &nbsp;
+      <ion-label>
+        Show Signature Info (who & when)
+      </ion-label>
+    </ion-item>
+
+    <!-- <br>
+        "EditPermissionTypeID": {{this.fieldInfo.EditPermissionTypeID}},
+        <br> -->
+
+    <div *ngIf="this.fieldInfo.FieldType.CanHaveOptions" [hidden]="this.fieldInfo.IsDeleted">
+      <ion-item-divider>
+        Options
+      </ion-item-divider>
+      <ion-list lines="full" class="jt-table ion-no-padding" color="secondary">
+        <ion-item color="primary" class="jt-table-row table-header-row ion-no-padding">
+          <ion-row class="full-width-item">
+            <ion-col class="jt-table-cell action-button-cell ion-text-center">
+              <ion-label>#</ion-label>
+            </ion-col>
+            <ion-col class="jt-table-cell">
+              <ion-label>Text</ion-label>
+            </ion-col>
+            <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center">
+              <!-- Popover or other actions column -->
+              <!-- Header cell holds the "+" record button. -->
+              <ion-button color="success" title="Add Option" (click)="this.onAddOptionClick();">
+                <ion-icon name="add"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-item>
+        <!-- Warning messages, like "no data" & stuff.
+            - Shown on the jt-table because that table also holds the +Form button.-->
+        <ng-container *ngFor="let warning of this.optionsWarnings">
+          <ion-item [color]="warning.Color">
+            <em>
+              {{warning.Message}}
+            </em>
+          </ion-item>
+        </ng-container>
+        <ion-reorder-group disabled="false" (ionItemReorder)="this.onOptionReorder($event)">
+          <div *ngFor="let option of this.fieldInfo.Options;" class="jt-table-row inner-body-row table-body-row">
+            <ion-item class="ion-no-padding">
+              <ion-row class="full-width-item">
+                <ion-col class="jt-table-cell action-button-cell ion-text-center">
+                  <ion-reorder>
+                    <ion-button fill="clear">
+                      <ion-icon name="move"></ion-icon>
+                    </ion-button>
+                  </ion-reorder>
+                </ion-col>
+                <ion-col class="jt-table-cell jt-table-cell-raised">
+                  <input placeholder="Text" type="text" class="form-control" [(ngModel)]="option.Text"
+                    [hidden]="option.IsDeleted">
+                  <div *ngIf="option.IsDeleted">
+                    {{option.Text}}
+                  </div>
+                </ion-col>
+                <ion-col class="jt-table-cell action-button-cell jt-table-no-border-right ion-text-center">
+                  <ion-button *ngIf="!option.IsDeleted" fill="outline" title="Remove option" color="danger"
+                    (click)="this.onRemoveOptionClick(option);">
+                    <ion-icon name="close"></ion-icon>
+                  </ion-button>
+                  <ion-button *ngIf="option.IsDeleted" fill="outline" title="Restore option" color="success"
+                    (click)="this.onRestoreOptionClick(option);">
+                    <ion-icon name="refresh"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-item>
+            <!-- Record disabled warning message -->
+            <div class="jt-table-nested-rows-wrapper" *ngIf="option.IsDeleted">
+              <ion-item class="jt-table-row table-body-row inner-body-row ion-no-padding">
+                <ion-row class="full-width-item">
+                  <ion-col class="jt-table-cell action-button-cell jt-spacer-cell ion-no-padding">
+                    <!-- Spacer cell -->
+                  </ion-col>
+                  <ion-col class="jt-table-cell ion-no-padding">
+                    <ion-item lines="none" color="danger">
+                      This option has been disabled.
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-item>
+            </div>
+          </div>
+        </ion-reorder-group>
+      </ion-list>
+    </div>
+  </div>
+</div>

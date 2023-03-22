@@ -1,0 +1,157 @@
+<!-- Header -->
+<ion-header #header class="activeCourses-page-wrapper">
+    <app-header [defaultHref]="'/home'" [headerText]="'ActiveCourses'" [hideBackButton]="false"></app-header>
+    <ion-toolbar>
+        <!-- Instructions, Archive button, and search bar -->
+        <ion-row justify-content-between *ngIf="hasActiveCourses">
+            <!-- Instructions -->
+            <ion-col size-xs="12" size-sm="8" size-md="5">
+                <ion-text>
+                    Click on a course to start your training.
+                </ion-text>
+            </ion-col>
+            <!-- Course Archive Button -->
+            <ion-col size-xs="12" size-sm="4" size-md="3">
+                <ion-button class="ion-float-md-left ion-float-sm-right">
+                    <ion-label>
+                        Course Archive
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <!-- Search bar -->
+            <ion-col size-xs="12" size-sm="12" size-md="4">
+                <ion-searchbar animated placeholder="Search"></ion-searchbar>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+    <!-- Category tabs -->
+    <ion-radio-group *ngIf="initialized && !failedToLoadActiveCourses" [(ngModel)]="selectedCategoryID"
+        (ionChange)="onCategoryChanged($event, null)">
+        <ion-row class="space-evenly">
+            <!-- We're relying on <ion-item> here to help with a couple of things:
+            1. Helps the <ion-radio> options be more easily clickable.
+            2. Hides the usage of <ion-radio> and allows styling to match tabs. -->
+            <ion-item *ngFor="let category of catalogCategories"
+                color="{{category.GUIData.isSelected ? 'secondary' : ''}}"
+                [class.selected-category-item]="category.GUIData.isSelected" class="radio-category-item-wrapper"
+                lines="none">
+                <ion-label>{{category.CategoryName}}</ion-label>
+                <ion-radio class="category-radio" (ionSelect)="onCategoryChanged($event, category)" color="primary"
+                    [value]="category.CategoryID">
+                </ion-radio>
+            </ion-item>
+        </ion-row>
+    </ion-radio-group>
+</ion-header>
+
+<!-- Loading-->
+<ion-content *ngIf="!initialized">
+    <ion-list>
+        <ion-item>
+            <ion-skeleton-text animated style="width: 27px; height: 27px" slot="start"></ion-skeleton-text>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
+
+<!--
+    Content, using the [appHideHeader] directive to auto hide the #header when this content scrolls
+-->
+<ion-content scrollEvents="true" appHideHeader [header]="header" *ngIf="initialized" class="activeCourses-page-wrapper">
+
+    <!-- Error case - [getActiveCourses] API call failed. Show error message about why. -->
+    <ion-item *ngIf="failedToLoadActiveCourses" color="danger">
+        <span>
+            {{activeCoursesErrorMessage}}
+        </span>
+        &nbsp;
+        <span>
+            ActiveCourses cannot be loaded at this time.
+        </span>
+    </ion-item>
+
+    <!-- Success case -->
+    <div *ngIf="!failedToLoadActiveCourses">
+        <!-- Lack of courses case -->
+        <ion-item *ngIf="!hasActiveCourses">
+            <em>
+                There are no activeCourses...
+            </em>
+        </ion-item>
+
+        <!-- Depending on screen size, we'll use up to 3 columns to display the course cards -->
+        <ion-row>
+            <!-- Looping the course-wrapper, which is a parent of the column, so each course has it's own column -->
+            <ion-col class="activeCourse-card-wrapper" *ngFor="let activeCourse of filteredActiveCourses" size-xs="12"
+                size-md="6" size-xl="4">
+                <ion-card class="activeCourse-card">
+                    <ion-card-header>
+                        <ion-card-title class="activeCourse-title">
+                            {{activeCourse.CourseName}}
+                        </ion-card-title>
+                    </ion-card-header>
+                    <div class="card-divider">
+                        <!-- Divider element to draw a border between the instructions text & likert info.-->
+                    </div>
+                    <ion-card-content>
+                        <ion-row>
+                            <!-- Course Image -->
+                            <ion-thumbnail class="activeCourse-Thumbnail">
+                                <ion-img class="course-image" [src]="activeCourse.CourseCatalogImagePath">
+                                </ion-img>
+                                <ion-buttons *ngIf="activeCourse.HasPromoVideo">
+                                    <ion-button class="preview-button"
+                                        (click)="onPreviewClick($event, activeCourse.PromoVideoPath, activeCourse.CourseName)">
+                                        <ion-icon class="preview-button-icon" name="play">
+                                        </ion-icon>
+                                    </ion-button>
+                                </ion-buttons>
+                            </ion-thumbnail>
+                            <div class="course-info-wrapper">
+                                <!-- SME -->
+                                <ion-list class="course-info-list">
+                                    <ion-text *ngIf="activeCourse.HasSMEDetails">
+                                        {{activeCourse.SME.Name}}
+                                        <br />
+                                    </ion-text>
+                                    <ion-text *ngIf="activeCourse.HasSMEDetails" color="tms-dark-grey">
+                                        {{activeCourse.SME.Title}}
+                                        <br />
+                                    </ion-text>
+                                    <ion-text *ngIf="activeCourse.HasSMEDetails" color="tms-dark-grey">
+                                        {{activeCourse.SME.Company}}
+                                        <br />
+                                    </ion-text>
+                                    <ion-text *ngIf="activeCourse.HasDuration" color="tms-dark-grey">
+                                        {{activeCourse.FormattedDurationText}}
+                                        <br />
+                                    </ion-text>
+                                </ion-list>
+                                <!-- Description Popover Button -->
+                                <ion-item *ngIf="activeCourse.HasCourseDescription"
+                                    (click)="onPopoverDescriptionButtonClick($event, activeCourse.CourseDescription)"
+                                    button lines="none" class="ion-float-right ion-text-end course-description-button">
+                                    <ion-text>
+                                        <ion-icon name="information-circle-outline"></ion-icon>
+                                        Description
+                                        <br />
+                                    </ion-text>
+                                </ion-item>
+                            </div>
+                        </ion-row>
+                    </ion-card-content>
+                </ion-card>
+            </ion-col>
+        </ion-row>
+    </div>
+</ion-content>

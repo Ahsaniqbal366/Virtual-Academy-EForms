@@ -1,0 +1,68 @@
+<h2 *ngIf="this.isRenew" mat-dialog-title style="background-color: #1a43a9; color:white; padding: 0 0 0 24px !important;" class="policy-modal-title">
+  <ion-row class="full-width-item ion-align-items-center">
+    <ion-col style="padding-left: 14px;">
+      Add Assessment Questions
+    </ion-col>
+    <ion-col size="auto">
+<ion-button (click)="this.closeDialog()" id="questionClose" fill="clear" class="prev-policy-close" style="float: right;">
+  <ion-icon name="close" slot="icon-only" color="white"></ion-icon>
+</ion-button>
+    </ion-col>
+  </ion-row>
+</h2>
+<mat-dialog-content class="assesment-dialog-content" >
+  <form #addressForm="ngForm" (ngSubmit)="logValue()">
+    <ion-row>
+      <ion-col size="12">
+        <ion-item id="row" *ngFor="let questioninput of addPolicyQuestions; let i = index;">
+          <ion-button *ngIf="i > 0" class="question-close" (click)="this.removeQuestion(i)" fill="clear">
+            <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-card #card class="full-width-item" id="newCard" style="border-radius: 13px; padding: 5px 0 25px;">
+            <ion-card-content style="padding:20px;">
+              <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false">
+                <mat-label>Question {{i+1}}</mat-label> <!-- {{questioninput.key  || 'q-'+i}} -->
+                <input class="form-control" matInput [(ngModel)]="questioninput.questionBody" name="{{questioninput.key  || 'q-'+i}}" (change)="onChangeQuestionEvent($event)">
+                <!-- <mat-error *ngIf="questioninput.questionBody.invalid">
+                  {{this.getFieldErrorMessage(questioninput.questionBody)}}
+                </mat-error> -->
+              </mat-form-field>
+              <ion-item class="no-border-width" id="questionNum{{i}}" *ngFor="let optioninput of questioninput.policyAssessmentAnswers ; let j = index">
+                <mat-checkbox [checked]="optioninput.isCorrect" [disabled]="optioninput.isCorrect" (change)="checkboxToggle($event, optioninput, questioninput)" color="primary" class="my_checkbox"></mat-checkbox>
+                <mat-form-field class="full-width-item" floatLabel="always" appearance="outline" hideRequiredMarker="false" style="padding:0 8px;">
+                  <mat-label>Option {{j+1}}</mat-label>  <!-- {{optioninput.key || 'q-'+i+'-opt-'+j}} -->
+                  <!-- <input class="form-control" id="question{{i}}option{{j}}" matInput name="question{{i}}option_{{j}}" "> -->
+                  <input class="form-control" matInput [(ngModel)]="optioninput.answerBody" name="{{optioninput.key || 'q-'+i+'-opt-'+j}}" (change)="onChangeOptionEvent($event, optioninput, i, j)">
+                </mat-form-field>
+                <ion-button  *ngIf="j > 0" class="option-close" (click)="this.removeOption(j, i)" fill="clear">
+                  <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+                </ion-button>
+              </ion-item>
+              <ion-button style="margin: 10px 37%;" class="option-add" (click)="this.addOption(i, questioninput)" fill="clear">
+                 Add Option
+                <ion-icon name="add-circle" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <!-- <ion-col class="add-question-position" size="auto"> -->
+        <ion-button expand="block" class="button-small button-solid" style="margin: auto; width: 88%;"
+          (click)="addNewQuestion()">
+          Add Question
+        </ion-button>
+      </ion-col>
+      <!-- </ion-col> -->
+      <ion-col size="12">
+        <ion-button *ngIf="this.isRenew" expand="block" id="submitClose" class="button-small button-solid"
+          style="margin-left: 74%; width: 20%;" color="success" (click)="submitOnUpdate()">
+          Submit
+        </ion-button>
+      </ion-col>
+    </ion-row>
+</form>
+
+</mat-dialog-content>

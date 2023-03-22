@@ -1,0 +1,24 @@
+<ion-content>
+    <ion-list>
+        <ion-item color="secondary">
+            {{this.traineeFormRecordInfo.BasicFormInfo.Name}}
+        </ion-item>
+        <ion-item>
+            <ion-label>
+                Change Phase
+            </ion-label>
+            <ion-select placeholder="Phase" (click)="$event.stopPropagation()"
+                [(ngModel)]="this.traineeFormRecordInfo.PhaseID" (ionChange)="dismissPopover('changeFormPhase')">
+                <ion-select-option *ngFor="let phaseOption of this.jobTrainingService.selectedProgram.Phases"
+                    [value]="phaseOption.PhaseID">
+                    {{phaseOption.Name}}</ion-select-option>
+            </ion-select>
+        </ion-item>
+        <ion-item button (click)="this.dismissPopover('removeForm');">
+            Remove
+        </ion-item>
+        <ion-item button (click)="this.dismissPopover('close');">
+            Close
+        </ion-item>
+    </ion-list>
+</ion-content>

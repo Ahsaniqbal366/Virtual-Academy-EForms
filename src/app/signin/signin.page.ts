@@ -1,0 +1,65 @@
+import { Component, OnInit } from "@angular/core";
+import { NgForm } from "@angular/forms";
+import { AuthService } from "./providers/auth.service";
+import { Router } from "@angular/router";
+import { MatDialog } from "@angular/material/dialog";
+import { TechSupportDialogComponent } from "./tech-support-dialog/tech-support-dialog.component";
+import { ToastService } from "../shared/Toast.Service";
+import { IonicLoadingService } from '../shared/Ionic.Loading.Service';
+
+// define component
+@Component({
+  selector: "app-signin",
+  templateUrl: "signin.page.html",
+  styleUrls: ["signin.page.scss"],
+})
+
+// create class for export
+export class SigninPage implements OnInit {
+  private selectedItem: any;
+
+  // constructor -- define service provider
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    public dialog: MatDialog,
+    private loadingService: IonicLoadingService,
+    public toast: ToastService
+  ) {}
+
+  ngOnInit() {
+    //validate jwtToken here. this will check if it exists, then check server to make sure its valid
+    this.authService.JWTIsValid().subscribe((isValid) => {
+      //if valid, push users to home
+      if (isValid) {
+         this.router.navigate(["/home"]);
+      } 
+    });
+  }
+
+  onSignin(form: NgForm) {
+    //get username and password from the form
+    const username = form.value.username;
+    const password = form.value.password;
+    this.loadingService.presentLoading('Signing in');
+    //try to sign in user 
+    this.authService.signin(username, password).subscribe(
+      //if we get a success, then navigate home
+      (response: any) => {
+        this.loadingService.dismissLoading();
+        this.router.navigate(["/home"]);
+      },
+      //else present error as toast
+      (error) => {
+        this.loadingService.dismissLoading();
+        console.log("signin-error: ", error);
+        //JLP 7/10/20 removed this as a popup already shows up
+        //this.toast.presentToast(error.publicResponseMessage);
+      }
+    );
+  }
+
+  showTechsupportModal(): void {
+    this.dialog.open(TechSupportDialogComponent);
+  }
+}

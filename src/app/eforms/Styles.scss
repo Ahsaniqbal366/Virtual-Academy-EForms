@@ -1,0 +1,311 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$an-formio-demo-primary: mat.define-palette(mat.$indigo-palette);
+$an-formio-demo-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$an-formio-demo-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$an-formio-demo-theme: mat.define-light-theme((color: (primary: $an-formio-demo-primary,
+                accent: $an-formio-demo-accent,
+                warn: $an-formio-demo-warn,
+            )));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($an-formio-demo-theme);
+
+/* You can add global styles to this file, and also import other style files */
+
+// @font-face {
+//     font-family: ABeeZee-regular;
+//     src: url(assets//fonts/ABeeZee/ABeeZee-Regular.ttf) format("opentype");
+// }
+
+// @font-face {
+//     font-family: ABeeZee-italic;
+//     src: url(assets//fonts/ABeeZee/ABeeZee-Italic.ttf) format("opentype");
+// }
+
+* {
+    font-family: ABeeZee-regular !important;
+}
+
+.cutomm {
+    color: #95c602 !important;
+    font-size: larger;
+    font-weight: bold;
+}
+
+
+pre {
+    font-weight: 400;
+
+    .number-line {
+        color: #adadaf;
+    }
+
+    .string {
+        color: #95c602;
+    }
+
+    .number {
+        color: #f2b619;
+    }
+
+    .boolean {
+        color: #0097f1;
+    }
+
+    .null {
+        color: #727990;
+    }
+
+    .key {
+        color: #fff;
+    }
+}
+
+
+
+.text-w-icon {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+    color: inherit;
+    font-size: inherit;
+    background: none;
+    text-decoration: none;
+    margin: 0;
+}
+
+
+.icon-display-0_8x {
+    transform: scale(0.8);
+}
+
+html {
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'ABeeZee', sans-serif !important;
+}
+
+ul,
+li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    display: block;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin: 0px;
+    padding: 0px;
+}
+
+button {
+    cursor: pointer;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+
+// tabs-style
+
+.Tabs-wrapper {
+    .mat-mdc-tab-group.custom-tabs {
+        .mat-mdc-tab-header {
+            max-width: 350px;
+            margin-top: 20px;
+
+            // &::before {
+            //     content: "";
+            //     position: absolute;
+            //     width: 100%;
+            //     height: 2px;
+            //     background-color: #CFD8DC;
+            //     bottom: 0;
+            //     left: 0;
+            // }
+        }
+
+        .mat-mdc-tab-body-wrapper {
+            .mat-mdc-tab-body.ng-tns-c204-0.mat-mdc-tab-body-active.ng-star-inserted {
+                border-top: 1px solid #CFD8DC;
+                padding-top: 42px;
+
+            }
+        }
+    }
+}
+
+.mat-mdc-tab-body-wrapper {
+    border-top: 1px solid #CFD8DC;
+    padding-top: 42px;
+
+    .mat-mdc-tab-body {
+        .mat-mdc-tab-body-content {
+            border: 1px solid #CFD8DC;
+        }
+
+    }
+}
+
+.table-wrapper {
+    table {
+
+        thead {
+            tr {
+
+
+                th {
+                    font-weight: 400;
+                    font-size: 12px;
+                    line-height: 20px;
+                    color: #000000;
+                    height: 58px;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                &:nth-child(odd) {
+                    td {
+
+                        background-color: #F7F7FA;
+                    }
+                }
+
+                td {
+                    font-weight: 400;
+                    font-size: 12px;
+                    line-height: 20px;
+                    color: #555555;
+                    height: 58px;
+
+                }
+            }
+        }
+    }
+}
+
+.mat-mdc-menu-panel.mat-mdc-menu-panel.custom-table-menu {
+    .mat-mdc-menu-content {
+        width: 123px;
+        max-width: 123px;
+    }
+}
+
+.mat-mdc-menu-item.mat-mdc-focus-indicator.mdc-list-item.single-menu-item.ng-tns-c77-0 {
+    padding: 0 4px;
+    min-height: 24px;
+
+    .mdc-list-item__primary-text {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        span {
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 24px;
+            color: #000000;
+            white-space: nowrap;
+        }
+    }
+}
+
+.mat-mdc-paginator.custom-pagination {
+    .mat-mdc-paginator-outer-container {
+        .mat-mdc-paginator-page-size.ng-star-inserted {
+            .mat-mdc-form-field.mat-form-field-appearance-outline {
+                width: 60px;
+
+                .mat-mdc-text-field-wrapper.mdc-text-field {
+                    .mat-mdc-form-field-flex.ng-tns-c99-7 {
+                        .mdc-notched-outline {
+                            border: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-end {
+    border-radius: 0px !important;
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-start {
+    border-radius: 0px !important;
+}
+
+.mdc-text-field--outlined .mdc-notched-outline .mdc-notched-outline__trailing,
+.mdc-notched-outline__leading {
+    outline-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+.a {
+color: #0097f1 !important;
+}

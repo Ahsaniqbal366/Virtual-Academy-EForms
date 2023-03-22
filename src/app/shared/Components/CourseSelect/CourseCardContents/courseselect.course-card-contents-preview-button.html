@@ -1,0 +1,12 @@
+<div *ngIf="config.ShowPreview && (course.HasPromoVideo || course.CanShowFullCoursePreview)">
+    <ion-button fill="clear"
+               style="width: 100%;margin:0;"
+               class="promo-video-play-button"
+                (click)="this.onPreviewBtnClick($event);">
+                
+               <ion-icon name="caret-forward-outline" style="font-size: 20px;"></ion-icon>
+        <div>
+            {{config.PreviewText}}
+        </div>
+    </ion-button>
+</div>

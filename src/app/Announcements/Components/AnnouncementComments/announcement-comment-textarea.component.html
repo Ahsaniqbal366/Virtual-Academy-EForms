@@ -1,0 +1,36 @@
+<ion-textarea #commentTextarea class="form-control full-width-item" [(ngModel)]="this.commentTextareaModel"    
+    disabled="{{comment.GUIData.IsSaving}}"
+    autoGrow="true"
+    spellcheck="true"
+    (ngModelChange)="this.onAnnouncementCommentTextareaChange();"
+    maxlength="{{this.ANNOUNCEMENT_COMMENT_MAX_CHARS}}" placeholder="Leave a comment.">
+</ion-textarea>
+<ion-row class="ion-align-items-center">
+    <ion-col size="auto" class="no-padding">
+        <span *ngIf="!comment.GUIData.IsSaving">
+            <!-- Real comment save/submit button -->
+            <ion-button size="small"
+                (click)="this.onSubmitAnnouncementCommentClick();">
+                Submit
+            </ion-button>
+            <ion-button size="small" *ngIf="this.showCancelButton"
+                (click)="this.onCancelAnnouncementCommentClick();">
+                Cancel
+            </ion-button>
+        </span>
+
+        <!-- Mock button shown while the comment is saving. -->
+        <ion-button size="small" *ngIf="comment.GUIData.IsSaving" disabled="disabled">
+            <ion-spinner name="crescent"></ion-spinner>
+            &nbsp;
+            Submitting...
+        </ion-button>
+    </ion-col>
+    <!-- Comment char counter text. Hidden when saving to help w/ small screen 
+                                                responsiveness.-->
+    <ion-col *ngIf="!comment.GUIData.IsSaving">
+        <span class="ion-float-right ion-text-right">
+            {{this.remainingCharactersMessage}}            
+        </span>
+    </ion-col>
+</ion-row>
